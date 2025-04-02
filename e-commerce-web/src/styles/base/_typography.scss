@@ -1,0 +1,91 @@
+@use "../abstracts/colors" as c;
+@use "../abstracts/functions" as fn;
+@use "../abstracts/variables" as gv;
+
+a,
+a:visited,
+a:active {
+  cursor: pointer;
+}
+
+a[disabled],
+.disabled-link {
+  color: c.$disable-text-color;
+  cursor: not-allowed;
+  pointer-events: none;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+h1 {
+  font-size: fn.rem(40); //fallback
+  font-size: fn.get_clamp(40px, 72px);
+}
+
+h2 {
+  font-size: fn.rem(24); //fallback
+  font-size: fn.get_clamp(24px, 32px);
+}
+
+h3 {
+  font-size: fn.rem(36); //fallback
+  font-size: fn.get_clamp(36px, 48px);
+}
+
+h4 {
+  font-size: fn.rem(21); //fallback
+  font-size: fn.get_clamp(21px, 24px);
+  color: c.$dark-text-color;
+}
+
+label,
+p,
+span,
+time,
+select option {
+  font-size: 0.75rem;
+  font-size: fn.get_clamp(12px, 14px);
+}
+
+label {
+  font-weight: 500;
+}
+
+svg {
+  background-size: contain;
+  font-size: 1.5em;
+  width: 25px;
+  height: 25px;
+}
+
+summary {
+  list-style: none;
+  list-style-type: none;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary:focus {
+  outline: none;
+}
+
+summary:focus a.button {
+  border: 2px solid white;
+}
+
+summary:focus {
+  outline: none;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}

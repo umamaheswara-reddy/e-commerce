@@ -1,0 +1,83 @@
+// -----------------------------------------------------------------------------
+// This file contains all application-wide Sass functions.
+// -----------------------------------------------------------------------------
+
+@use "sass:math";
+@use "./variables" as gv;
+
+/// Native `url(..)` function wrapper
+/// @param {String} $base - base URL for the asset
+/// @param {String} $type - asset type folder (e.g. `fonts/`)
+/// @param {String} $path - asset path
+/// @return $base-url
+@function asset($base, $type, $path) {
+  @return url($base + $type + $path);
+}
+
+/// Returns URL to an image based on its path
+/// @param {String} $path - image path
+/// @param {String} $base [$base-url] - base URL
+/// @return {Url}
+/// @require $base-url
+@function image($path, $base: $base-url) {
+  @return asset($base, "images/", $path);
+}
+
+/// Returns URL to a font based on its path
+/// @param {String} $path - font path
+/// @param {String} $base [$base-url] - base URL
+/// @return {Url}
+/// @require $base-url
+@function font($path, $base: $base-url) {
+  @return asset($base, "fonts/", $path);
+}
+
+/// Returns rem value by converting pixels
+@function rem($px, $b-px: 16) {
+  @if math.is-unitless($px) {
+    @return math.div($px, $b-px) + rem;
+  } @else {
+    @error "Don't use units when using rem() function.";
+  }
+}
+
+/// Returns em value by converting pixels
+@function em($px, $b-px: 16) {
+  @if math.is-unitless($px) {
+    @return math.div($px, $b-px) + em;
+  } @else {
+    @error "Don't use units when using em() function.";
+  }
+}
+
+@function round($number, $decimals: 4) {
+  $n: 1;
+  @for $i from 1 through $decimals {
+    $n: $n * 10;
+  }
+  @return math.div(math.round($number * $n), $n);
+}
+
+@function px-to-rem($px) {
+  $rems: math.div($px, 16px) * 1rem;
+  @return $rems;
+}
+
+@function get_clamp(
+  $min-size,
+  $max-size,
+  $min-breakpoint: gv.$default-min-bp,
+  $max-breakpoint: gv.$default-max-bp,
+  $unit: vw
+) {
+  $slope: math.div($max-size - $min-size, $max-breakpoint - $min-breakpoint);
+  $slope-to-unit: round($slope * 100, 2);
+  $intercept-rem: round(px-to-rem($min-size - $slope * $min-breakpoint), 2);
+  $min-size-rem: round(px-to-rem($min-size), 2);
+  $max-size-rem: round(px-to-rem($max-size), 2);
+  @return clamp(
+    #{$min-size-rem},
+    #{$slope-to-unit}#{$unit} + #{$intercept-rem},
+    #{$max-size-rem}
+  );
+}

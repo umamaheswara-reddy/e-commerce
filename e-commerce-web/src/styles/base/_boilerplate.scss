@@ -1,0 +1,19 @@
+@use "./fonts" as f;
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  font-family: f.$font;
+  background-color: var(--body-bg-color);
+}

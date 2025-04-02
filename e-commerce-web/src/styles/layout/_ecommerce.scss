@@ -1,0 +1,32 @@
+@use "../abstracts/functions" as fn;
+@use "../abstracts/breakpoints" as bp;
+
+.utility {
+  display: flex;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  $u-padding: clamp(0.1875rem, 0.1625rem + 0.125vw, 0.3125rem);
+
+  app-header {
+    .topnav {
+      &__brand,
+      &__content {
+        padding-inline: $u-padding;
+      }
+
+      &__brand {
+        @include bp.breakpoint-down(medium) {
+          justify-content: center;
+        }
+      }
+    }
+  }
+
+  &__main {
+    padding: $u-padding;
+  }
+}

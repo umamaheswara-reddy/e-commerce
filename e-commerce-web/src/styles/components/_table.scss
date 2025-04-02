@@ -1,0 +1,188 @@
+@use "../abstracts" as *;
+@use "../abstracts/variables" as gv;
+
+$table-header-bg-color: #e8eff7;
+$table-header-col-separator-color: #38849f;
+
+table {
+  width: 100%;
+  caption-side: top;
+  border-collapse: separate;
+  border-spacing: 0 2px;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
+
+  caption {
+    padding-block: 0;
+  }
+
+  th,
+  td,
+  span {
+    font-size: 0.75rem;
+    font-size: clamp(0.75rem, 0.7143rem + 0.1787vw, 0.875rem);
+  }
+
+  th,
+  td {
+    padding: 2px;
+  }
+
+  th span i {
+    cursor: pointer;
+  }
+
+  thead {
+    background-color: gv.$gray-light;
+
+    th {
+      position: relative;
+      padding: 7px 8px;
+      line-height: 1.2;
+      font-weight: 500;
+      white-space: nowrap;
+
+      span {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      svg {
+        width: 17px;
+        height: 11px;
+      }
+    }
+
+    th:first-child {
+      border-top-left-radius: 2px;
+      border-bottom-left-radius: 2px;
+    }
+    th:last-child {
+      border-top-right-radius: 2px;
+      border-bottom-right-radius: 2px;
+    }
+  }
+
+  tbody tr {
+    td {
+      padding-left: 8px;
+    }
+  }
+}
+
+.table-container {
+  table {
+    th {
+      &:not(:first-of-type)::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 20%;
+        bottom: 20%;
+        width: 0.05rem;
+        background-color: $table-header-col-separator-color;
+      }
+    }
+
+    .clickable {
+      cursor: pointer;
+    }
+
+    .column-head {
+      cursor: pointer;
+    }
+
+    .column-head {
+      cursor: pointer;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 3px;
+      border-radius: 2px;
+      border: 1px solid grey;
+      transition: border-color 0.3s ease;
+
+      &:focus {
+        border-color: #1a5eac;
+        outline: none;
+      }
+    }
+
+    form-select .custom-select button.form-select {
+      svg {
+        height: 17px;
+      }
+      padding-block: 3px;
+      padding-left: 3px;
+      border-bottom: none !important;
+      border: 1px solid grey !important;
+    }
+
+    input:focus {
+      box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1),
+        0 0 0 1px rgba(0, 120, 212, 0.5);
+    }
+
+    .parent-row {
+      font-weight: 500;
+    }
+
+    .clear-filter-icon {
+      cursor: pointer;
+    }
+  }
+
+  .table-overlay {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+  }
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+
+  button {
+    margin: 0 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 5px;
+  }
+
+  button[disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  button[disabled] svg use {
+    fill: grey;
+  }
+
+  button:not([disabled]) svg use {
+    fill: gv.$primary-color;
+  }
+
+  span {
+    margin: 0 10px;
+  }
+}
+
+@mixin table-separator {
+  th:nth-child(2) {
+    &::before {
+      @content;
+    }
+  }
+}

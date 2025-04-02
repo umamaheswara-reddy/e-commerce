@@ -1,0 +1,22 @@
+%f-r {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+%f-c {
+  display: flex;
+  flex-direction: column;
+}
+
+%f-jc-ai-c {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+%full-size {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+}

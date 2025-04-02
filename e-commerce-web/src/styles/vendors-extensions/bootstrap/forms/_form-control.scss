@@ -1,0 +1,102 @@
+@use "../../../abstracts/variables" as gv;
+@use "../../../abstracts/functions" as fn;
+
+:root {
+  --bs-form-invalid-border-color: red;
+}
+
+.form-control {
+  border-radius: 2px;
+  transition: border-color 0.2s ease;
+  font-size: 0.75rem;
+  font-size: fn.get_clamp(12px, 14px);
+
+  &:focus {
+    box-shadow: inset 0 0 0 1px gv.$primary-color;
+  }
+}
+
+// .was-validated .form-control:valid:focus,
+// .form-control.is-valid:focus {
+//   box-shadow: none;
+// }
+
+// .form-control.is-invalid {
+//   border-color: var(--bs-form-invalid-border-color);
+// }
+
+// .was-validated .form-control:invalid:focus,
+// .form-control.is-invalid:focus {
+//   box-shadow: none;
+//   border-radius: 0px;
+// }
+
+// .was-validated .form-control:invalid,
+// .form-control.is-invalid {
+//   background-image: none;
+//   border-radius: 0px;
+// }
+
+// .was-validated .form-select:valid:not([multiple]):not([size]),
+// .was-validated .form-select:valid:not([multiple])[size="1"],
+// .form-select.is-valid:not([multiple]):not([size]),
+// .form-select.is-valid:not([multiple])[size="1"] {
+//   --bs-form-select-bg-icon: none;
+// }
+
+.is-invalid,
+.is-valid {
+  background-image: none !important;
+}
+
+.was-validated .form-control:invalid:focus,
+.form-control.is-invalid:focus {
+  box-shadow: none !important;
+  border-color: red !important;
+}
+
+.form-control.is-invalid {
+  border-color: red !important;
+}
+
+.form-control:focus {
+  border-color: #0a58ca !important;
+}
+
+.custom-input-control {
+  padding: 5px;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  border-radius: 2px;
+}
+
+.was-validated .custom-input-control:invalid:focus,
+.custom-input-control.is-invalid:focus {
+  box-shadow: none !important;
+  border-color: red !important;
+  border-radius: 0px !important;
+}
+
+.was-validated .custom-input-control:invalid,
+.custom-input-control.is-invalid {
+  border-radius: 0px !important;
+}
+
+.custom-input-control:focus {
+  border-color: #0a58ca;
+  border-radius: 0px !important;
+  border-bottom: 2px solid #0a58ca !important;
+  box-shadow: none !important;
+}
+
+.was-validated .form-control:valid,
+.form-control.is-valid {
+  background-image: none !important;
+}
+
+.was-validated .form-select:valid:not([multiple]):not([size]),
+.was-validated .form-select:valid:not([multiple])[size="1"],
+.form-select.is-valid:not([multiple]):not([size]),
+.form-select.is-valid:not([multiple])[size="1"] {
+  --bs-form-select-bg-icon: none !important;
+}

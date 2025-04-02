@@ -1,0 +1,13 @@
+@use "sass:color";
+
+//colors
+$primary-color: #1b5eac;
+$secondary-color: #f9c50b;
+
+// gray colors
+$gray: #6c757d; // Mid-neutral gray as the base value
+$gray-light: color.adjust($gray, $lightness: 50%);
+
+// Breakpoints
+$default-min-bp: 320px;
+$default-max-bp: 1440px;
