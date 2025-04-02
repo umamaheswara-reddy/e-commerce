@@ -2,6 +2,6 @@ import { Routes } from '@angular/router';
 import { CheckoutComponent } from './checkout/checkout.component';
 
 export const routes: Routes = [
-    {path: '', redirectTo: 'checkout', pathMatch: 'full'},
-    {path: 'checkout', loadComponent: () => import('./checkout/checkout.component').then(m => m.CheckoutComponent)}
+    {path: '', redirectTo: 'cart', pathMatch: 'full'},
+    {path: 'cart', loadComponent: () => import('./cart/cart.component').then(m => m.CartComponent)}
 ];

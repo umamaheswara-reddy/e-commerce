@@ -20,22 +20,26 @@ a[disabled],
 h1 {
   font-size: fn.rem(40); //fallback
   font-size: fn.get_clamp(40px, 72px);
+  font-weight: 400;
 }
 
 h2 {
   font-size: fn.rem(24); //fallback
   font-size: fn.get_clamp(24px, 32px);
+  font-weight: 400;
 }
 
 h3 {
   font-size: fn.rem(36); //fallback
   font-size: fn.get_clamp(36px, 48px);
+  font-weight: 400;
 }
 
 h4 {
   font-size: fn.rem(21); //fallback
   font-size: fn.get_clamp(21px, 24px);
   color: c.$dark-text-color;
+  font-weight: 400;
 }
 
 label,
