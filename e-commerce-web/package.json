@@ -44,7 +44,7 @@
     "typescript": "^5.8.2"
   },
   "overrides": {
-    "glob":"^11.0.1",
-    "rimraf":"^5.0.10"
+    "glob": "^11.0.1",
+    "rimraf": "^5.0.10"
   }
 }
