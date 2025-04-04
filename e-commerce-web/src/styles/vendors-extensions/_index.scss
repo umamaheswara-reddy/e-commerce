@@ -1,1 +1,5 @@
-@use "bootstrap/scss/bootstrap";
+@use "bootstrap/variables" as *;
+@use "bootstrap/scss/bootstrap" with (
+    $body-bg: $body-bg,
+    $font-family-base: $font-family-base,
+);

@@ -1,0 +1,8 @@
+@use "../../base/fonts" as f;
+/* override bootstrap scss variables */
+
+// fonts
+$font-family-base: f.$font;
+
+// colors
+$body-bg: #EAEDED;
