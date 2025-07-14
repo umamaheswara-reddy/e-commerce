@@ -1,0 +1,30 @@
+# AiDE Rules for Personal E-Commerce Project
+
+This file captures important patterns, preferences, and project intelligence to help AiDE work more effectively on this project.
+
+## 1. Core Philosophy
+
+- **Memento First:** Always consult the `memento/` directory at the start of any session to regain context. The Memento is the single source of truth for the project's architecture, goals, and progress.
+- **Documentation is Key:** Any significant change in architecture, technology, or process must be reflected in the Memento. `activeContext.md` and `progress.md` should be updated regularly.
+
+## 2. Technical Patterns
+
+### Frontend (Angular)
+- **Component Structure:** Strive for small, single-responsibility components. Use `OnPush` change detection where possible to optimize performance.
+- **State Management:** For now, rely on component state and services. If complexity grows, we will re-evaluate and potentially introduce a state management library like NgRx or Elf.
+- **Styling:** Use SCSS and follow the existing structure in `src/styles`. Leverage Angular Material components and theming.
+
+### Backend (.NET)
+- **Project Structure:** Follow standard .NET Web API project structure. Use a clean architecture approach with distinct layers for Domain, Application, and Infrastructure.
+- **API Design:** Adhere to RESTful principles. Use clear and consistent naming for endpoints.
+- **Error Handling:** Implement global error handling middleware to catch and format exceptions consistently.
+
+## 3. Tool Usage Patterns
+
+- **Commits:** Commits should be small and atomic, representing a single logical change.
+- **File Edits:** Prefer `replace_in_file` for targeted changes to avoid accidental overwrites. Use `write_to_file` for new files or complete refactors of existing ones.
+
+## 4. User Preferences & Workflow
+
+- **Clarity over brevity:** When presenting plans or updates, provide enough detail to be clear and unambiguous.
+- **Visuals are good:** Use Mermaid diagrams to illustrate complex architectural concepts when helpful.
