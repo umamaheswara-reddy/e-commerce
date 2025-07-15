@@ -19,8 +19,8 @@ This document provides an overview of the technologies, development setup, and t
 - **Caching:** Redis (for basket/cart)
 
 ### Authentication
-- **Provider:** Azure AD B2C
-- **Policies:** Custom policies using the Identity Experience Framework (IEF)
+- **Provider:** Microsoft Entra External ID
+- **User Flows:** Standard user flows for sign-up, sign-in, etc.
 
 ### DevOps & Deployment
 - **Containerization:** Docker
@@ -38,5 +38,5 @@ This document provides an overview of the technologies, development setup, and t
 - **.NET Version:** The project is standardized on .NET 9. All backend services must use this version to ensure consistency.
 - **Angular Version:** The frontend will use a recent version of Angular (19/20) to leverage the latest features and performance improvements.
 - **Stateless Services:** Backend services should be designed to be stateless wherever possible to facilitate horizontal scaling. State, when required (like the user's basket), will be managed in an external store like Redis.
-- **JWT Validation:** Each microservice must be configured to validate JWTs issued by Azure AD B2C. This will involve fetching the public keys from the B2C tenant and validating the token's signature, issuer, and audience.
+- **JWT Validation:** Each microservice must be configured to validate JWTs issued by Microsoft Entra External ID. This will involve fetching the public keys from the tenant's metadata endpoint and validating the token's signature, issuer, and audience.
 - **Polyrepo Management:** While a polyrepo structure offers independence, it also introduces challenges in managing dependencies and ensuring consistent configurations across services. A clear strategy for versioning and shared libraries will be needed.

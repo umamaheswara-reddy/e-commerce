@@ -24,7 +24,7 @@ graph TD
     end
 
     subgraph "Authentication"
-        G[Azure AD B2C]
+        G[Microsoft Entra External ID]
     end
 
     subgraph "Event Bus"
@@ -61,7 +61,7 @@ graph TD
 - **Microservices:** The backend is split into distinct services based on business capabilities (Catalog, Basket, Orders, Payment). This enhances modularity, scalability, and maintainability.
 - **API Gateway (Ocelot):** A single entry point for the frontend to interact with the backend services. It handles request routing, aggregation, and cross-cutting concerns like authentication and logging.
 - **Event-Driven Communication (RabbitMQ):** Services will communicate asynchronously using an event bus. This decouples services and improves resilience. For example, when an order is created, the Orders service will publish an `OrderCreated` event, which other services (like Payment) can subscribe to.
-- **Externalized Authentication (Azure AD B2C):** Authentication is delegated to a managed service. This simplifies the architecture by removing the need for a dedicated Identity microservice and leverages a robust, scalable, and secure identity solution. All microservices will be responsible for validating the JWTs issued by B2C.
+- **Externalized Authentication (Microsoft Entra External ID):** Authentication is delegated to a managed service. This simplifies the architecture by removing the need for a dedicated Identity microservice and leverages a robust, scalable, and secure identity solution. All microservices will be responsible for validating the JWTs issued by Entra External ID.
 - **Containerization (Docker):** All backend services will be containerized, ensuring consistency across all environments and simplifying deployment.
 
 ## 3. Design Patterns

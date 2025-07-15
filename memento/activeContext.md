@@ -4,22 +4,24 @@ This document tracks the current work focus, recent changes, and next steps for 
 
 ## 1. Current Work Focus
 
-The current focus is on the initial project setup and documentation. We are establishing the foundational context for the project by creating the Memento files. This ensures that the project's goals, architecture, and technical stack are clearly defined before any code is written.
+The current focus is on implementing authentication using **Microsoft Entra External ID**. This involves configuring the new External ID tenant, registering the frontend application, creating user flows, and integrating the Angular application with MSAL.
 
 ## 2. Recent Changes
 
-- **Initialized Memento:** Created the core Memento documentation:
-  - `projectbrief.md`: Defines the overall project scope and goals.
-  - `productContext.md`: Outlines the product vision and user experience goals.
-  - `systemPatterns.md`: Describes the microservices architecture and design patterns.
-  - `techContext.md`: Details the technical stack and development environment.
+- **Pivoted Authentication Provider:** Made the key architectural decision to switch from the legacy Azure AD B2C to the modern **Microsoft Entra External ID** after discovering B2C is no longer available for new customers.
+- **Created External ID Tenant:** Successfully created the new tenant.
+- **Updated Memento:** Updated `projectbrief.md`, `techContext.md`, and `systemPatterns.md` to reflect the pivot to Microsoft Entra External ID.
 
 ## 3. Next Steps
 
-- **Create `progress.md`:** The final core Memento file, `progress.md`, needs to be created to track the project's status, what is working, and what is left to build.
-- **Establish `.aiderules`:** Create the `.aiderules` file to start capturing project-specific patterns and intelligence.
-- **Begin Scaffolding:** Once the Memento is fully established, the next logical step is to begin scaffolding the project structure, starting with the frontend Angular application and the initial backend microservices.
+- **Register the SPA in Entra External ID:** Create a new application registration for the Angular frontend.
+- **Create a User Flow:** Set up a "Sign up and sign in" user flow for customers.
+- **Configure Angular with MSAL:**
+  - Install MSAL packages.
+  - Configure the MSAL module with the new tenant's details (Client ID, Authority).
+  - Implement login/logout functionality.
+- **Update `progress.md`:** Reflect the new authentication tasks in the progress tracker.
 
 ## 4. Active Decisions & Considerations
 
-- **Memento First:** The immediate decision is to complete the Memento documentation before proceeding with any development. This ensures a solid foundation and clear direction for the project.
+- **Authentication Pivot:** The decision to use Microsoft Entra External ID is final. This ensures the project is built on a modern, supported platform. All new authentication work will be based on this technology.

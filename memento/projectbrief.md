@@ -10,7 +10,7 @@ The project is a full-stack e-commerce application featuring a frontend, a micro
 
 - **Frontend:** Angular (19/20) with Angular Material (MDC components).
 - **Backend:** .NET 9 Web API, structured as microservices.
-- **Authentication:** Azure AD B2C with custom policies (Identity Experience Framework). Frontend interaction via MSAL.
+- **Authentication:** Microsoft Entra External ID. Frontend interaction via MSAL.
 - **API Gateway:** Ocelot.
 - **Event-Driven Communication:** RabbitMQ.
 - **Database:** PostgreSQL on Supabase.
@@ -25,7 +25,7 @@ The project is a full-stack e-commerce application featuring a frontend, a micro
 
 - **Structure:** Polyrepo.
 - **Backend Architecture:** Microservices.
-  - Identity (handled by Azure AD B2C)
+  - Identity (handled by Microsoft Entra External ID)
   - Catalog
   - Basket
   - Orders
@@ -37,7 +37,7 @@ The project is a full-stack e-commerce application featuring a frontend, a micro
 
 ## 4. Key Architectural Intentions
 
-- **Authentication:** The Identity microservice is replaced by Azure AD B2C's hosted flows. All other microservices will validate JWTs issued by B2C.
+- **Authentication:** The Identity microservice is replaced by Microsoft Entra External ID's hosted flows. All other microservices will validate JWTs issued by Entra External ID.
 - **Event-Driven:** Microservices will communicate asynchronously via RabbitMQ to ensure loose coupling and scalability.
 - **Containerization:** All services will be containerized with Docker for consistency across development, testing, and production environments.
 - **Cloud-Native:** The application will be deployed to a combination of cloud services (Firebase, Supabase) and orchestrated with Kubernetes, reflecting modern cloud-native patterns.
