@@ -20,6 +20,8 @@
     "@angular/platform-server": "^19.2.14",
     "@angular/router": "^19.2.14",
     "@angular/ssr": "^19.2.15",
+    "@azure/msal-angular": "^4.0.15",
+    "@azure/msal-browser": "^4.15.0",
     "bootstrap": "^5.3.3",
     "express": "^5.1.0",
     "glob": "^11.0.1",

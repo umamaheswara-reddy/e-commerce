@@ -1,0 +1,22 @@
+<div class="container">
+  <div class="header">
+    <h1>
+      Welcome to {{ title }}!
+    </h1>
+  </div>
+
+  <div class="content">
+    <div *ngIf="!loginDisplay">
+      <p>Please sign-in to continue.</p>
+      <button (click)="login()">Login</button>
+    </div>
+
+    <div *ngIf="loginDisplay">
+      <p>You are logged in!</p>
+      <p>Welcome, {{ this.authService.instance.getActiveAccount()?.name }}</p>
+      <button (click)="logout()">Logout</button>
+    </div>
+  </div>
+</div>
+
+<router-outlet></router-outlet>
