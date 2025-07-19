@@ -1,62 +1,63 @@
-import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
+// src/app/app.config.ts
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
-import { MsalGuard, MsalInterceptor, MsalService, MsalBroadcastService, MSAL_INSTANCE, MsalRedirectComponent, MsalGuardConfiguration, MSAL_GUARD_CONFIG, MsalInterceptorConfiguration, MSAL_INTERCEPTOR_CONFIG } from '@azure/msal-angular';
-import { IPublicClientApplication, PublicClientApplication, InteractionType, BrowserCacheLocation, LogLevel } from '@azure/msal-browser';
-import { msalConfigFactory, loginRequest, protectedResources } from './auth-config';
+
+import {
+  MSAL_INSTANCE,
+  MSAL_GUARD_CONFIG,
+  MSAL_INTERCEPTOR_CONFIG,
+  MsalBroadcastService,
+  MsalGuard,
+  MsalModule,
+  MsalRedirectComponent,
+  MsalService
+} from '@azure/msal-angular';
+
+import {
+  IPublicClientApplication,
+  PublicClientApplication,
+  InteractionType,
+  BrowserCacheLocation
+} from '@azure/msal-browser';
+import { msalConfigFactory } from './auth-config';
 import { PLATFORM_ID } from '@angular/core';
 
-export function MSALInstanceFactory(platformId: Object): IPublicClientApplication {
-  const msalInstance = new PublicClientApplication(msalConfigFactory(platformId));
-  msalInstance.initialize();
-  return msalInstance;
-}
-
-export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
-  const protectedResourceMap = new Map<string, Array<string>>();
-
-  return {
-    interactionType: InteractionType.Redirect,
-    protectedResourceMap
-  };
-}
-
-export function MSALGuardConfigFactory(): MsalGuardConfiguration {
-  return {
-    interactionType: InteractionType.Redirect,
-    authRequest: loginRequest
-  };
+export function msalInstanceFactory(platformId: Object): IPublicClientApplication {
+  return new PublicClientApplication(msalConfigFactory(platformId));
 }
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
-    provideClientHydration(withEventReplay()),
     provideHttpClient(withInterceptorsFromDi()),
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: MsalInterceptor,
-      multi: true
-    },
+    provideRouter(routes),
+    importProvidersFrom(MsalModule),
+    importProvidersFrom(MsalRedirectComponent),
     {
       provide: MSAL_INSTANCE,
-      useFactory: MSALInstanceFactory,
-      deps: [PLATFORM_ID]
+      useFactory: msalInstanceFactory
     },
     {
       provide: MSAL_GUARD_CONFIG,
-      useFactory: MSALGuardConfigFactory
+      useValue: {
+        interactionType: InteractionType.Redirect,
+        authRequest: {
+          scopes: ['openid', 'profile', 'email']
+        }
+      }
     },
     {
       provide: MSAL_INTERCEPTOR_CONFIG,
-      useFactory: MSALInterceptorConfigFactory
+      useValue: {
+        interactionType: InteractionType.Redirect,
+        protectedResourceMap: new Map([
+          ['https://graph.microsoft.com/v1.0/me', ['User.Read']]
+        ])
+      }
     },
     MsalService,
     MsalGuard,
-    MsalBroadcastService,
-    MsalRedirectComponent
+    MsalBroadcastService
   ]
 };
