@@ -1,8 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { MsalService, MsalBroadcastService } from '@azure/msal-angular';
-import { EventType, AuthenticationResult } from '@azure/msal-browser';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
+import { MsalService, MsalBroadcastService } from '@azure/msal-angular';
+import { EventType, AuthenticationResult } from '@azure/msal-browser';
 
 @Component({
   selector: 'app-root',
@@ -11,44 +11,40 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   private msalService = inject(MsalService);
   private msalBroadcastService = inject(MsalBroadcastService);
 
-  loggedIn = false;
-  username = '';
+  private account = signal(this.msalService.instance.getActiveAccount());
+  readonly loggedIn = computed(() => !!this.account());
+  readonly username = computed(() => this.account()?.username ?? '');
 
-  async ngOnInit(): Promise<void> {
+  constructor() {
+    this.initAuth();
+    this.setupBroadcastListener();
+  }
 
+  private async initAuth() {
     try {
-      // ✅ Wait until MSAL is initialized before calling handleRedirectPromise
       await this.msalService.instance.initialize();
-
       const result = await this.msalService.instance.handleRedirectPromise();
       if (result) {
         this.msalService.instance.setActiveAccount(result.account);
+        this.account.set(result.account);
       }
     } catch (err) {
-      console.error("❌ Redirect handling failed:", err);
+      console.error('❌ Redirect handling failed:', err);
     }
+  }
 
-    // 2. Subscribe to MSAL broadcast events to update user info
+  private setupBroadcastListener() {
     this.msalBroadcastService.msalSubject$.subscribe((msg) => {
       if (msg.eventType === EventType.LOGIN_SUCCESS && msg.payload) {
         const authResult = msg.payload as AuthenticationResult;
         this.msalService.instance.setActiveAccount(authResult.account);
-        this.setUserInfo();
+        this.account.set(authResult.account);
       }
     });
-
-    const account = this.msalService.instance.getActiveAccount();
-    if (account) this.setUserInfo();
-  }
-
-  setUserInfo() {
-    const account = this.msalService.instance.getActiveAccount();
-    this.loggedIn = !!account;
-    this.username = account?.username || '';
   }
 
   login() {
