@@ -18,7 +18,7 @@ export function msalConfigFactory(platformId: Object): Configuration {
       auth: {
           clientId: '324dfba7-14a4-4e2f-9042-2c8043ca8b97', // This is the ONLY mandatory field that you need to supply.
           authority: 'https://eadashopperstop.ciamlogin.com/fe9de334-4bcc-4e34-96e2-83ed4683a38e/v2.0', // Defaults to "https://login.microsoftonline.com/common"
-          redirectUri: '/', // Points to window.location.origin. You must register this URI on Azure portal/App Registration.
+          redirectUri: 'https://localhost:4200/cart', // Points to window.location.origin. You must register this URI on Azure portal/App Registration.
           postLogoutRedirectUri: '/', // Indicates the page to navigate after logout.
           navigateToLoginRequestUrl: true, // If "true", will navigate back to the original request location before processing the auth code response.
       },
@@ -42,12 +42,7 @@ export function msalConfigFactory(platformId: Object): Configuration {
  * Add here the endpoints and scopes when obtaining an access token for protected web APIs. For more information, see:
  * https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-browser/docs/resources-and-scopes.md
  */
-export const protectedResources = {
-  todoListApi: {
-    endpoint: "http://localhost:5000/api/todolist",
-    scopes: ["https://fabrikamb2c.onmicrosoft.com/helloapi/demo.read"],
-  },
-}
+export const protectedResources = {};
 
 /**
  * Scopes you add here will be prompted for user consent during sign-in.
@@ -56,5 +51,5 @@ export const protectedResources = {
  * https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#openid-connect-scopes
  */
 export const loginRequest = {
-  scopes: []
+  scopes: ['openid', 'offline_access', 'email']
 };
