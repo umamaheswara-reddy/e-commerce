@@ -9,17 +9,12 @@ export function isBrowser(platformId: Object): boolean {
 
 const isIE = (platformId: Object) => isBrowser(platformId) && (window.navigator.userAgent.indexOf('MSIE ') > -1 || window.navigator.userAgent.indexOf('Trident/') > -1);
 
-export function msalInstanceFactory(): IPublicClientApplication {
-  return new PublicClientApplication(msalInstance(PLATFORM_ID));
-}
-
 /**
  * Configuration object to be passed to MSAL instance on creation.
  * For a full list of MSAL.js configuration parameters, visit:
  * https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-browser/docs/configuration.md
  */
-function msalInstance(platformId: Object): Configuration {
-  return {
+const msalConfig: Configuration = {
       auth: {
           clientId: '324dfba7-14a4-4e2f-9042-2c8043ca8b97', // This is the ONLY mandatory field that you need to supply.
           authority: 'https://eadashopperstop.ciamlogin.com/fe9de334-4bcc-4e34-96e2-83ed4683a38e/v2.0', // Defaults to "https://login.microsoftonline.com/common"
@@ -29,7 +24,7 @@ function msalInstance(platformId: Object): Configuration {
       },
       cache: {
           cacheLocation: BrowserCacheLocation.LocalStorage, // Configures cache location. "sessionStorage" is more secure, but "localStorage" gives you SSO between tabs.
-          storeAuthStateInCookie: isIE(platformId), // Set this to "true" if you are having issues on IE11 or Edge
+          storeAuthStateInCookie: isIE(PLATFORM_ID), // Set this to "true" if you are having issues on IE11 or Edge
       },
       system: {
           loggerOptions: {
@@ -41,6 +36,13 @@ function msalInstance(platformId: Object): Configuration {
           }
       }
   };
+
+// ✅ Singleton instance created once
+export const msalInstance = new PublicClientApplication(msalConfig);
+
+// 👇 Factory used in providers
+export function msalInstanceFactory() {
+  return msalInstance;
 }
 
 /**
@@ -56,5 +58,5 @@ export const protectedResources = {};
  * https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#openid-connect-scopes
  */
 export const loginRequest = {
-  scopes: ['openid', 'offline_access', 'email']
+  scopes: ['openid', 'profile', 'email']
 };
