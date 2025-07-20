@@ -10,3 +10,6 @@
 
 @use "components" as *;
 @use "vendors-extensions" as *;
+@use 'themes/default-theme';
+
+html, body { height: 100%; }

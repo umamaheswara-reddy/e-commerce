@@ -1,38 +1,5 @@
-@use "sass:color";
-@use "../abstracts/colors" as c;
-@use "../abstracts/variables" as gv;
-@use "../abstracts/functions" as fn;
+@use '@angular/material' as mat;
 
-$button-border-radius: 6px;
-$back-btn-color: lightgray;
-
-button[disabled] {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.btn {
-  font-size: fn.get_clamp(12px, 14px);
-  border-radius: 0.175rem;
-}
-
-.btn-primary {
-  background-color: gv.$primary-color;
-  color: #fff;
-}
-
-.btn-primary:hover{
-  background-color: color.adjust($color: gv.$primary-color, $lightness: 5%);
-  color: #fff;
-}
-
-.btn-secondary {
-  color: c.$dark-text-color;
-  border: 1px solid #9ea4ad;
-  background-color: #f4f4f4;
-}
-
-.btn-secondary:hover {
-  color: c.$dark-text-color;
-  background-color: color.scale($color: c.$dark-grey-color, $lightness: 91.0714285714%);
+:root {
+  @include mat.button-overrides(());
 }
