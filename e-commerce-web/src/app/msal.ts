@@ -1,5 +1,6 @@
-import { LogLevel, Configuration, BrowserCacheLocation } from '@azure/msal-browser';
+import { LogLevel, Configuration, BrowserCacheLocation, PublicClientApplication, IPublicClientApplication } from '@azure/msal-browser';
 import { isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID } from '@angular/core';
 
 // This function will be used to check if the code is running in a browser environment.
 export function isBrowser(platformId: Object): boolean {
@@ -8,12 +9,16 @@ export function isBrowser(platformId: Object): boolean {
 
 const isIE = (platformId: Object) => isBrowser(platformId) && (window.navigator.userAgent.indexOf('MSIE ') > -1 || window.navigator.userAgent.indexOf('Trident/') > -1);
 
+export function msalInstanceFactory(): IPublicClientApplication {
+  return new PublicClientApplication(msalInstance(PLATFORM_ID));
+}
+
 /**
  * Configuration object to be passed to MSAL instance on creation.
  * For a full list of MSAL.js configuration parameters, visit:
  * https://github.com/AzureAD/microsoft-authentication-library-for-js/blob/dev/lib/msal-browser/docs/configuration.md
  */
-export function msalConfigFactory(platformId: Object): Configuration {
+function msalInstance(platformId: Object): Configuration {
   return {
       auth: {
           clientId: '324dfba7-14a4-4e2f-9042-2c8043ca8b97', // This is the ONLY mandatory field that you need to supply.
