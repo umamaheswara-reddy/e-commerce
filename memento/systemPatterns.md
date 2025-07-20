@@ -38,6 +38,11 @@ graph TD
         L[PostgreSQL - Payment]
     end
 
+    subgraph "Sass Structure"
+        M[Common MDC variables: vendors-extensions/material/_variables.scss]
+        N[Component overrides: components/]
+    end
+
     A -- HTTPS --> B
     A -- OAuth 2.0 --> G
     B -- Validates JWT from G --> C

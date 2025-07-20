@@ -18,7 +18,7 @@ const msalConfig: Configuration = {
       auth: {
           clientId: '324dfba7-14a4-4e2f-9042-2c8043ca8b97', // This is the ONLY mandatory field that you need to supply.
           authority: 'https://eadashopperstop.ciamlogin.com/fe9de334-4bcc-4e34-96e2-83ed4683a38e/v2.0', // Defaults to "https://login.microsoftonline.com/common"
-          redirectUri: 'https://localhost:4200/cart', // Points to window.location.origin. You must register this URI on Azure portal/App Registration.
+          redirectUri: 'https://localhost:4200/authenticate', // Points to window.location.origin. You must register this URI on Azure portal/App Registration.
           postLogoutRedirectUri: '/', // Indicates the page to navigate after logout.
           navigateToLoginRequestUrl: true, // If "true", will navigate back to the original request location before processing the auth code response.
       },

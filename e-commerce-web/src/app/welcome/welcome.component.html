@@ -1,0 +1,22 @@
+<div class="welcome__hero">
+  <div class="welcome__hero-content">
+    <h1>Welcome to Eada Shopping</h1>
+    <p>Your one-stop shop for everything!</p>
+    <button mat-raised-button color="primary">Shop Now</button>
+  </div>
+</div>
+
+<div class="welcome__featured-section">
+  <h2>Featured Products</h2>
+  <div class="welcome__product-grid">
+    <!-- Example product cards, replace with dynamic data later -->
+    <mat-card class="welcome__product-card" *ngFor="let product of [1,2,3,4]">
+      <img mat-card-image src="https://via.placeholder.com/200x200?text=Product" alt="Product image">
+      <mat-card-title class="welcome__card-title">Product Name</mat-card-title>
+      <mat-card-content class="welcome__card-content">
+        <p>Short product description goes here.</p>
+      </mat-card-content>
+      <button mat-stroked-button color="accent">Add to Cart</button>
+    </mat-card>
+  </div>
+</div>

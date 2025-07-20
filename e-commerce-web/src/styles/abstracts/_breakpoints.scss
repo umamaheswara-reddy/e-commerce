@@ -1,30 +1,37 @@
 @use "sass:map";
-@use "../abstracts/functions" as fn;
-
-$breakpoints-up: (
-  "medium": fn.em(700),
-  "large": fn.em(900),
-  "xlarge": fn.em(1440),
-);
-
-$breakpoints-down: (
-  "small": fn.em(699.98),
-  "medium": fn.em(899.98),
-  "large": fn.em(1439.98),
+@use "./functions" as fn;
+// Centralized breakpoints map for all components
+$breakpoints: (
+  xs: 0,
+  sm: fn.em(600),
+  md: fn.em(900),
+  lg: fn.em(1200),
+  xl: fn.em(1536)
 );
 
 @mixin breakpoint-up($size) {
-  @media (min-width: map.get($breakpoints-up, $size)) {
+  $min: map.get($breakpoints, $size);
+  @media (min-width: #{$min}) {
     @content;
   }
 }
 
 @mixin breakpoint-down($size) {
-  @media (max-width: map.get($breakpoints-down, $size)) {
+  $max: map.get($breakpoints, $size) - 0.02px;
+  @media (max-width: #{$max}) {
     @content;
   }
 }
 
+@mixin breakpoint-between($min-size, $max-size) {
+  $min: map.get($breakpoints, $min-size);
+  $max: map.get($breakpoints, $max-size) - 0.02px;
+  @media (min-width: #{$min}) and (max-width: #{$max}) {
+    @content;
+  }
+}
+
+// Direct pixel-based mixins for edge cases
 @mixin breakpoint($bp: 0) {
   @media (min-width: $bp) {
     @content;

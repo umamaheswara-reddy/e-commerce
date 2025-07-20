@@ -27,11 +27,16 @@ This document provides an overview of the technologies, development setup, and t
 - **Orchestration & CI/CD:** Kubernetes
 - **Frontend Hosting:** Firebase Hosting
 
+
 ## 2. Development Setup
 
 - **IDE:** Visual Studio Code is the primary editor.
 - **Source Control:** Git, with a polyrepo structure (one repository per microservice).
 - **Local Environment:** Docker Desktop will be used to run the microservices, RabbitMQ, Redis, and a local PostgreSQL instance for development and testing.
+
+### Sass Structure (7-1 Pattern)
+- Common Angular Material MDC variables/tokens should be placed in `src/styles/vendors-extensions/material/_variables.scss`.
+- Component-specific style/token overrides should go in their respective file under `src/styles/components/`.
 
 ## 3. Technical Constraints & Considerations
 

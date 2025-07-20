@@ -1,5 +1,12 @@
+@use 'sass:map';
 @use '@angular/material' as mat;
+@use '../themes/default-theme' as theme;
 
 :root {
-  @include mat.button-overrides(());
+  @include mat.button-overrides((
+    filled-container-color: map.get(theme.$primary, 500),
+    filled-label-text-color: map.get(map.get(theme.$primary, contrast), 500),
+    protected-container-shape: 4px,
+    // Add more MDC button token overrides as needed
+  ));
 }

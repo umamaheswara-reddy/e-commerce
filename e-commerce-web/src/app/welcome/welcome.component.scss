@@ -1,0 +1,57 @@
+@use "../../styles/abstracts/breakpoints" as bp;
+@use "../../styles/abstracts/mixins" as mx;
+@use "../../styles/abstracts/functions" as fn;
+
+.welcome {
+  &__hero {
+    background: linear-gradient(90deg, #1976d2 0%, #64b5f6 100%);
+    color: #fff;
+    flex: 1 1 100%;
+    padding: 3rem 1rem;
+    min-height: fn.rem(300);
+    @include mx.flex(row, center, center);
+    @include bp.breakpoint-down(sm) {
+      padding: 2rem 0.5rem;
+      min-height: fn.rem(180);
+    }
+  }
+
+  &__hero-content {
+    text-align: center;
+  }
+
+  &__featured-section {
+    margin: fn.rem(32) auto;
+    max-width: fn.rem(1200);
+    padding: 0 fn.rem(16);
+    @include bp.breakpoint-down(sm) {
+      padding: 0 fn.rem(8);
+    }
+  }
+
+  &__product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(fn.rem(250), 1fr));
+    gap: fn.rem(32);
+    margin-top: fn.rem(16);
+    @include bp.breakpoint-down(sm) {
+      gap: fn.rem(16);
+    }
+  }
+
+  &__product-card {
+    box-shadow: 0 fn.rem(2) fn.rem(8) rgba(0,0,0,0.08);
+    @include mx.flex(column, center, center);
+  }
+
+  &__card-title {
+    font-size: fn.rem(19.2); // 1.2rem
+    font-weight: 500;
+    margin-top: fn.rem(8);
+  }
+
+  &__card-content {
+    font-size: fn.rem(15.2); // 0.95rem
+    margin-bottom: fn.rem(16);
+  }
+}
