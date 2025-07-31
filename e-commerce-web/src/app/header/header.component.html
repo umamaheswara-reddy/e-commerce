@@ -2,20 +2,26 @@
   <div class="header__brand">
     <span class="header__logo">
       <svg width="38" height="38" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="19" cy="19" r="19" fill="#1976d2"/>
-        <text x="19" y="24" text-anchor="middle" font-size="16" font-family="Roboto, Arial, sans-serif" fill="#fff" font-weight="bold">E</text>
-        <path d="M10 28 Q19 34 28 28" stroke="#ffb300" stroke-width="2" fill="none"/>
+        <circle cx="19" cy="19" r="19" fill="#1976d2" />
+        <text x="19" y="24" text-anchor="middle" font-size="16" font-family="Roboto, Arial, sans-serif" fill="#fff"
+          font-weight="bold">
+          E
+        </text>
+        <path d="M10 28 Q19 34 28 28" stroke="#ffb300" stroke-width="2" fill="none" />
       </svg>
     </span>
-    <span class="header__title">Eada<span style="color:#ffb300;font-weight:bold;">Shop</span></span>
+    <span class="header__title">Eada<span style="color: #ffb300; font-weight: bold">Shop</span></span>
   </div>
-  
-  <!-- <div class="header__search">
-    <input type="text" placeholder="Search products...." class="header__search-input" />
-    <button mat-icon-button aria-label="Search">
-      <mat-icon style="color: #000;">search</mat-icon>
-    </button>
-  </div> -->
+  <mat-form-field class="header__search">
+    <mat-label class="header__search-label">Search</mat-label>
+    <input type="text" class="header__search-input" placeholder="Search for products..." aria-label="Search" matInput
+      [formControl]="myControl" [matAutocomplete]="auto" />
+    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" class="header__search-autocomplete">
+      @for (option of filteredOptions | async; track option) {
+      <mat-option [value]="option" class="header__search-option">{{ option }}</mat-option>
+      }
+    </mat-autocomplete>
+  </mat-form-field>
   <nav class="header__nav">
     <button mat-icon-button aria-label="Home">
       <mat-icon>home</mat-icon>
@@ -33,9 +39,9 @@
 </header>
 
 <mat-form-field appearance="outline" class="amazon-style-search">
-    <mat-label> Search </mat-label>
-    <input matInput placeholder="Search for products..." />
-    <button mat-icon-button matSuffix disableRipple aria-label="Search">
-        <mat-icon>search</mat-icon>
-    </button>
-  </mat-form-field>
+  <mat-label> Search </mat-label>
+  <input matInput placeholder="Search for products..." />
+  <button mat-icon-button matSuffix disableRipple aria-label="Search">
+    <mat-icon>search</mat-icon>
+  </button>
+</mat-form-field>

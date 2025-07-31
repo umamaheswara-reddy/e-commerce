@@ -1,6 +1,6 @@
-@use '@angular/material' as mat;
-@use '../abstracts/colors' as *;
-@use '../abstracts/variables' as *;
+@use "@angular/material" as mat;
+@use "../abstracts/colors" as *;
+@use "../abstracts/variables" as *;
 
 // Define palettes
 $primary: mat.m2-define-palette($primary-colors);
@@ -22,19 +22,21 @@ $typography: mat.m2-define-typography-config(
   $button: mat.m2-define-typography-level(14px, 14px, 500),
   $caption: mat.m2-define-typography-level(12px, 20px, 400),
   $overline: mat.m2-define-typography-level(10px, 16px, 400),
-  $font-family: $font-family-base
+  $font-family: $font-family-base,
 );
 
 // Define the theme
-$default-theme: mat.m2-define-light-theme((
-  color: (
-    primary: $primary,
-    accent: $accent,
-    warn: $warn,
-  ),
-  typography: $typography,
-  density: 0
-));
+$default-theme: mat.m2-define-light-theme(
+  (
+    color: (
+      primary: $primary,
+      accent: $accent,
+      warn: $warn,
+    ),
+    typography: $typography,
+    density: 0,
+  )
+);
 
 // Apply Angular Material core styles (required once)
 @include mat.core();

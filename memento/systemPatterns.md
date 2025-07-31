@@ -1,6 +1,14 @@
 # System Patterns: Personal E-Commerce Application
 
+
 This document describes the system architecture, key technical decisions, and design patterns for the e-commerce application.
+
+## 0. Styling & SASS Structure
+
+- The project uses the SASS 7-1 architecture for scalable and maintainable styles.
+- Each style folder contains an `_index.scss` to forward all partials, and `main.scss` imports only the index files.
+- Import order: abstracts → base → layout → components → vendors → themes.
+- Vendor and component overrides for Angular Material are placed in `vendors-extensions/` and `components/` respectively.
 
 ## 1. System Architecture
 
