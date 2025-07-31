@@ -1,15 +1,14 @@
-@use "base/boilerplate";
-@use "base/fonts";
-@use "base/helpers";
-@use "base/typography";
 
+// =============================
+// Main SASS entry (7-1 pattern)
+// =============================
+// Order: abstracts > base > layout > components > vendors > themes
+
+@use "abstracts" as *;
+@use "base";
 @use "layout";
-
-@use "abstracts/variables" as *;
-@use "abstracts/placeholders" as *;
-
 @use "components" as *;
 @use "vendors-extensions" as *;
-@use 'themes/default-theme';
+@use "themes/default-theme";
 
 html, body { height: 100%; }
