@@ -14,9 +14,9 @@
   </div>
   <div class="header__search">
     <input type="text" class="header__search-input" placeholder="Search for products..." aria-label="Search" matInput
-      [formControl]="myControl" [matAutocomplete]="auto" />
+      [formControl]="searchControl" [matAutocomplete]="auto" />
     <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" class="header__search-autocomplete">
-      @for (option of filteredOptions | async; track option) {
+      @for (option of filteredOptions(); track option) {
       <mat-option [value]="option" class="header__search-option">{{ option }}</mat-option>
       }
     </mat-autocomplete>

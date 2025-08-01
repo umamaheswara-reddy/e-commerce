@@ -1,16 +1,18 @@
-import { ReactiveFormsModule } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
+import { signal, computed } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { FormControl } from '@angular/forms';
-import { Observable, startWith, map } from 'rxjs';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { map, startWith } from 'rxjs';
 
 @Component({
   selector: 'app-header',
+  standalone: true,
   imports: [
     CommonModule,
     MatIconModule,
@@ -23,24 +25,21 @@ import { Observable, startWith, map } from 'rxjs';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
-export class HeaderComponent implements OnInit {
-  myControl = new FormControl('');
-  options: string[] = ['One', 'Two', 'Three'];
-  filteredOptions!: Observable<string[]>;
+export class HeaderComponent {
+  searchControl = new FormControl('');
+  options = signal(['Products', 'Categories', 'Deals', 'New Arrivals']);
 
-  constructor() {}
-
-  ngOnInit(): void {
-    this.filteredOptions = this.myControl.valueChanges.pipe(
+  filteredOptions = toSignal(
+    this.searchControl.valueChanges.pipe(
       startWith(''),
-      map((value) => this._filter(value || ''))
-    );
-  }
+      map((value) => this.filterOptions(value || ''))
+    ),
+    { initialValue: this.options() }
+  );
 
-  private _filter(value: string): string[] {
+  private filterOptions(value: string): string[] {
     const filterValue = value.toLowerCase();
-
-    return this.options.filter((option) =>
+    return this.options().filter((option) =>
       option.toLowerCase().includes(filterValue)
     );
   }
