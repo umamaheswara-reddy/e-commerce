@@ -34,7 +34,7 @@ $default-theme: mat.m2-define-light-theme(
       warn: $warn,
     ),
     typography: $typography,
-    density: 0,
+    density: -2,
   )
 );
 

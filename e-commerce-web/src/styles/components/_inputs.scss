@@ -1,0 +1,27 @@
+// Material Design Outlined Text Field variables
+:root {
+  --mdc-text-field-container-height: 2rem;
+  --mdc-typography-body2-font-size: 0.875rem;
+
+  // Colors for outlined text fields
+  --mdc-outlined-text-field-outline-color: lightgreen;
+  --mdc-outlined-text-field-focus-outline-color: green;
+
+  // Hover styles
+  --mdc-outlined-text-field-hover-outline-color: blue;
+}
+// BEM-based global input overrides for Angular Material and native inputs
+
+// Global Angular Material input overrides (no ::ng-deep, no custom class)
+.mat-mdc-form-field {
+  .mat-mdc-text-field-wrapper {
+    /* Use Material CSS variable for min height and padding */
+    min-height: var(--mdc-text-field-container-height, 32px);
+    padding-inline: 0.5rem;
+  }
+  .mat-mdc-form-field-infix {
+    input.mat-mdc-input-element {
+      font-size: var(--mdc-typography-body2-font-size, 0.875rem);
+    }
+  }
+}
