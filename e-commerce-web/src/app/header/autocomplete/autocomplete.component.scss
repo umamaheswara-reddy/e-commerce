@@ -1,19 +1,9 @@
 @use "../../../styles/abstracts/breakpoints" as bp;
 
-:root {
-  --panel-padding: 0;
-}
-
-div.mat-mdc-autocomplete-panel {
-  --panel-padding: 0;
-}
-
 :host {
   width: 100%;
-  div.mat-mdc-autocomplete-panel {
-    padding: 0 !important;
-  }
 }
+
 .autocomplete {
   &__search {
     background: #fff;
@@ -33,9 +23,4 @@ div.mat-mdc-autocomplete-panel {
       margin-top: 0.5rem;
     }
   }
-}
-
-// // Style the autocomplete panel
-:host-context(div.mat-mdc-autocomplete-panel) {
-  padding: var(--panel-padding) !important;
 }

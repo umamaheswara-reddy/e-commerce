@@ -1,10 +1,5 @@
-@use "@angular/material" as mat;
+// Custom styles for all individual component autocompletes
 
-// Customize the entire app. Change :root to your selector if you want to scope the styles.
-:root {
-  @include mat.autocomplete-overrides(
-    (
-      container-elevation-shadow: 1px 1px 0.25px rgba(0, 0, 0, 0.2),
-    )
-  );
+.no-option-check .mat-mdc-option .mat-pseudo-checkbox {
+  display: none !important;
 }
