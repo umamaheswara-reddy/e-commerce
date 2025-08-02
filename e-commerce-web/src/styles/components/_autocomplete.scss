@@ -1,5 +1,24 @@
-// Custom styles for all individual component autocompletes
+/**
+ * Autocomplete Component Styles
+ * ---------------------------
+ * This file contains custom styles for customizing Material Angular's autocomplete component t component level across the application.
+ * 
+ * Usage:
+ * 1. Add class="no-option-check" in any component
+ * 2. This will hide the check mark that appears by default in the options
+ * 
+ * Example:
+ * <mat-autocomplete class="no-option-check">
+ *   <mat-option>Option content</mat-option>
+ * </mat-autocomplete>
+ */
 
-.no-option-check .mat-mdc-option .mat-pseudo-checkbox {
-  display: none !important;
+.cdk-overlay-container {
+  .no-option-check {
+    .mat-mdc-option {
+      .mat-pseudo-checkbox {
+        display: none;
+      }
+    }
+  }
 }
