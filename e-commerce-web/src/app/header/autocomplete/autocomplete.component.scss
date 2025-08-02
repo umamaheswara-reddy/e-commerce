@@ -1,0 +1,41 @@
+@use "../../../styles/abstracts/breakpoints" as bp;
+
+:root {
+  --panel-padding: 0;
+}
+
+div.mat-mdc-autocomplete-panel {
+  --panel-padding: 0;
+}
+
+:host {
+  width: 100%;
+  div.mat-mdc-autocomplete-panel {
+    padding: 0 !important;
+  }
+}
+.autocomplete {
+  &__search {
+    background: #fff;
+    border-radius: 4px;
+    padding: 0.15rem 0.5rem;
+
+    &-input {
+      border: none;
+      outline: none;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 1px;
+      width: 100%;
+    }
+
+    @include bp.breakpoint-down(md) {
+      margin-top: 0.5rem;
+    }
+  }
+}
+
+// // Style the autocomplete panel
+:host-context(div.mat-mdc-autocomplete-panel) {
+  padding: var(--panel-padding) !important;
+}

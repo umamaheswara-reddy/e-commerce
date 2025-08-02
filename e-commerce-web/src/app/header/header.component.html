@@ -12,16 +12,9 @@
     </span>
     <span class="header__title">Eada<span style="color: #ffb300; font-weight: bold">Shop</span></span>
   </div>
-  <div class="header__search">
-    <input type="text" class="header__search-input" placeholder="Search for products..." aria-label="Search" matInput
-      [formControl]="searchControl" [matAutocomplete]="auto" />
-    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" class="header__search-autocomplete">
-      @for (option of filteredOptions(); track option) {
-      <mat-option [value]="option" class="header__search-option">{{ option }}</mat-option>
-      }
-    </mat-autocomplete>
+  <div class="header__autocomplete">
+    <app-header-autocomplete></app-header-autocomplete>
   </div>
-  <!-- </div> -->
   <nav class="header__nav">
     <button mat-icon-button aria-label="Home">
       <mat-icon>home</mat-icon>

@@ -1,0 +1,10 @@
+<div class="autocomplete">
+    <input type="text" class="autocomplete__search-input" placeholder="Search for products..." aria-label="Search"
+        matInput [formControl]="searchControl" [matAutocomplete]="auto" />
+    <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" class="header__search-autocomplete"
+        panelClass="header-search-autocomplete-panel">
+        @for (option of filteredOptions(); track option) {
+        <mat-option [value]="option" class="autocomplete__search-option">{{ option }}</mat-option>
+        }
+    </mat-autocomplete>
+</div>
