@@ -1,6 +1,6 @@
 @use "@angular/material" as mat;
-@use "../abstracts/colors" as *;
-@use "../abstracts/variables" as *;
+@use "abstracts/colors" as *;
+@use "abstracts/variables" as *;
 
 // Define palettes
 $primary: mat.m2-define-palette($primary-colors);

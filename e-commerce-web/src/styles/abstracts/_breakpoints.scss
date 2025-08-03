@@ -1,12 +1,12 @@
 @use "sass:map";
-@use "./functions" as fn;
+@use "functions" as fn;
 // Centralized breakpoints map for all components
 $breakpoints: (
   xs: 0,
   sm: fn.em(600),
   md: fn.em(900),
   lg: fn.em(1200),
-  xl: fn.em(1536)
+  xl: fn.em(1536),
 );
 
 @mixin breakpoint-up($size) {

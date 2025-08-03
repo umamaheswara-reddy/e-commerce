@@ -1,6 +1,6 @@
-@use "../../styles/abstracts/breakpoints" as bp;
-@use "../../styles/abstracts/mixins" as mx;
-@use "../../styles/abstracts/functions" as fn;
+@use "abstracts/breakpoints" as bp;
+@use "abstracts/mixins" as mx;
+@use "abstracts/functions" as fn;
 
 .welcome {
   &__hero {
@@ -40,7 +40,7 @@
   }
 
   &__product-card {
-    box-shadow: 0 fn.rem(2) fn.rem(8) rgba(0,0,0,0.08);
+    box-shadow: 0 fn.rem(2) fn.rem(8) rgba(0, 0, 0, 0.08);
     @include mx.flex(column, center, center);
   }
 

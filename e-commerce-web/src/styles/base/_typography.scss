@@ -1,6 +1,6 @@
-@use "../abstracts/colors" as c;
-@use "../abstracts/functions" as fn;
-@use "../abstracts/variables" as gv;
+@use "abstracts/colors" as c;
+@use "abstracts/functions" as fn;
+@use "abstracts/variables" as gv;
 
 h2 {
   font-size: fn.rem(24); //fallback

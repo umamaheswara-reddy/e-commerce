@@ -1,5 +1,5 @@
-@use "../abstracts/variables" as gv;
-@use "../abstracts/placeholders" as *;
+@use "abstracts/variables" as gv;
+@use "abstracts/placeholders" as *;
 
 .brand-color {
   color: var(--brand-color);

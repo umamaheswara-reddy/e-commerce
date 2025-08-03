@@ -1,8 +1,8 @@
 @use "sass:color";
-@use "../../../styles/abstracts/breakpoints" as bp;
-@use "../../../styles/abstracts/colors" as c;
-@use "../../../styles/abstracts/variables" as v;
-@use "../../../styles/abstracts/mixins" as mx;
+@use "abstracts/breakpoints" as bp;
+@use "abstracts/colors" as c;
+@use "abstracts/variables" as v;
+@use "abstracts/mixins" as mx;
 
 :host {
   width: 100%;

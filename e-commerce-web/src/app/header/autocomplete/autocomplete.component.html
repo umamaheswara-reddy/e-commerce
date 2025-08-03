@@ -2,6 +2,7 @@
     <div class="autocomplete__container">
         <input type="text" class="autocomplete__search-input" placeholder="Search for products..." aria-label="Search"
             matInput [formControl]="searchControl" [matAutocomplete]="auto" />
+
         @if (searchControl.value) {
         <button class="autocomplete__clear-button" type="button" (click)="clearSearch()" aria-label="Clear search">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
@@ -10,6 +11,7 @@
             </svg>
         </button>
         }
+
         <button class="autocomplete__search-button" type="submit" aria-label="Search">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
                 <path
@@ -17,16 +19,17 @@
             </svg>
         </button>
     </div>
+
     <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" [class]="(noOptionCheck())?'no-option-check':''">
         @for (option of filteredOptions(); track option) {
         <mat-option [value]="option.label" (onSelectionChange)="onOptionSelected(option)"
-            class="autocomplete__search-option">{{ option.label }}</mat-option>
+            class="autocomplete__search-option">
+            {{ option.label }}
+        </mat-option>
         }
 
-        @if(filteredOptions().length ===0){
-        <mat-option disabled>
-            No results found
-        </mat-option>
+        @if (filteredOptions().length === 0) {
+        <mat-option disabled>No results found</mat-option>
         }
     </mat-autocomplete>
 </div>

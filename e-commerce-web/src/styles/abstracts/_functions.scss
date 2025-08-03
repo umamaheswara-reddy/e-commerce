@@ -3,7 +3,7 @@
 // -----------------------------------------------------------------------------
 
 @use "sass:math";
-@use "./variables" as gv;
+@use "variables" as gv;
 
 /// Native `url(..)` function wrapper
 /// @param {String} $base - base URL for the asset

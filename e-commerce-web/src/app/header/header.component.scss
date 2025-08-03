@@ -1,7 +1,7 @@
-@use "../../styles/themes/default-theme" as theme;
-@use "../../styles/abstracts/breakpoints" as bp;
-@use "../../styles/abstracts/mixins" as mx;
 @use "sass:map";
+@use "themes/default-theme" as theme;
+@use "abstracts/breakpoints" as bp;
+@use "abstracts/mixins" as mx;
 
 .header {
   background: map.get(theme.$primary, 500);
