@@ -4,8 +4,8 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { SearchService } from '../../shared/services/search.service';
-import { AutocompleteOption } from './autocomplete-option.model';
+import { SearchService } from '../../search/services/search.service';
+import { AutocompleteOption } from '../../search/models/autocomplete-option.model';
 
 @Component({
   selector: 'app-header-autocomplete',

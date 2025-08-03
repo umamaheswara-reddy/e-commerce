@@ -1,7 +1,13 @@
 import { Routes } from '@angular/router';
-import { WelcomeComponent } from './welcome/welcome.component';
+import { WelcomeComponent } from './features/welcome/welcome.component';
 
 export const routes: Routes = [
-    { path: '', component: WelcomeComponent, pathMatch: 'full' },
-    { path: 'home', loadComponent: () => import('./welcome/welcome.component').then(m => m.WelcomeComponent) },
+  { path: '', component: WelcomeComponent, pathMatch: 'full' },
+  {
+    path: 'home',
+    loadComponent: () =>
+      import('./features/welcome/welcome.component').then(
+        (m) => m.WelcomeComponent
+      ),
+  },
 ];

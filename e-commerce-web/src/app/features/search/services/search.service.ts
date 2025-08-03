@@ -2,7 +2,7 @@ import { Injectable, Signal } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map, startWith } from 'rxjs';
-import { AutocompleteOption } from '../../header/autocomplete/autocomplete-option.model';
+import { AutocompleteOption } from '../models/autocomplete-option.model';
 
 @Injectable({
   providedIn: 'root',
