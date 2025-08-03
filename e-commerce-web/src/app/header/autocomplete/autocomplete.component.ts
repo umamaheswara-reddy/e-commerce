@@ -1,11 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, input, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map, startWith } from 'rxjs';
+import { SearchService } from '../../shared/services/search.service';
 
 @Component({
   selector: 'app-header-autocomplete',
@@ -21,21 +20,19 @@ import { map, startWith } from 'rxjs';
   styleUrl: './autocomplete.component.scss',
 })
 export class HeaderAutocompleteComponent {
-  searchControl = new FormControl('');
-  options = signal(['Products', 'Categories', 'Deals', 'New Arrivals']);
+  private searchService = inject(SearchService);
 
-  filteredOptions = toSignal(
-    this.searchControl.valueChanges.pipe(
-      startWith(''),
-      map((value) => this.filterOptions(value || ''))
-    ),
-    { initialValue: this.options() }
+  readonly searchControl = new FormControl('');
+  readonly options = signal([
+    'Products',
+    'Categories',
+    'Deals',
+    'New Arrivals',
+  ]);
+  readonly filteredOptions = this.searchService.getFilteredOptions(
+    this.searchControl,
+    this.options()
   );
 
-  private filterOptions(value: string): string[] {
-    const filterValue = value.toLowerCase();
-    return this.options().filter((option) =>
-      option.toLowerCase().includes(filterValue)
-    );
-  }
+  noOptionCheck = input<boolean>(false);
 }

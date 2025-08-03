@@ -47,18 +47,24 @@ $default-theme: mat.m2-define-light-theme(
 // Apply the theme to all Angular Material components
 @include mat.all-component-themes($default-theme);
 
-// Apply default theme globally to all autocomplete panels
+/*------------------------------------------ Start Apply default theme globally to all autocomplete panels ------------------------------*/
 :root {
   // Options styling
   --mat-option-label-text-font: $font-family-base;
   --mat-option-label-text-line-height: 1rem;
-  --mat-option-hover-state-layer-color: #eee;
   --mat-option-label-text-size: 16px; //default
   --mat-option-label-text-weight: 400; // default
-  --mat-option-selected-state-layer-color: #ffb300;
+  --mat-option-selected-state-layer-color: blue;
+  --mat-option-selected-state-label-text-color: white;
+  --mat-option-hover-state-layer-color: #eee;
   @include mat.autocomplete-overrides(
     (
       container-elevation-shadow: 1px 1px 0.25px rgba(0, 0, 0, 0.2),
     )
   );
 }
+
+div.mat-mdc-autocomplete-panel {
+  padding: 0 !important;
+}
+/*------------------------------------------ End Apply default theme globally to all autocomplete panels --------------------------------*/

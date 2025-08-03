@@ -6,12 +6,12 @@
 
   <div class="content">
     @if (!loggedIn()) {
-      <p>Please sign-in to continue.</p>
-      <button mat-raised-button color="primary" (click)="login()">Sign in</button>
+    <p>Please sign-in to continue.</p>
+    <button mat-raised-button color="primary" (click)="login()">Sign in</button>
     } @else {
-      <p>You are logged in!</p>
-      <p>Welcome, {{ username() }}</p>
-      <button mat-raised-button color="warn" (click)="logout()">Logout</button>
+    <p>You are logged in!</p>
+    <p>Welcome, {{ username() }}</p>
+    <button mat-raised-button color="warn" (click)="logout()">Logout</button>
     }
   </div>
 </div>

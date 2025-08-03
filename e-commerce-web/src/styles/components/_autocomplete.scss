@@ -16,6 +16,8 @@
 .cdk-overlay-container {
   .no-option-check {
     .mat-mdc-option {
+      --mat-option-selected-state-layer-color: transparent;
+      --mat-option-selected-state-label-text-color: black;
       .mat-pseudo-checkbox {
         display: none;
       }
