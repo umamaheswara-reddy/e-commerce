@@ -29,22 +29,9 @@ export class HeaderAutocompleteComponent {
   // Search input form control
   readonly searchControl = new FormControl<string | null>('');
 
-  // All available options as a signal
-  readonly options = signal<AutocompleteOption[]>([
-    { id: '1', label: 'Laptops & Computers', type: 'category' },
-    { id: '2', label: 'Smartphones', type: 'category' },
-    { id: '3', label: 'Summer Sale - Up to 50% off', type: 'deal' },
-    { id: '4', label: 'Wireless Headphones', type: 'product' },
-    { id: '5', label: 'New Arrivals in Home & Kitchen', type: 'new-arrival' },
-    { id: '6', label: 'Samsung Galaxy S23', type: 'product' },
-    { id: '7', label: 'Top Deals', type: 'trending' },
-    { id: '8', label: 'Nike Brand', type: 'brand' },
-  ]);
-
   // Result of filtered options using service
-  readonly filteredOptions = this.searchService.getFilteredOptions(
+  readonly filteredOptions = this.searchService.getAutocompleteResults(
     this.searchControl,
-    this.options(),
     (match) => this.onOptionSelected(match)
   );
 

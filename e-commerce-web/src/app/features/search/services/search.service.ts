@@ -1,4 +1,4 @@
-import { Injectable, Signal } from '@angular/core';
+import { Injectable, signal, Signal } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map, startWith } from 'rxjs';
@@ -8,9 +8,20 @@ import { AutocompleteOption } from '../models/autocomplete-option.model';
   providedIn: 'root',
 })
 export class SearchService {
-  getFilteredOptions(
+  // All available options as a signal
+  readonly options = signal<AutocompleteOption[]>([
+    { id: '1', label: 'Laptops & Computers', type: 'category' },
+    { id: '2', label: 'Smartphones', type: 'category' },
+    { id: '3', label: 'Summer Sale - Up to 50% off', type: 'deal' },
+    { id: '4', label: 'Wireless Headphones', type: 'product' },
+    { id: '5', label: 'New Arrivals in Home & Kitchen', type: 'new-arrival' },
+    { id: '6', label: 'Samsung Galaxy S23', type: 'product' },
+    { id: '7', label: 'Top Deals', type: 'trending' },
+    { id: '8', label: 'Nike Brand', type: 'brand' },
+  ]);
+
+  getAutocompleteResults(
     control: FormControl,
-    options: AutocompleteOption[],
     onExactMatch?: (option: AutocompleteOption) => void
   ): Signal<AutocompleteOption[]> {
     let lastMatchId: string | undefined;
@@ -19,10 +30,13 @@ export class SearchService {
         startWith(''),
         map((value) => {
           const normalized = (value || '').toLowerCase();
-          const filtered = this.filterOptions(normalized, options);
+          const filtered = this.filterAutocompleteResults(
+            normalized,
+            this.options()
+          );
 
           if (onExactMatch) {
-            const match = options.find(
+            const match = this.options().find(
               (opt) => opt.label.toLowerCase() === normalized
             );
             if (match && match.id !== lastMatchId) {
@@ -34,11 +48,11 @@ export class SearchService {
           return filtered;
         })
       ),
-      { initialValue: options }
+      { initialValue: this.options() }
     );
   }
 
-  private filterOptions(
+  private filterAutocompleteResults(
     value: string,
     options: AutocompleteOption[]
   ): AutocompleteOption[] {
