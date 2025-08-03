@@ -1,17 +1,18 @@
 // Colors
-$primary-colors:(
-  50 : #e1e6ef,
+$primary-colors: (
+  50: #e1e6ef,
   100: #b3c0d7,
   200: #8097bd,
   300: #4d6ea3,
   400: #264f8f,
-  500: #0A2463, // Primary color
+  500: #0a2463,
+  // Primary color
   600: #081f59,
   700: #06194e,
   800: #051343,
   900: #030933,
   contrast: (
-    50 : #000,
+    50: #000,
     100: #000,
     200: #fff,
     300: #fff,
@@ -21,5 +22,5 @@ $primary-colors:(
     700: #fff,
     800: #fff,
     900: #fff,
-  )
+  ),
 );

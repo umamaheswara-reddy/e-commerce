@@ -23,4 +23,24 @@
       }
     }
   }
+
+  .mat-mdc-autocomplete-panel {
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    margin-top: 4px;
+
+    .mat-mdc-option {
+      padding: 8px 12px;
+      min-height: 36px;
+
+      &.mdc-list-item--selected {
+        color: yellow;
+        font-weight: 500;
+      }
+
+      .mdc-list-item__primary-text {
+        font-size: 14px;
+      }
+    }
+  }
 }

@@ -1,26 +1,75 @@
+@use "sass:color";
 @use "../../../styles/abstracts/breakpoints" as bp;
+@use "../../../styles/abstracts/colors" as c;
+@use "../../../styles/abstracts/variables" as v;
+@use "../../../styles/abstracts/mixins" as mx;
 
 :host {
   width: 100%;
 }
 
 .autocomplete {
-  &__search {
+  &__container {
+    @include mx.flex(row, center, center);
     background: #fff;
     border-radius: 4px;
-    padding: 0.15rem 0.5rem;
+    border: 1px solid orange;
+    transition: border-color 0.3s;
 
-    &-input {
-      border: none;
+    &:focus-within {
+      border-color: orange;
+      box-shadow: 0 0 0 3px rgba(orange, 0.3);
+    }
+  }
+
+  &__search-input {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    padding: 0.5rem;
+    font-size: 1rem;
+    width: 100%;
+    background: transparent;
+
+    &:focus {
       outline: none;
-      padding: 0.5rem;
-      font-size: 1rem;
-      border-radius: 1px;
-      width: 100%;
+    }
+  }
+
+  &__clear-button,
+  &__search-button {
+    @include mx.flex(row, center, center);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
     }
 
-    @include bp.breakpoint-down(md) {
-      margin-top: 0.5rem;
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(orange, 0.3);
     }
+  }
+
+  &__search-button {
+    background-color: orange;
+    border-radius: 0 4px 4px 0;
+
+    &:hover {
+      background-color: color.adjust(orange, $lightness: -5%);
+    }
+
+    svg {
+      fill: #fff;
+    }
+  }
+
+  @include bp.breakpoint-down(md) {
+    margin-top: 0.5rem;
   }
 }
