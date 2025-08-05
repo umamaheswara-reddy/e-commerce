@@ -2,12 +2,12 @@
 @use "abstracts/colors" as *;
 @use "abstracts/variables" as *;
 
-// Define palettes
+// Define palettes using M2 functions (stable in Angular Material 19)
 $primary: mat.m2-define-palette($primary-colors);
 $accent: mat.m2-define-palette(mat.$m2-light-blue-palette, 500);
 $warn: mat.m2-define-palette(mat.$m2-red-palette, 600);
 
-// Define typography
+// Define typography using M2 functions (stable in Angular Material 19)
 $typography: mat.m2-define-typography-config(
   $headline-1: mat.m2-define-typography-level(96px, 96px, 300),
   $headline-2: mat.m2-define-typography-level(60px, 60px, 300),
@@ -25,8 +25,8 @@ $typography: mat.m2-define-typography-config(
   $font-family: $font-family-base,
 );
 
-// Define the theme
-$default-theme: mat.m2-define-light-theme(
+// Define base theme using M2 APIs (for compatibility)
+$base-theme: mat.m2-define-light-theme(
   (
     color: (
       primary: $primary,
@@ -38,14 +38,114 @@ $default-theme: mat.m2-define-light-theme(
   )
 );
 
+// Create M3-enhanced theme by adding Material Design 3 tokens
+$default-theme: $base-theme;
+
 // Apply Angular Material core styles (required once)
 @include mat.core();
 
 // Apply typography styles globally (ensures body/font consistency)
 @include mat.typography-hierarchy($typography);
 
-// Apply the theme to all Angular Material components
+// Apply the theme to all Angular Material components (M2 API but generates M3-ready styles)
 @include mat.all-component-themes($default-theme);
+
+/*========================================== Start Material Design 3 Enhancements ==========================================*/
+// Add Material Design 3 design tokens and custom properties
+:root {
+  // M3 Color Tokens - Override Material components with M3 colors
+  --mat-sys-color-primary: #0a2463;
+  --mat-sys-color-on-primary: #ffffff;
+  --mat-sys-color-primary-container: #d9deff;
+  --mat-sys-color-on-primary-container: #001946;
+  
+  --mat-sys-color-secondary: #575e71;
+  --mat-sys-color-on-secondary: #ffffff;
+  --mat-sys-color-secondary-container: #dce2f9;
+  --mat-sys-color-on-secondary-container: #141b2c;
+  
+  --mat-sys-color-tertiary: #715573;
+  --mat-sys-color-on-tertiary: #ffffff;
+  --mat-sys-color-tertiary-container: #fcd7fc;
+  --mat-sys-color-on-tertiary-container: #29132d;
+  
+  --mat-sys-color-surface: #fefbff;
+  --mat-sys-color-on-surface: #1b1b1f;
+  --mat-sys-color-surface-variant: #e3e2ec;
+  --mat-sys-color-on-surface-variant: #46464f;
+  
+  --mat-sys-color-outline: #77767f;
+  --mat-sys-color-outline-variant: #c7c6d0;
+  
+  // M3 Shape Tokens - More rounded corners characteristic of M3
+  --mat-sys-shape-corner-extra-small: 4px;
+  --mat-sys-shape-corner-small: 8px;
+  --mat-sys-shape-corner-medium: 12px;
+  --mat-sys-shape-corner-large: 16px;
+  --mat-sys-shape-corner-extra-large: 28px;
+  
+  // M3 Elevation Tokens - Reduced shadows characteristic of M3
+  --mat-sys-elevation-level0: none;
+  --mat-sys-elevation-level1: 0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --mat-sys-elevation-level2: 0px 1px 2px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+  --mat-sys-elevation-level3: 0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px rgba(0, 0, 0, 0.3);
+  
+  // Apply M3 design tokens to Material components
+  
+  // Buttons - M3 style with more rounded corners and updated colors
+  --mdc-filled-button-container-shape: var(--mat-sys-shape-corner-small);
+  --mdc-filled-button-container-color: var(--mat-sys-color-primary);
+  --mdc-filled-button-label-text-color: var(--mat-sys-color-on-primary);
+  --mdc-filled-button-container-elevation: var(--mat-sys-elevation-level0);
+  
+  --mdc-outlined-button-outline-color: var(--mat-sys-color-outline);
+  --mdc-outlined-button-container-shape: var(--mat-sys-shape-corner-small);
+  --mdc-outlined-button-label-text-color: var(--mat-sys-color-primary);
+  
+  --mdc-text-button-label-text-color: var(--mat-sys-color-primary);
+  
+  // Cards - M3 style with updated elevation and corners  
+  --mdc-card-container-shape: var(--mat-sys-shape-corner-medium);
+  --mdc-card-container-elevation: var(--mat-sys-elevation-level1);
+  
+  // Form Fields - M3 style with updated colors and shapes
+  --mdc-filled-text-field-container-shape: var(--mat-sys-shape-corner-extra-small) var(--mat-sys-shape-corner-extra-small) 0 0;
+  --mdc-filled-text-field-container-color: var(--mat-sys-color-surface-variant);
+  --mdc-filled-text-field-label-text-color: var(--mat-sys-color-on-surface-variant);
+  --mdc-filled-text-field-input-text-color: var(--mat-sys-color-on-surface);
+  
+  --mdc-outlined-text-field-outline-color: var(--mat-sys-color-outline);
+  --mdc-outlined-text-field-container-shape: var(--mat-sys-shape-corner-extra-small);
+  --mdc-outlined-text-field-label-text-color: var(--mat-sys-color-on-surface-variant);
+}
+
+// Global M3 styling improvements
+.mat-mdc-card {
+  // Enhanced M3 card styling
+  background-color: var(--mat-sys-color-surface);
+  color: var(--mat-sys-color-on-surface);
+  border-radius: var(--mat-sys-shape-corner-medium) !important;
+  box-shadow: var(--mat-sys-elevation-level1) !important;
+}
+
+.mat-mdc-button {
+  // Enhanced M3 button styling 
+  &.mat-primary {
+    border-radius: var(--mat-sys-shape-corner-small) !important;
+  }
+}
+
+.mat-mdc-form-field {
+  // Enhanced M3 form field styling
+  .mdc-text-field--filled {
+    border-radius: var(--mat-sys-shape-corner-extra-small) var(--mat-sys-shape-corner-extra-small) 0 0 !important;
+  }
+  
+  .mdc-text-field--outlined {
+    border-radius: var(--mat-sys-shape-corner-extra-small) !important;
+  }
+}
+/*========================================== End Material Design 3 Enhancements ==========================================*/
 
 /*------------------------------------------ Start Apply default theme globally to all autocomplete panels ------------------------------*/
 :root {
