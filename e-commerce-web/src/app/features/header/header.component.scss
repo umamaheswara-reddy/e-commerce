@@ -1,12 +1,11 @@
 @use "sass:map";
-@use "themes/default-theme" as theme;
 @use "abstracts/breakpoints" as bp;
 @use "abstracts/mixins" as mx;
 
 .header {
-  background: map.get(theme.$primary, 500);
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: var(--mat-sys-color-primary, #0a2463); // Use M3 design token with fallback
+  color: var(--mat-sys-color-on-primary, #fff);
+  box-shadow: var(--mat-sys-elevation-level2, 0 2px 8px rgba(0, 0, 0, 0.08));
   position: sticky;
   top: 0;
   z-index: 100;
