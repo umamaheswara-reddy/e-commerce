@@ -1,11 +1,15 @@
-import { Component, signal, inject, input } from '@angular/core';
+import { Component, signal, inject, input, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatSelectModule } from '@angular/material/select';
 import { SearchService } from '../../search/services/search.service';
-import { AutocompleteOption } from '../../search/models/autocomplete-option.model';
+import {
+  AutocompleteOption,
+  Category,
+} from '../../search/models/autocomplete-option.model';
 
 @Component({
   selector: 'app-header-autocomplete',
@@ -16,6 +20,7 @@ import { AutocompleteOption } from '../../search/models/autocomplete-option.mode
     MatInputModule,
     MatAutocompleteModule,
     ReactiveFormsModule,
+    MatSelectModule,
   ],
   templateUrl: './autocomplete.component.html',
   styleUrl: './autocomplete.component.scss',
@@ -27,7 +32,21 @@ export class HeaderAutocompleteComponent {
   noOptionCheck = input<boolean>(false);
 
   // Search input form control
-  readonly searchControl = new FormControl<string | null>('');
+  readonly searchControl = new FormControl<string | null>(null);
+
+  // Category selection form control
+  readonly categoryControl = new FormControl<string>('');
+
+  // Get all top-level categories for the dropdown
+  readonly categories = computed<Category[]>(() => {
+    const allCategories: Category[] = [];
+    this.searchService.options().forEach((option) => {
+      if (option.categories) {
+        allCategories.push(...option.categories);
+      }
+    });
+    return allCategories;
+  });
 
   // Result of filtered options using service
   readonly filteredOptions = this.searchService.getAutocompleteResults(

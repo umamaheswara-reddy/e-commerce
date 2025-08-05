@@ -15,10 +15,19 @@
     border-radius: 4px;
     border: 1px solid orange;
     transition: border-color 0.3s;
+    gap: 8px;
 
     &:focus-within {
       border-color: orange;
       box-shadow: 0 0 0 3px rgba(orange, 0.3);
+    }
+  }
+
+  &__category-dropdown {
+    width: 160px;
+
+    .mat-mdc-form-field {
+      width: 100%;
     }
   }
 

@@ -1,5 +1,17 @@
 <div class="autocomplete">
     <div class="autocomplete__container">
+        <div class="autocomplete__category-dropdown">
+            <mat-form-field subscriptSizing="dynamic">
+                <mat-select placeholder="All" [formControl]="categoryControl"
+                    [class]="(noOptionCheck())?'no-option-check':''">
+                    <mat-option value="">All Departments</mat-option>
+                    @for (category of categories(); track category) {
+                    <mat-option [value]="category.id">{{category.name}}</mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+        </div>
+
         <input type="text" class="autocomplete__search-input" placeholder="Search for products..." aria-label="Search"
             matInput [formControl]="searchControl" [matAutocomplete]="auto" />
 
