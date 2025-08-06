@@ -1,12 +1,19 @@
 @use "@angular/material" as mat;
 
-// 1️⃣ Define theme
+// 1️⃣ Define M3 theme (typography only allows font families + weights)
 $theme: mat.define-theme(
   (
     color: (
       theme-type: light,
       primary: mat.$azure-palette,
       tertiary: mat.$orange-palette,
+    ),
+    typography: (
+      plain-family: "Roboto, sans-serif",
+      brand-family: "Roboto, sans-serif",
+      bold-weight: 700,
+      medium-weight: 500,
+      regular-weight: 400,
     ),
   )
 );
@@ -23,26 +30,29 @@ $theme: mat.define-theme(
   --mdc-typography-body-large-font-size: 1rem;
   --mdc-typography-body-large-font-weight: 500;
   --mdc-typography-label-large-font-size: 0.875rem;
+
+  /* Applies to all button types */
+  --mdc-text-button-container-shape: 8px;
+  --mdc-filled-button-container-shape: 8px;
+  --mdc-outlined-button-container-shape: 8px;
+  --mdc-elevated-button-container-shape: 8px;
+
+  --mdc-text-button-label-text-size: 16px;
+  --mdc-text-button-label-text-weight: 500;
+  --mdc-filled-button-label-text-size: 16px;
+  --mdc-filled-button-label-text-weight: 500;
+
+  --mdc-text-button-with-icon-icon-size: 20px;
+  --mdc-filled-button-with-icon-icon-size: 20px;
+
+  --mdc-filled-button-horizontal-padding: 20px;
+  --mdc-filled-button-vertical-padding: 10px;
 }
 
-// 4️⃣ Global button overrides (applies to all mat-buttons, mat-raised-buttons, mat-fab, etc.)
-@include mat.button-tokens(
-  (
-    container-shape: 8px,
-    // Border radius
-    label-text-size: 16px,
-    // Font size
-    label-text-weight: 500,
-    // Font weight
-    with-icon-icon-size: 20px,
-    // Icon size
-    horizontal-padding: 20px,
-    // Left/right padding
-    vertical-padding: 10px,
-    // Top/bottom padding
-    state-layer-shape: 8px // Ripple layer radius,,,,,,,,
-  )
-);
+// ✅ Button token overrides in M3 stable
+@include mat.button-color($theme);
+@include mat.button-typography($theme);
+@include mat.button-density($theme);
 
 // // Global button styles
 // .mat-mdc-button {
