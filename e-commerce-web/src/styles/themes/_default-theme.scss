@@ -24,7 +24,7 @@ $theme: mat.define-theme(
 // 3️⃣ Apply all component themes
 :root {
   @include mat.all-component-themes($theme);
-  @include mat.all-component-densities(-2);
+  @include mat.all-component-densities(-4);
 
   // Typography settings
   --mdc-typography-body-large-font-size: 1rem;
@@ -53,14 +53,6 @@ $theme: mat.define-theme(
 @include mat.button-color($theme);
 @include mat.button-typography($theme);
 @include mat.button-density($theme);
-
-// // Global button styles
-// .mat-mdc-button {
-//   // Common styles for all buttons
-//   border-radius: 8px;
-//   padding: 8px 16px;
-//   font-weight: 500;
-// }
 
 // /*------------------------------------------ Apply M3 autocomplete theme ------------------------------*/
 // .mat-mdc-autocomplete-panel {

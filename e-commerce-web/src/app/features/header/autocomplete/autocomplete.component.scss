@@ -1,7 +1,5 @@
 @use "sass:color";
 @use "abstracts/breakpoints" as bp;
-@use "abstracts/colors" as c;
-@use "abstracts/variables" as v;
 @use "abstracts/mixins" as mx;
 
 :host {
@@ -74,7 +72,7 @@
     }
 
     svg {
-      fill: #fff;
+      fill: currentColor;
     }
   }
 

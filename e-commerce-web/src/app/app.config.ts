@@ -19,6 +19,7 @@ import {
 import { InteractionType } from '@azure/msal-browser';
 import { msalInstanceFactory } from './msal';
 import { routes } from './app.routes';
+import { MAT_RIPPLE_GLOBAL_OPTIONS } from '@angular/material/core';
 
 export const APP_CONFIG: ApplicationConfig = {
   providers: [
@@ -46,5 +47,6 @@ export const APP_CONFIG: ApplicationConfig = {
     MsalService,
     MsalGuard,
     MsalBroadcastService,
+    { provide: MAT_RIPPLE_GLOBAL_OPTIONS, useValue: { disabled: true } },
   ],
 };
