@@ -1,14 +1,8 @@
-@use "sass:map";
 @use "@angular/material" as mat;
-@use "themes/default-theme" as theme;
 
 :root {
-  @include mat.button-overrides(
-    (
-      filled-container-color: map.get(theme.$primary, 500),
-      filled-label-text-color: map.get(map.get(theme.$primary, contrast), 500),
-      protected-container-shape: 4px,
-      // Add more MDC button token overrides as needed
-    )
-  );
+  // Use M3 CSS variables for button theming
+  --mdc-filled-button-container-color: var(--md-sys-color-primary);
+  --mdc-filled-button-label-text-color: var(--md-sys-color-on-primary);
+  --mdc-protected-button-container-shape: 4px;
 }

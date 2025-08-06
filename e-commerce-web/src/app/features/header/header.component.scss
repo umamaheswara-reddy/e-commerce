@@ -1,10 +1,8 @@
-@use "sass:map";
-@use "themes/default-theme" as theme;
 @use "abstracts/breakpoints" as bp;
 @use "abstracts/mixins" as mx;
 
 .header {
-  background: map.get(theme.$primary, 500);
+  background: var(--mdc-theme-primary); // Use M3 primary color variable
   color: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   position: sticky;
