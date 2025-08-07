@@ -1,17 +1,16 @@
-// M3 tonal palette for primary colors
-$primary-colors: (
-  0: #e1e6ef,
-  10: #b3c0d7,
-  20: #8097bd,
-  30: #4d6ea3,
-  40: #264f8f,
-  50: #0a2463,
-  // Primary color
-  60: #081f59,
-  70: #06194e,
-  80: #051343,
-  90: #030933,
-  95: #010520,
-  99: #fbf8ff,
-  100: #ffffff,
-);
+// Surface colors for light and dark themes
+$light-surface: #ffffff; // White surface for light theme
+$light-on-surface: #212121; // Dark text on light surface
+$dark-surface: #121212; // Dark surface for dark theme
+$dark-on-surface: #e0e0e0; // Light text on dark surface
+
+// Brand color (orange) - remains consistent across themes
+$brand-orange: #ff9800;
+
+// Additional theme colors
+$primary: #1976d2;
+$secondary: #9c27b0;
+$error: #d32f2f;
+$warning: #ed6c02;
+$info: #0288d1;
+$success: #2e7d32;

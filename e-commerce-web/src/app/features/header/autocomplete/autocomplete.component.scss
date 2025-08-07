@@ -1,6 +1,7 @@
 @use "sass:color";
 @use "abstracts/breakpoints" as bp;
 @use "abstracts/mixins" as mx;
+@use "abstracts/colors" as app-colors;
 
 :host {
   width: 100%;
@@ -9,15 +10,15 @@
 .autocomplete {
   &__container {
     @include mx.flex(row, center, center);
-    background: #fff;
+    background: var(--app-surface);
     border-radius: 4px;
-    border: 1px solid orange;
+    border: 1px solid var(--app-on-surface);
     transition: border-color 0.3s;
     gap: 8px;
 
     &:focus-within {
-      border-color: orange;
-      box-shadow: 0 0 0 3px rgba(orange, 0.3);
+      border-color: app-colors.$brand-orange;
+      box-shadow: 0 0 0 3px rgba(app-colors.$brand-orange, 0.3);
     }
   }
 
@@ -37,6 +38,7 @@
     font-size: 1rem;
     width: 100%;
     background: transparent;
+    color: var(--app-on-surface);
 
     &:focus {
       outline: none;
@@ -52,6 +54,7 @@
     padding: 0.5rem;
     border-radius: 50%;
     transition: background-color 0.2s;
+    color: var(--app-on-surface);
 
     &:hover {
       background-color: rgba(0, 0, 0, 0.05);
@@ -59,16 +62,17 @@
 
     &:focus {
       outline: none;
-      box-shadow: 0 0 0 2px rgba(orange, 0.3);
+      box-shadow: 0 0 0 2px rgba(var(--mdc-theme-primary), 0.3);
     }
   }
 
   &__search-button {
-    background-color: orange;
+    background-color: app-colors.$brand-orange;
     border-radius: 0 4px 4px 0;
+    color: white;
 
     &:hover {
-      background-color: color.adjust(orange, $lightness: -5%);
+      background-color: color.adjust(app-colors.$brand-orange, $lightness: -5%);
     }
 
     svg {
