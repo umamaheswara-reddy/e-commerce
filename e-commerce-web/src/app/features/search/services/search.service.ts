@@ -1,5 +1,10 @@
 import { Injectable, signal } from '@angular/core';
-import { Category, Item } from '../models/product.models';
+import {
+  Category,
+  EntityType,
+  KeyValuePair,
+  SearchEntity,
+} from '../models/product.models';
 import {
   optionMatchesCategory,
   optionMatchesTerm,
@@ -10,35 +15,59 @@ import {
 })
 export class SearchService {
   // All available categories as a signal — later can be replaced by API data
-  readonly categories = signal<Category[]>([
+  // Categories
+  readonly categories = signal<SearchEntity[]>([
     {
       id: 'cat-1',
       label: 'Electronics & Gadgets',
-      type: 'category',
+      type: EntityType.Category,
       children: [
         {
           id: 'cat-1-1',
           label: 'Laptops & Computers',
+          type: EntityType.Category,
           children: [
-            { id: 'cat-1-1-1', label: 'Gaming Laptops' },
-            { id: 'cat-1-1-2', label: 'Ultrabooks' },
-            { id: 'cat-1-1-3', label: '2-in-1 Convertibles' },
+            {
+              id: 'cat-1-1-1',
+              label: 'Gaming Laptops',
+              type: EntityType.Category,
+            },
+            { id: 'cat-1-1-2', label: 'Ultrabooks', type: EntityType.Category },
+            {
+              id: 'cat-1-1-3',
+              label: '2-in-1 Convertibles',
+              type: EntityType.Category,
+            },
           ],
         },
         {
           id: 'cat-1-2',
           label: 'Smartphones',
+          type: EntityType.Category,
           children: [
-            { id: 'cat-1-2-1', label: 'Android Phones' },
-            { id: 'cat-1-2-2', label: 'iPhones' },
+            {
+              id: 'cat-1-2-1',
+              label: 'Android Phones',
+              type: EntityType.Category,
+            },
+            { id: 'cat-1-2-2', label: 'iPhones', type: EntityType.Category },
           ],
         },
         {
           id: 'cat-1-3',
           label: 'Wearable Tech',
+          type: EntityType.Category,
           children: [
-            { id: 'cat-1-3-1', label: 'Smartwatches' },
-            { id: 'cat-1-3-2', label: 'Fitness Trackers' },
+            {
+              id: 'cat-1-3-1',
+              label: 'Smartwatches',
+              type: EntityType.Category,
+            },
+            {
+              id: 'cat-1-3-2',
+              label: 'Fitness Trackers',
+              type: EntityType.Category,
+            },
           ],
         },
       ],
@@ -46,23 +75,37 @@ export class SearchService {
     {
       id: 'cat-2',
       label: 'Home & Kitchen',
-      type: 'category',
+      type: EntityType.Category,
       children: [
         {
           id: 'cat-2-1',
           label: 'Appliances',
+          type: EntityType.Category,
           children: [
-            { id: 'cat-2-1-1', label: 'Refrigerators' },
-            { id: 'cat-2-1-2', label: 'Microwaves' },
-            { id: 'cat-2-1-3', label: 'Coffee Machines' },
+            {
+              id: 'cat-2-1-1',
+              label: 'Refrigerators',
+              type: EntityType.Category,
+            },
+            { id: 'cat-2-1-2', label: 'Microwaves', type: EntityType.Category },
+            {
+              id: 'cat-2-1-3',
+              label: 'Coffee Machines',
+              type: EntityType.Category,
+            },
           ],
         },
         {
           id: 'cat-2-2',
           label: 'Furniture',
+          type: EntityType.Category,
           children: [
-            { id: 'cat-2-2-1', label: 'Sofas' },
-            { id: 'cat-2-2-2', label: 'Dining Tables' },
+            { id: 'cat-2-2-1', label: 'Sofas', type: EntityType.Category },
+            {
+              id: 'cat-2-2-2',
+              label: 'Dining Tables',
+              type: EntityType.Category,
+            },
           ],
         },
       ],
@@ -70,50 +113,62 @@ export class SearchService {
     {
       id: 'cat-3',
       label: 'Sports & Outdoors',
-      type: 'category',
+      type: EntityType.Category,
       children: [
         {
           id: 'cat-3-1',
           label: 'Cycling',
+          type: EntityType.Category,
           children: [
-            { id: 'cat-3-1-1', label: 'Mountain Bikes' },
-            { id: 'cat-3-1-2', label: 'Road Bikes' },
+            {
+              id: 'cat-3-1-1',
+              label: 'Mountain Bikes',
+              type: EntityType.Category,
+            },
+            { id: 'cat-3-1-2', label: 'Road Bikes', type: EntityType.Category },
           ],
         },
         {
           id: 'cat-3-2',
           label: 'Camping',
+          type: EntityType.Category,
           children: [
-            { id: 'cat-3-2-1', label: 'Tents' },
-            { id: 'cat-3-2-2', label: 'Sleeping Bags' },
+            { id: 'cat-3-2-1', label: 'Tents', type: EntityType.Category },
+            {
+              id: 'cat-3-2-2',
+              label: 'Sleeping Bags',
+              type: EntityType.Category,
+            },
           ],
         },
       ],
     },
+  ]);
 
-    // Products
+  // Products
+  readonly products = signal([
     {
       id: 'prod-1',
       label: 'Samsung Galaxy S23 Ultra',
-      type: 'product',
+      type: EntityType.Product,
       metadata: { brand: 'Samsung', price: 1199 },
     },
     {
       id: 'prod-2',
       label: 'Apple MacBook Air M3',
-      type: 'product',
+      type: EntityType.Product,
       metadata: { brand: 'Apple', price: 1499 },
     },
     {
       id: 'prod-3',
       label: 'Sony WH-1000XM5 Noise Cancelling Headphones',
-      type: 'product',
+      type: EntityType.Product,
       metadata: { brand: 'Sony', price: 399 },
     },
     {
       id: 'prod-4',
       label: 'Dyson V15 Detect Cordless Vacuum',
-      type: 'product',
+      type: EntityType.Product,
       metadata: { brand: 'Dyson', price: 749 },
     },
 
@@ -121,61 +176,61 @@ export class SearchService {
     {
       id: 'deal-1',
       label: 'Summer Sale – Up to 50% Off Electronics',
-      type: 'deal',
+      type: EntityType.Deal,
     },
     {
       id: 'deal-2',
       label: 'Buy 1 Get 1 Free – Kitchen Essentials',
-      type: 'deal',
+      type: EntityType.Deal,
     },
 
     // Trending
     {
       id: 'trend-1',
       label: 'Top Deals on Smart Home Devices',
-      type: 'trending',
+      type: EntityType.Trending,
     },
     {
       id: 'trend-2',
       label: 'Trending: Minimalist Furniture Designs',
-      type: 'trending',
+      type: EntityType.Trending,
     },
 
     // New Arrivals
     {
       id: 'new-1',
       label: 'New Arrival: GoPro Hero 12 Black',
-      type: 'new-arrival',
+      type: EntityType.NewArrival,
     },
     {
       id: 'new-2',
       label: 'Just Launched: Nike Air Zoom Pegasus 40',
-      type: 'new-arrival',
+      type: EntityType.NewArrival,
     },
 
     // Brands
     {
       id: 'brand-1',
       label: 'Nike',
-      type: 'brand',
+      type: EntityType.Brand,
       metadata: { country: 'USA' },
     },
     {
       id: 'brand-2',
       label: 'Adidas',
-      type: 'brand',
+      type: EntityType.Brand,
       metadata: { country: 'Germany' },
     },
     {
       id: 'brand-3',
       label: 'Samsung',
-      type: 'brand',
+      type: EntityType.Brand,
       metadata: { country: 'South Korea' },
     },
     {
       id: 'brand-4',
       label: 'Apple',
-      type: 'brand',
+      type: EntityType.Brand,
       metadata: { country: 'USA' },
     },
   ]);
@@ -184,26 +239,23 @@ export class SearchService {
    * Get a list of categories { id, label }.
    * Can return only top-level or all nested categories based on `includeNested`.
    */
-  getCategoryList(includeNested = false): Item<string>[] {
+  getCategoryList(includeNested = false): KeyValuePair<string>[] {
     const seen = new Set<string>();
-    const result: Item<string>[] = [];
+    const result: KeyValuePair<string>[] = [];
 
-    const collect = (categories: Category[], nested: boolean) => {
-      for (const category of categories) {
-        if (!seen.has(category.label)) {
-          seen.add(category.label);
-          result.push({ id: category.id, label: category.label });
-        }
-
-        if (nested && category.children?.length) {
-          collect(category.children, nested);
-        }
+    const collect = (category: Category) => {
+      if (!seen.has(category.label)) {
+        seen.add(category.label);
+        result.push({ id: category.id, label: category.label });
+      }
+      if (includeNested && category.children?.length) {
+        category.children.forEach(collect);
       }
     };
 
     this.categories()
-      .filter((c) => c.type === 'category' && c.children)
-      .forEach((c) => collect(c.children ?? [], includeNested));
+      .filter((c): c is Category => c.type === EntityType.Category)
+      .forEach(collect);
 
     return result.sort((a, b) => a.label.localeCompare(b.label));
   }
@@ -223,26 +275,37 @@ export class SearchService {
   filterByCategoryAndSearch(
     categoryId: string | null,
     searchTerm: string | null,
-    options: Category[],
+    searchEntities: SearchEntity[],
     onExactMatch?: (option: Category) => void
-  ): Category[] {
+  ): SearchEntity[] {
     const normalizedCategoryId = categoryId ?? '';
     const term = (searchTerm ?? '').trim().toLowerCase();
 
-    if (!term && !normalizedCategoryId) return options;
+    if (!term && !normalizedCategoryId) return searchEntities;
 
-    const filtered = options.filter((option) => {
+    const filtered = searchEntities.filter((searchEntity) => {
+      // Filter by category if provided
       if (
         normalizedCategoryId &&
-        !optionMatchesCategory(option, normalizedCategoryId)
+        searchEntity.type === EntityType.Category &&
+        !optionMatchesCategory(searchEntity, normalizedCategoryId)
       )
         return false;
-      if (term && !optionMatchesTerm(option, term)) return false;
+      if (
+        term &&
+        searchEntity.type === EntityType.Category &&
+        !optionMatchesTerm(searchEntity, term)
+      )
+        return false;
       return true;
     });
 
+    // Trigger exact match callback
     if (term && onExactMatch) {
-      const match = options.find((opt) => opt.label.toLowerCase() === term);
+      const match = searchEntities.find(
+        (opt) =>
+          opt.type === EntityType.Category && opt.label.toLowerCase() === term
+      ) as Category | undefined;
       if (match) {
         onExactMatch(match);
       }
