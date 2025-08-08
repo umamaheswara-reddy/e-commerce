@@ -9,7 +9,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { startWith } from 'rxjs';
 
 import { SearchService } from '../../search/services/search.service';
-import { Category, Item } from '../../search/models/product.models';
+import { SearchEntity } from '../../search/models/product.models';
 
 @Component({
   selector: 'app-header-autocomplete',
@@ -50,34 +50,38 @@ export class HeaderAutocompleteComponent {
     { initialValue: '' }
   );
 
-  // Cached category list — recomputes ONLY when options() changes
-  readonly categories = computed<Item<string>[]>(() => {
-    return this.searchService.getCategoryList();
-  });
+  // Category dropdown list
+  readonly categoryList = computed(() =>
+    this.searchService.getCategoryList().filter((c) => !!c.label)
+  );
 
-  // Filtered options using reusable service method
+  // Filtered options (now includes products)
   readonly filteredOptions = computed(() => {
+    const allEntities = [
+      ...this.searchService.categories(),
+      ...this.searchService.products(),
+    ];
     return this.searchService.filterByCategoryAndSearch(
       this.selectedCategoryIdSig(),
       this.searchTermSig(),
-      this.searchService.categories(),
-      (exactMatch) => this.onOptionSelected(exactMatch) // optional
+      allEntities,
+      (exactMatch) => this.onOptionSelected(exactMatch)
     );
   });
 
   // Selected option signal
-  readonly selectedOption = signal<Category | undefined>(undefined);
+  readonly selectedSearchEntity = signal<SearchEntity | undefined>(undefined);
 
   // Handle option selection
-  onOptionSelected(option: Category) {
-    this.selectedOption.set(option);
-    this.searchControl.setValue(option.label);
+  onOptionSelected(selectedSearchEntity: SearchEntity) {
+    this.selectedSearchEntity.set(selectedSearchEntity);
+    this.searchControl.setValue(selectedSearchEntity.label);
   }
 
   // Clear everything
   clearSearch(): void {
     this.searchControl.setValue(null);
     this.categoryControl.setValue('');
-    this.selectedOption.set(undefined);
+    this.selectedSearchEntity.set(undefined);
   }
 }

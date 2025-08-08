@@ -1,25 +1,47 @@
 // src/app/utils/search-utils.ts
 
-import { Category } from '../features/search/models/product.models';
+import {
+  Category,
+  EntityType,
+  SearchEntity,
+} from '../features/search/models/product.models';
 
 /** Checks if an option matches a search term in its label or nested categories */
-export function optionMatchesTerm(category: Category, term: string): boolean {
+export function optionMatchesTerm(
+  searchEntity: SearchEntity,
+  term: string
+): boolean {
   const normalized = term.toLowerCase();
-  if (category.label.toLowerCase().includes(normalized)) {
+
+  // Direct label match
+  if (searchEntity.label.toLowerCase().includes(normalized)) {
     return true;
   }
-  return (
-    !!category.children && searchInCategories(category.children, normalized)
-  );
+
+  // If it's a category, search children recursively
+  if (searchEntity.type === EntityType.Category && searchEntity.children) {
+    return searchInCategories(searchEntity.children, normalized);
+  }
+
+  return false;
 }
 
 /** Checks if an option belongs to a specific category id */
 export function optionMatchesCategory(
-  category: Category,
+  searchEntity: SearchEntity,
   categoryId: string
 ): boolean {
-  if (!category.children) return false;
-  return categoryTreeContainsId(category.children, categoryId);
+  // For categories, check the category tree
+  if (searchEntity.type === EntityType.Category && searchEntity.children) {
+    return categoryTreeContainsId(searchEntity.children, categoryId);
+  }
+
+  // For products, check if metadata has categoryId
+  if (searchEntity.type === EntityType.Product && searchEntity.categoryId) {
+    return searchEntity.categoryId === categoryId;
+  }
+
+  return false;
 }
 
 /** Recursively searches categories for a term */

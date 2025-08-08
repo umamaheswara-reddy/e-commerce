@@ -271,41 +271,39 @@ export class SearchService {
    * Filters options by category and search term.
    * Detects exact match and triggers optional callback.
    */
-
   filterByCategoryAndSearch(
     categoryId: string | null,
     searchTerm: string | null,
     searchEntities: SearchEntity[],
-    onExactMatch?: (option: Category) => void
+    onExactMatch?: (category: Category) => void
   ): SearchEntity[] {
     const normalizedCategoryId = categoryId ?? '';
     const term = (searchTerm ?? '').trim().toLowerCase();
 
     if (!term && !normalizedCategoryId) return searchEntities;
 
-    const filtered = searchEntities.filter((searchEntity) => {
-      // Filter by category if provided
-      if (
-        normalizedCategoryId &&
-        searchEntity.type === EntityType.Category &&
-        !optionMatchesCategory(searchEntity, normalizedCategoryId)
-      )
-        return false;
-      if (
-        term &&
-        searchEntity.type === EntityType.Category &&
-        !optionMatchesTerm(searchEntity, term)
-      )
-        return false;
+    const filtered = searchEntities.filter((entity) => {
+      // Only Category entities participate in category/term matching
+      if (entity.type === EntityType.Category) {
+        if (
+          normalizedCategoryId &&
+          !optionMatchesCategory(entity as Category, normalizedCategoryId)
+        ) {
+          return false;
+        }
+        if (term && !optionMatchesTerm(entity as Category, term)) {
+          return false;
+        }
+      }
       return true;
     });
 
-    // Trigger exact match callback
+    // Trigger exact match callback only for categories
     if (term && onExactMatch) {
       const match = searchEntities.find(
-        (opt) =>
+        (opt): opt is Category =>
           opt.type === EntityType.Category && opt.label.toLowerCase() === term
-      ) as Category | undefined;
+      );
       if (match) {
         onExactMatch(match);
       }
