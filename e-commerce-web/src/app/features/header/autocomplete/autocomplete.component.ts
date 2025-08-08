@@ -5,6 +5,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { startWith } from 'rxjs';
+
 import { SearchService } from '../../search/services/search.service';
 import {
   AutocompleteOption,
@@ -37,7 +40,22 @@ export class HeaderAutocompleteComponent {
   // Category selection form control
   readonly categoryControl = new FormControl<string>('');
 
-  // Get all top-level categories for the dropdown
+  // Reactive signals for form control values
+  readonly searchTermSig = toSignal(
+    this.searchControl.valueChanges.pipe(
+      startWith(this.searchControl.value ?? '')
+    ),
+    { initialValue: '' }
+  );
+
+  readonly selectedCategoryIdSig = toSignal(
+    this.categoryControl.valueChanges.pipe(
+      startWith(this.categoryControl.value ?? '')
+    ),
+    { initialValue: '' }
+  );
+
+  // All top-level categories for the dropdown
   readonly categories = computed<Category[]>(() => {
     const allCategories: Category[] = [];
     this.searchService.options().forEach((option) => {
@@ -48,56 +66,47 @@ export class HeaderAutocompleteComponent {
     return allCategories;
   });
 
-  // Result of filtered options using service
+  // Filtered options (reactive to both search term and category)
   readonly filteredOptions = computed(() => {
-    // Depend on both search and category controls
-    const searchTerm = (this.searchControl.value || '').toLowerCase();
-    const selectedCategoryId = this.categoryControl.value;
+    const searchTerm = (this.searchTermSig() || '').toLowerCase();
+    const selectedCategoryId = this.selectedCategoryIdSig();
 
-    // Get base options
     let options = this.searchService.options();
 
-    // Apply category filter if selected
+    // Apply category filter
     if (selectedCategoryId) {
-      options = options.filter((option) => {
-        // Check if option has categories and if any category matches
-        return option.categories?.some((category) =>
+      options = options.filter((option) =>
+        option.categories?.some((category) =>
           this.isCategoryInHierarchy(category, selectedCategoryId)
-        );
-      });
+        )
+      );
     }
 
     // Apply search term filter
     return this.searchService.filterAutocompleteResults(searchTerm, options);
   });
 
-  // Remove the constructor as it's no longer needed
+  // Selected option (optional)
+  readonly selectedOption = signal<AutocompleteOption | undefined>(undefined);
 
   // Check if category or any of its children matches the selected category ID
   private isCategoryInHierarchy(category: Category, targetId: string): boolean {
-    // Check if current category matches
     if (category.id === targetId) return true;
-
-    // Check children recursively
     if (category.children) {
       return category.children.some((child) =>
         this.isCategoryInHierarchy(child, targetId)
       );
     }
-
     return false;
   }
 
-  // Selected option (optional use in parent or UI)
-  readonly selectedOption = signal<AutocompleteOption | undefined>(undefined);
-
-  // Callback when option selected
+  // When option is selected
   onOptionSelected(option: AutocompleteOption) {
     this.selectedOption.set(option);
     this.searchControl.setValue(option.label);
   }
 
-  // Clear the search box and category filter
+  // Clear everything
   clearSearch(): void {
     this.searchControl.setValue(null);
     this.categoryControl.setValue('');
