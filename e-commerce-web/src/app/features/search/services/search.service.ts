@@ -2,6 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import {
   AutocompleteOption,
   Category,
+  Item,
 } from '../models/autocomplete-option.model';
 import {
   optionMatchesCategory,
@@ -21,27 +22,27 @@ export class SearchService {
       categories: [
         {
           id: 'cat-1-1',
-          name: 'Laptops & Computers',
+          label: 'Laptops & Computers',
           children: [
-            { id: 'cat-1-1-1', name: 'Gaming Laptops' },
-            { id: 'cat-1-1-2', name: 'Ultrabooks' },
-            { id: 'cat-1-1-3', name: '2-in-1 Convertibles' },
+            { id: 'cat-1-1-1', label: 'Gaming Laptops' },
+            { id: 'cat-1-1-2', label: 'Ultrabooks' },
+            { id: 'cat-1-1-3', label: '2-in-1 Convertibles' },
           ],
         },
         {
           id: 'cat-1-2',
-          name: 'Smartphones',
+          label: 'Smartphones',
           children: [
-            { id: 'cat-1-2-1', name: 'Android Phones' },
-            { id: 'cat-1-2-2', name: 'iPhones' },
+            { id: 'cat-1-2-1', label: 'Android Phones' },
+            { id: 'cat-1-2-2', label: 'iPhones' },
           ],
         },
         {
           id: 'cat-1-3',
-          name: 'Wearable Tech',
+          label: 'Wearable Tech',
           children: [
-            { id: 'cat-1-3-1', name: 'Smartwatches' },
-            { id: 'cat-1-3-2', name: 'Fitness Trackers' },
+            { id: 'cat-1-3-1', label: 'Smartwatches' },
+            { id: 'cat-1-3-2', label: 'Fitness Trackers' },
           ],
         },
       ],
@@ -53,19 +54,19 @@ export class SearchService {
       categories: [
         {
           id: 'cat-2-1',
-          name: 'Appliances',
+          label: 'Appliances',
           children: [
-            { id: 'cat-2-1-1', name: 'Refrigerators' },
-            { id: 'cat-2-1-2', name: 'Microwaves' },
-            { id: 'cat-2-1-3', name: 'Coffee Machines' },
+            { id: 'cat-2-1-1', label: 'Refrigerators' },
+            { id: 'cat-2-1-2', label: 'Microwaves' },
+            { id: 'cat-2-1-3', label: 'Coffee Machines' },
           ],
         },
         {
           id: 'cat-2-2',
-          name: 'Furniture',
+          label: 'Furniture',
           children: [
-            { id: 'cat-2-2-1', name: 'Sofas' },
-            { id: 'cat-2-2-2', name: 'Dining Tables' },
+            { id: 'cat-2-2-1', label: 'Sofas' },
+            { id: 'cat-2-2-2', label: 'Dining Tables' },
           ],
         },
       ],
@@ -77,18 +78,18 @@ export class SearchService {
       categories: [
         {
           id: 'cat-3-1',
-          name: 'Cycling',
+          label: 'Cycling',
           children: [
-            { id: 'cat-3-1-1', name: 'Mountain Bikes' },
-            { id: 'cat-3-1-2', name: 'Road Bikes' },
+            { id: 'cat-3-1-1', label: 'Mountain Bikes' },
+            { id: 'cat-3-1-2', label: 'Road Bikes' },
           ],
         },
         {
           id: 'cat-3-2',
-          name: 'Camping',
+          label: 'Camping',
           children: [
-            { id: 'cat-3-2-1', name: 'Tents' },
-            { id: 'cat-3-2-2', name: 'Sleeping Bags' },
+            { id: 'cat-3-2-1', label: 'Tents' },
+            { id: 'cat-3-2-2', label: 'Sleeping Bags' },
           ],
         },
       ],
@@ -184,18 +185,18 @@ export class SearchService {
   ]);
 
   /**
-   * Get a flat list of { id, name } for all categories.
+   * Get a flat list of { id, label } for all categories.
    * This is used for the category dropdown.
    */
-  getCategoryList(): { id: string; name: string }[] {
+  getCategoryList(): Item<string>[] {
     const seen = new Set<string>();
-    const result: { id: string; name: string }[] = [];
+    const result: Item<string>[] = [];
 
     const collectCategories = (categories: AutocompleteOption[]) => {
       for (const category of categories) {
-        if (!seen.has(category.name)) {
-          seen.add(category.name);
-          result.push({ id: category.id, name: category.name });
+        if (!seen.has(category.label)) {
+          seen.add(category.label);
+          result.push({ id: category.id, label: category.label });
         }
       }
     };
@@ -204,8 +205,8 @@ export class SearchService {
       .filter((c) => c.type === 'category' && c.categories)
       .forEach((opt) => collectCategories(opt.categories!));
 
-    // Sort alphabetically by name
-    return result.sort((a, b) => a.name.localeCompare(b.name));
+    // Sort alphabetically by label
+    return result.sort((a, b) => a.label.localeCompare(b.label));
   }
 
   /**

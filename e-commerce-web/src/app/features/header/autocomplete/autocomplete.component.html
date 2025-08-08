@@ -7,7 +7,7 @@
                     [class]="(noOptionCheck())?'no-option-check':''">
                     <mat-option value="">All Departments</mat-option>
                     @for (category of categories(); track category) {
-                    <mat-option [value]="category.id">{{category.name}}</mat-option>
+                    <mat-option [value]="category.id">{{category.label}}</mat-option>
                     }
                 </mat-select>
             </mat-form-field>

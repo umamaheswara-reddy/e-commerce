@@ -9,11 +9,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { startWith } from 'rxjs';
 
 import { SearchService } from '../../search/services/search.service';
-import {
-  AutocompleteOption,
-  Category,
-  CategoryDropdownItem,
-} from '../../search/models/autocomplete-option.model';
+import { Category, Item } from '../../search/models/autocomplete-option.model';
 
 @Component({
   selector: 'app-header-autocomplete',
@@ -55,7 +51,7 @@ export class HeaderAutocompleteComponent {
   );
 
   // Cached category list — recomputes ONLY when options() changes
-  readonly categories = computed<CategoryDropdownItem[]>(() => {
+  readonly categories = computed<Item<string>[]>(() => {
     return this.searchService.getCategoryList();
   });
 

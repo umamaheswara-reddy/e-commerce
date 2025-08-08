@@ -31,7 +31,7 @@ export function searchInCategories(
   term: string
 ): boolean {
   for (const category of categories) {
-    if (category.name.toLowerCase().includes(term)) {
+    if (category.label.toLowerCase().includes(term)) {
       return true;
     }
     if (category.children && searchInCategories(category.children, term)) {
