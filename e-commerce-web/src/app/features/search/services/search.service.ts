@@ -94,7 +94,7 @@ export class SearchService {
     return false;
   }
 
-  private filterAutocompleteResults(
+  filterAutocompleteResults(
     value: string,
     options: AutocompleteOption[]
   ): AutocompleteOption[] {

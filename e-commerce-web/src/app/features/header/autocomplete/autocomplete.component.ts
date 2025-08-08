@@ -49,10 +49,44 @@ export class HeaderAutocompleteComponent {
   });
 
   // Result of filtered options using service
-  readonly filteredOptions = this.searchService.getAutocompleteResults(
-    this.searchControl,
-    (match) => this.onOptionSelected(match)
-  );
+  readonly filteredOptions = computed(() => {
+    // Depend on both search and category controls
+    const searchTerm = (this.searchControl.value || '').toLowerCase();
+    const selectedCategoryId = this.categoryControl.value;
+
+    // Get base options
+    let options = this.searchService.options();
+
+    // Apply category filter if selected
+    if (selectedCategoryId) {
+      options = options.filter((option) => {
+        // Check if option has categories and if any category matches
+        return option.categories?.some((category) =>
+          this.isCategoryInHierarchy(category, selectedCategoryId)
+        );
+      });
+    }
+
+    // Apply search term filter
+    return this.searchService.filterAutocompleteResults(searchTerm, options);
+  });
+
+  // Remove the constructor as it's no longer needed
+
+  // Check if category or any of its children matches the selected category ID
+  private isCategoryInHierarchy(category: Category, targetId: string): boolean {
+    // Check if current category matches
+    if (category.id === targetId) return true;
+
+    // Check children recursively
+    if (category.children) {
+      return category.children.some((child) =>
+        this.isCategoryInHierarchy(child, targetId)
+      );
+    }
+
+    return false;
+  }
 
   // Selected option (optional use in parent or UI)
   readonly selectedOption = signal<AutocompleteOption | undefined>(undefined);
@@ -63,9 +97,10 @@ export class HeaderAutocompleteComponent {
     this.searchControl.setValue(option.label);
   }
 
-  // Clear the search box
+  // Clear the search box and category filter
   clearSearch(): void {
     this.searchControl.setValue(null);
+    this.categoryControl.setValue('');
     this.selectedOption.set(undefined);
   }
 }

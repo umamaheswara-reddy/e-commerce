@@ -3,6 +3,7 @@
         <div class="autocomplete__category-dropdown">
             <mat-form-field subscriptSizing="dynamic">
                 <mat-select placeholder="All" [formControl]="categoryControl"
+                    (selectionChange)="searchControl.setValue(searchControl.value)"
                     [class]="(noOptionCheck())?'no-option-check':''">
                     <mat-option value="">All Departments</mat-option>
                     @for (category of categories(); track category) {
