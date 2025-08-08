@@ -181,27 +181,30 @@ export class SearchService {
   ]);
 
   /**
-   * Get a flat list of { id, label } for all categories.
-   * This is used for the category dropdown.
+   * Get a list of categories { id, label }.
+   * Can return only top-level or all nested categories based on `includeNested`.
    */
-  getCategoryList(): Item<string>[] {
+  getCategoryList(includeNested = false): Item<string>[] {
     const seen = new Set<string>();
     const result: Item<string>[] = [];
 
-    const collectCategories = (categories: Category[]) => {
+    const collect = (categories: Category[], nested: boolean) => {
       for (const category of categories) {
         if (!seen.has(category.label)) {
           seen.add(category.label);
           result.push({ id: category.id, label: category.label });
+        }
+
+        if (nested && category.children?.length) {
+          collect(category.children, nested);
         }
       }
     };
 
     this.categories()
       .filter((c) => c.type === 'category' && c.children)
-      .forEach((opt) => collectCategories(opt.children!));
+      .forEach((c) => collect(c.children ?? [], includeNested));
 
-    // Sort alphabetically by label
     return result.sort((a, b) => a.label.localeCompare(b.label));
   }
 
