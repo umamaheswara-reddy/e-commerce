@@ -12,6 +12,7 @@ import { SearchService } from '../../search/services/search.service';
 import {
   AutocompleteOption,
   Category,
+  CategoryDropdownItem,
 } from '../../search/models/autocomplete-option.model';
 
 @Component({
@@ -54,14 +55,8 @@ export class HeaderAutocompleteComponent {
   );
 
   // Cached category list — recomputes ONLY when options() changes
-  readonly categories = computed<Category[]>(() => {
-    const allCategories: Category[] = [];
-    for (const option of this.searchService.options()) {
-      if (option.categories) {
-        allCategories.push(...option.categories);
-      }
-    }
-    return allCategories;
+  readonly categories = computed<CategoryDropdownItem[]>(() => {
+    return this.searchService.getCategoryList();
   });
 
   // Filtered options using reusable service method
