@@ -11,7 +11,7 @@ import {
   providedIn: 'root',
 })
 export class SearchService {
-  // All available options as a signal
+  // All available options as a signal (stubbed for now, can be replaced with API)
   readonly options = signal<AutocompleteOption[]>([
     {
       id: '1',
@@ -44,25 +44,25 @@ export class SearchService {
     { id: '7', label: 'Nike Brand', type: 'brand' },
   ]);
 
+  /**
+   * Wraps a FormControl's valueChanges into a reactive signal
+   * that auto-filters based on current options.
+   */
   getAutocompleteResults(
     control: FormControl,
     onExactMatch?: (option: AutocompleteOption) => void
   ): Signal<AutocompleteOption[]> {
     let lastMatchId: string | undefined;
+
     return toSignal(
       control.valueChanges.pipe(
-        startWith(''),
+        startWith(control.value ?? ''),
         map((value) => {
           const normalized = (value || '').toLowerCase();
-          const filtered = this.filterAutocompleteResults(
-            normalized,
-            this.options()
-          );
+          const filtered = this.filterBySearchTerm(normalized, this.options());
 
           if (onExactMatch) {
-            const match = this.options().find(
-              (opt) => opt.label.toLowerCase() === normalized
-            );
+            const match = this.findExactMatch(normalized);
             if (match && match.id !== lastMatchId) {
               lastMatchId = match.id;
               onExactMatch(match);
@@ -76,44 +76,96 @@ export class SearchService {
     );
   }
 
-  private searchInCategories(
-    categories: Category[],
-    filterValue: string
-  ): boolean {
-    for (const category of categories) {
-      if (category.name.toLowerCase().includes(filterValue)) {
-        return true;
-      }
-      if (
-        category.children &&
-        this.searchInCategories(category.children, filterValue)
-      ) {
-        return true;
-      }
+  /**
+   * Filters options by search term.
+   */
+  filterBySearchTerm(
+    searchTerm: string,
+    options: AutocompleteOption[]
+  ): AutocompleteOption[] {
+    const term = searchTerm.toLowerCase();
+    return options.filter((option) =>
+      this.matchesOptionOrCategory(option, term)
+    );
+  }
+
+  /**
+   * Filters options by category ID (including nested categories).
+   */
+  filterByCategoryId(
+    categoryId: string,
+    options: AutocompleteOption[]
+  ): AutocompleteOption[] {
+    if (!categoryId) return options;
+
+    return options.filter((option) =>
+      option.categories?.some((cat) =>
+        this.isCategoryInHierarchy(cat, categoryId)
+      )
+    );
+  }
+
+  /**
+   * Filters options by BOTH category and search term.
+   */
+  filterByCategoryAndSearch(
+    categoryId: string,
+    searchTerm: string,
+    options: AutocompleteOption[]
+  ): AutocompleteOption[] {
+    let result = this.filterByCategoryId(categoryId, options);
+    if (searchTerm) {
+      result = this.filterBySearchTerm(searchTerm, result);
     }
+    return result;
+  }
+
+  /**
+   * Finds an exact match for a term.
+   */
+  findExactMatch(normalizedTerm: string): AutocompleteOption | undefined {
+    return this.options().find(
+      (opt) => opt.label.toLowerCase() === normalizedTerm
+    );
+  }
+
+  /**
+   * Checks if an option matches a search term in its label or any of its categories.
+   */
+  private matchesOptionOrCategory(
+    option: AutocompleteOption,
+    term: string
+  ): boolean {
+    if (option.label.toLowerCase().includes(term)) return true;
+    if (option.categories && this.searchInCategories(option.categories, term))
+      return true;
     return false;
   }
 
-  filterAutocompleteResults(
-    value: string,
-    options: AutocompleteOption[]
-  ): AutocompleteOption[] {
-    const filterValue = value.toLowerCase();
-    return options.filter((option) => {
-      // Check the option itself
-      if (option.label.toLowerCase().includes(filterValue)) {
-        return true;
-      }
+  /**
+   * Recursively searches within categories for a match.
+   */
+  private searchInCategories(categories: Category[], term: string): boolean {
+    return categories.some(
+      (category) =>
+        category.name.toLowerCase().includes(term) ||
+        (category.children && this.searchInCategories(category.children, term))
+    );
+  }
 
-      // Check nested categories if they exist
-      if (
-        option.categories &&
-        this.searchInCategories(option.categories, filterValue)
-      ) {
-        return true;
-      }
-
-      return false;
-    });
+  /**
+   * Checks if category or any of its children matches the target ID.
+   */
+  private isCategoryInHierarchy(category: Category, targetId: string): boolean {
+    if (category.id === targetId) return true;
+    if (
+      category.children &&
+      category.children.some((child) =>
+        this.isCategoryInHierarchy(child, targetId)
+      )
+    ) {
+      return true;
+    }
+    return false;
   }
 }

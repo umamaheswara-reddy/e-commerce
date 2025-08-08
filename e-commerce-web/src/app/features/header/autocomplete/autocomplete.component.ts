@@ -34,13 +34,11 @@ export class HeaderAutocompleteComponent {
   // External flag to control styling
   noOptionCheck = input<boolean>(false);
 
-  // Search input form control
+  // Form controls
   readonly searchControl = new FormControl<string | null>(null);
-
-  // Category selection form control
   readonly categoryControl = new FormControl<string>('');
 
-  // Reactive signals for form control values
+  // Reactive signals from form controls
   readonly searchTermSig = toSignal(
     this.searchControl.valueChanges.pipe(
       startWith(this.searchControl.value ?? '')
@@ -55,7 +53,7 @@ export class HeaderAutocompleteComponent {
     { initialValue: '' }
   );
 
-  // All top-level categories for the dropdown
+  // All top-level categories for dropdown
   readonly categories = computed<Category[]>(() => {
     const allCategories: Category[] = [];
     this.searchService.options().forEach((option) => {
@@ -66,41 +64,19 @@ export class HeaderAutocompleteComponent {
     return allCategories;
   });
 
-  // Filtered options (reactive to both search term and category)
+  // Filtered options using reusable service method
   readonly filteredOptions = computed(() => {
-    const searchTerm = (this.searchTermSig() || '').toLowerCase();
-    const selectedCategoryId = this.selectedCategoryIdSig();
-
-    let options = this.searchService.options();
-
-    // Apply category filter
-    if (selectedCategoryId) {
-      options = options.filter((option) =>
-        option.categories?.some((category) =>
-          this.isCategoryInHierarchy(category, selectedCategoryId)
-        )
-      );
-    }
-
-    // Apply search term filter
-    return this.searchService.filterAutocompleteResults(searchTerm, options);
+    return this.searchService.filterByCategoryAndSearch(
+      this.selectedCategoryIdSig(),
+      this.searchTermSig(),
+      this.searchService.options()
+    );
   });
 
-  // Selected option (optional)
+  // Selected option signal
   readonly selectedOption = signal<AutocompleteOption | undefined>(undefined);
 
-  // Check if category or any of its children matches the selected category ID
-  private isCategoryInHierarchy(category: Category, targetId: string): boolean {
-    if (category.id === targetId) return true;
-    if (category.children) {
-      return category.children.some((child) =>
-        this.isCategoryInHierarchy(child, targetId)
-      );
-    }
-    return false;
-  }
-
-  // When option is selected
+  // Handle option selection
   onOptionSelected(option: AutocompleteOption) {
     this.selectedOption.set(option);
     this.searchControl.setValue(option.label);
