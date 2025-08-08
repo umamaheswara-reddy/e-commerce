@@ -1,9 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import {
-  AutocompleteOption,
-  Category,
-  Item,
-} from '../models/autocomplete-option.model';
+import { Category, Item } from '../models/product.models';
 import {
   optionMatchesCategory,
   optionMatchesTerm,
@@ -19,7 +15,7 @@ export class SearchService {
       id: 'cat-1',
       label: 'Electronics & Gadgets',
       type: 'category',
-      categories: [
+      children: [
         {
           id: 'cat-1-1',
           label: 'Laptops & Computers',
@@ -51,7 +47,7 @@ export class SearchService {
       id: 'cat-2',
       label: 'Home & Kitchen',
       type: 'category',
-      categories: [
+      children: [
         {
           id: 'cat-2-1',
           label: 'Appliances',
@@ -75,7 +71,7 @@ export class SearchService {
       id: 'cat-3',
       label: 'Sports & Outdoors',
       type: 'category',
-      categories: [
+      children: [
         {
           id: 'cat-3-1',
           label: 'Cycling',
@@ -192,7 +188,7 @@ export class SearchService {
     const seen = new Set<string>();
     const result: Item<string>[] = [];
 
-    const collectCategories = (categories: AutocompleteOption[]) => {
+    const collectCategories = (categories: Category[]) => {
       for (const category of categories) {
         if (!seen.has(category.label)) {
           seen.add(category.label);
@@ -202,8 +198,8 @@ export class SearchService {
     };
 
     this.categories()
-      .filter((c) => c.type === 'category' && c.categories)
-      .forEach((opt) => collectCategories(opt.categories!));
+      .filter((c) => c.type === 'category' && c.children)
+      .forEach((opt) => collectCategories(opt.children!));
 
     // Sort alphabetically by label
     return result.sort((a, b) => a.label.localeCompare(b.label));

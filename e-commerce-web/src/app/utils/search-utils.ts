@@ -1,9 +1,6 @@
 // src/app/utils/search-utils.ts
 
-import {
-  AutocompleteOption,
-  Category,
-} from '../features/search/models/autocomplete-option.model';
+import { Category } from '../features/search/models/product.models';
 
 /** Checks if an option matches a search term in its label or nested categories */
 export function optionMatchesTerm(category: Category, term: string): boolean {
@@ -12,7 +9,7 @@ export function optionMatchesTerm(category: Category, term: string): boolean {
     return true;
   }
   return (
-    !!category.categories && searchInCategories(category.categories, normalized)
+    !!category.children && searchInCategories(category.children, normalized)
   );
 }
 
@@ -21,13 +18,13 @@ export function optionMatchesCategory(
   category: Category,
   categoryId: string
 ): boolean {
-  if (!category.categories) return false;
-  return categoryTreeContainsId(category.categories, categoryId);
+  if (!category.children) return false;
+  return categoryTreeContainsId(category.children, categoryId);
 }
 
 /** Recursively searches categories for a term */
 export function searchInCategories(
-  categories: AutocompleteOption[],
+  categories: Category[],
   term: string
 ): boolean {
   for (const category of categories) {
@@ -43,7 +40,7 @@ export function searchInCategories(
 
 /** Recursively checks if a category tree contains a specific id */
 export function categoryTreeContainsId(
-  categories: AutocompleteOption[],
+  categories: Category[],
   id: string
 ): boolean {
   for (const category of categories) {

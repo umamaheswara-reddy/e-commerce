@@ -9,7 +9,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { startWith } from 'rxjs';
 
 import { SearchService } from '../../search/services/search.service';
-import { Category, Item } from '../../search/models/autocomplete-option.model';
+import { Category, Item } from '../../search/models/product.models';
 
 @Component({
   selector: 'app-header-autocomplete',
