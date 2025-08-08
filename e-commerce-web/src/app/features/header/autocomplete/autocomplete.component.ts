@@ -10,6 +10,7 @@ import { startWith } from 'rxjs';
 
 import { SearchService } from '../../search/services/search.service';
 import { SearchEntity } from '../../search/models/product.models';
+import { formControlSignal } from '../../../utils/form-utils';
 
 @Component({
   selector: 'app-header-autocomplete',
@@ -36,19 +37,8 @@ export class HeaderAutocompleteComponent {
   readonly categoryControl = new FormControl<string>('');
 
   // Reactive signals from form controls
-  readonly searchTermSig = toSignal(
-    this.searchControl.valueChanges.pipe(
-      startWith(this.searchControl.value ?? '')
-    ),
-    { initialValue: '' }
-  );
-
-  readonly selectedCategoryIdSig = toSignal(
-    this.categoryControl.valueChanges.pipe(
-      startWith(this.categoryControl.value ?? '')
-    ),
-    { initialValue: '' }
-  );
+  readonly searchTermSig = formControlSignal(this.searchControl, '');
+  readonly selectedCategoryIdSig = formControlSignal(this.categoryControl, '');
 
   // Category dropdown list
   readonly categoryList = computed(() =>
