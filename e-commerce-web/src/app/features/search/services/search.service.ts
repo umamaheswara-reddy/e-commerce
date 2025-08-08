@@ -1,17 +1,14 @@
-import { Injectable, signal, Signal } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { map, startWith } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
 import {
-  AutocompleteOption,
   Category,
+  AutocompleteOption,
 } from '../models/autocomplete-option.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SearchService {
-  // All available options as a signal (stubbed for now, can be replaced with API)
+  // All available options as a signal — later can be replaced by API data
   readonly options = signal<AutocompleteOption[]>([
     {
       id: '1',
@@ -45,126 +42,88 @@ export class SearchService {
   ]);
 
   /**
-   * Wraps a FormControl's valueChanges into a reactive signal
-   * that auto-filters based on current options.
-   */
-  getAutocompleteResults(
-    control: FormControl,
-    onExactMatch?: (option: AutocompleteOption) => void
-  ): Signal<AutocompleteOption[]> {
-    let lastMatchId: string | undefined;
-
-    return toSignal(
-      control.valueChanges.pipe(
-        startWith(control.value ?? ''),
-        map((value) => {
-          const normalized = (value || '').toLowerCase();
-          const filtered = this.filterBySearchTerm(normalized, this.options());
-
-          if (onExactMatch) {
-            const match = this.findExactMatch(normalized);
-            if (match && match.id !== lastMatchId) {
-              lastMatchId = match.id;
-              onExactMatch(match);
-            }
-          }
-
-          return filtered;
-        })
-      ),
-      { initialValue: this.options() }
-    );
-  }
-
-  /**
-   * Filters options by search term.
-   */
-  filterBySearchTerm(
-    searchTerm: string,
-    options: AutocompleteOption[]
-  ): AutocompleteOption[] {
-    const term = searchTerm.toLowerCase();
-    return options.filter((option) =>
-      this.matchesOptionOrCategory(option, term)
-    );
-  }
-
-  /**
-   * Filters options by category ID (including nested categories).
-   */
-  filterByCategoryId(
-    categoryId: string,
-    options: AutocompleteOption[]
-  ): AutocompleteOption[] {
-    if (!categoryId) return options;
-
-    return options.filter((option) =>
-      option.categories?.some((cat) =>
-        this.isCategoryInHierarchy(cat, categoryId)
-      )
-    );
-  }
-
-  /**
-   * Filters options by BOTH category and search term.
+   * Filters options by category and search term.
+   * Detects exact match and triggers optional callback.
    */
   filterByCategoryAndSearch(
     categoryId: string,
     searchTerm: string,
-    options: AutocompleteOption[]
+    options: AutocompleteOption[],
+    onExactMatch?: (option: AutocompleteOption) => void
   ): AutocompleteOption[] {
-    let result = this.filterByCategoryId(categoryId, options);
-    if (searchTerm) {
-      result = this.filterBySearchTerm(searchTerm, result);
+    const term = (searchTerm || '').trim().toLowerCase();
+    if (!term && !categoryId) return options;
+
+    const filtered = options.filter((option) => {
+      // Filter by category if provided
+      if (categoryId && !this.optionMatchesCategory(option, categoryId)) {
+        return false;
+      }
+      // Filter by search term if provided
+      if (term && !this.optionMatchesTerm(option, term)) {
+        return false;
+      }
+      return true;
+    });
+
+    // Handle exact match case
+    if (term && onExactMatch) {
+      const match = options.find((opt) => opt.label.toLowerCase() === term);
+      if (match) {
+        onExactMatch(match);
+      }
     }
-    return result;
+
+    return filtered;
   }
 
-  /**
-   * Finds an exact match for a term.
-   */
-  findExactMatch(normalizedTerm: string): AutocompleteOption | undefined {
-    return this.options().find(
-      (opt) => opt.label.toLowerCase() === normalizedTerm
+  /** Checks if an option matches a search term in its label or nested categories */
+  private optionMatchesTerm(option: AutocompleteOption, term: string): boolean {
+    if (option.label.toLowerCase().includes(term)) {
+      return true;
+    }
+    return (
+      !!option.categories && this.searchInCategories(option.categories, term)
     );
   }
 
-  /**
-   * Checks if an option matches a search term in its label or any of its categories.
-   */
-  private matchesOptionOrCategory(
+  /** Checks if an option belongs to a specific category id */
+  private optionMatchesCategory(
     option: AutocompleteOption,
-    term: string
+    categoryId: string
   ): boolean {
-    if (option.label.toLowerCase().includes(term)) return true;
-    if (option.categories && this.searchInCategories(option.categories, term))
-      return true;
+    if (!option.categories) return false;
+    return this.categoryTreeContainsId(option.categories, categoryId);
+  }
+
+  /** Recursively searches categories for a term */
+  private searchInCategories(categories: Category[], term: string): boolean {
+    for (const category of categories) {
+      if (category.name.toLowerCase().includes(term)) {
+        return true;
+      }
+      if (
+        category.children &&
+        this.searchInCategories(category.children, term)
+      ) {
+        return true;
+      }
+    }
     return false;
   }
 
-  /**
-   * Recursively searches within categories for a match.
-   */
-  private searchInCategories(categories: Category[], term: string): boolean {
-    return categories.some(
-      (category) =>
-        category.name.toLowerCase().includes(term) ||
-        (category.children && this.searchInCategories(category.children, term))
-    );
-  }
-
-  /**
-   * Checks if category or any of its children matches the target ID.
-   */
-  private isCategoryInHierarchy(category: Category, targetId: string): boolean {
-    if (category.id === targetId) return true;
-    if (
-      category.children &&
-      category.children.some((child) =>
-        this.isCategoryInHierarchy(child, targetId)
-      )
-    ) {
-      return true;
+  /** Recursively checks if a category tree contains a specific id */
+  private categoryTreeContainsId(categories: Category[], id: string): boolean {
+    for (const category of categories) {
+      if (category.id === id) {
+        return true;
+      }
+      if (
+        category.children &&
+        this.categoryTreeContainsId(category.children, id)
+      ) {
+        return true;
+      }
     }
     return false;
   }

@@ -53,14 +53,14 @@ export class HeaderAutocompleteComponent {
     { initialValue: '' }
   );
 
-  // All top-level categories for dropdown
+  // Cached category list — recomputes ONLY when options() changes
   readonly categories = computed<Category[]>(() => {
     const allCategories: Category[] = [];
-    this.searchService.options().forEach((option) => {
+    for (const option of this.searchService.options()) {
       if (option.categories) {
         allCategories.push(...option.categories);
       }
-    });
+    }
     return allCategories;
   });
 
@@ -69,7 +69,8 @@ export class HeaderAutocompleteComponent {
     return this.searchService.filterByCategoryAndSearch(
       this.selectedCategoryIdSig(),
       this.searchTermSig(),
-      this.searchService.options()
+      this.searchService.options(),
+      (exactMatch) => this.onOptionSelected(exactMatch) // optional
     );
   });
 
