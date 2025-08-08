@@ -64,16 +64,16 @@ export class HeaderAutocompleteComponent {
     return this.searchService.filterByCategoryAndSearch(
       this.selectedCategoryIdSig(),
       this.searchTermSig(),
-      this.searchService.options(),
+      this.searchService.categories(),
       (exactMatch) => this.onOptionSelected(exactMatch) // optional
     );
   });
 
   // Selected option signal
-  readonly selectedOption = signal<AutocompleteOption | undefined>(undefined);
+  readonly selectedOption = signal<Category | undefined>(undefined);
 
   // Handle option selection
-  onOptionSelected(option: AutocompleteOption) {
+  onOptionSelected(option: Category) {
     this.selectedOption.set(option);
     this.searchControl.setValue(option.label);
   }

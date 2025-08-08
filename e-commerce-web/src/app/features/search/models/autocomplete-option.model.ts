@@ -1,7 +1,7 @@
-export interface Category {
+export interface AutocompleteOption {
   id: string;
   name: string;
-  children?: Category[];
+  children?: AutocompleteOption[];
 }
 
 export interface CategoryDropdownItem {
@@ -9,10 +9,10 @@ export interface CategoryDropdownItem {
   name: string;
 }
 
-export interface AutocompleteOption {
+export interface Category {
   id: string;
   label: string;
   type: 'product' | 'category' | 'brand' | 'deal' | 'trending' | 'new-arrival';
   metadata?: Record<string, any>;
-  categories?: Category[];
+  categories?: AutocompleteOption[];
 }

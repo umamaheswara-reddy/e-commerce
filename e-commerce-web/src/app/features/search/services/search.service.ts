@@ -12,8 +12,8 @@ import {
   providedIn: 'root',
 })
 export class SearchService {
-  // All available options as a signal — later can be replaced by API data
-  readonly options = signal<AutocompleteOption[]>([
+  // All available categories as a signal — later can be replaced by API data
+  readonly categories = signal<Category[]>([
     {
       id: 'cat-1',
       label: 'Electronics & Gadgets',
@@ -191,20 +191,17 @@ export class SearchService {
     const seen = new Set<string>();
     const result: { id: string; name: string }[] = [];
 
-    const collectCategories = (categories: Category[]) => {
+    const collectCategories = (categories: AutocompleteOption[]) => {
       for (const category of categories) {
         if (!seen.has(category.name)) {
           seen.add(category.name);
           result.push({ id: category.id, name: category.name });
         }
-        if (category.children) {
-          collectCategories(category.children);
-        }
       }
     };
 
-    this.options()
-      .filter((opt) => opt.type === 'category' && opt.categories)
+    this.categories()
+      .filter((c) => c.type === 'category' && c.categories)
       .forEach((opt) => collectCategories(opt.categories!));
 
     // Sort alphabetically by name
@@ -215,7 +212,7 @@ export class SearchService {
    * Get all autocomplete labels (for search autocomplete panel).
    */
   getAutocompleteLabels(): string[] {
-    return this.options().map((opt) => opt.label);
+    return this.categories().map((opt) => opt.label);
   }
 
   /**
@@ -226,9 +223,9 @@ export class SearchService {
   filterByCategoryAndSearch(
     categoryId: string | null,
     searchTerm: string | null,
-    options: AutocompleteOption[],
-    onExactMatch?: (option: AutocompleteOption) => void
-  ): AutocompleteOption[] {
+    options: Category[],
+    onExactMatch?: (option: Category) => void
+  ): Category[] {
     const normalizedCategoryId = categoryId ?? '';
     const term = (searchTerm ?? '').trim().toLowerCase();
 
