@@ -1,8 +1,12 @@
 import { Injectable, signal } from '@angular/core';
 import {
-  Category,
   AutocompleteOption,
+  Category,
 } from '../models/autocomplete-option.model';
+import {
+  optionMatchesCategory,
+  optionMatchesTerm,
+} from '../../../utils/search-utils';
 
 @Injectable({
   providedIn: 'root',
@@ -11,62 +15,235 @@ export class SearchService {
   // All available options as a signal — later can be replaced by API data
   readonly options = signal<AutocompleteOption[]>([
     {
-      id: '1',
-      label: 'Electronics',
+      id: 'cat-1',
+      label: 'Electronics & Gadgets',
       type: 'category',
       categories: [
         {
-          id: '1-1',
+          id: 'cat-1-1',
           name: 'Laptops & Computers',
           children: [
-            { id: '1-1-1', name: 'Gaming Laptops' },
-            { id: '1-1-2', name: 'Ultrabooks' },
+            { id: 'cat-1-1-1', name: 'Gaming Laptops' },
+            { id: 'cat-1-1-2', name: 'Ultrabooks' },
+            { id: 'cat-1-1-3', name: '2-in-1 Convertibles' },
           ],
         },
         {
-          id: '1-2',
+          id: 'cat-1-2',
           name: 'Smartphones',
           children: [
-            { id: '1-2-1', name: 'Android' },
-            { id: '1-2-2', name: 'iOS' },
+            { id: 'cat-1-2-1', name: 'Android Phones' },
+            { id: 'cat-1-2-2', name: 'iPhones' },
+          ],
+        },
+        {
+          id: 'cat-1-3',
+          name: 'Wearable Tech',
+          children: [
+            { id: 'cat-1-3-1', name: 'Smartwatches' },
+            { id: 'cat-1-3-2', name: 'Fitness Trackers' },
           ],
         },
       ],
     },
-    { id: '2', label: 'Summer Sale - Up to 50% off', type: 'deal' },
-    { id: '3', label: 'Wireless Headphones', type: 'product' },
-    { id: '4', label: 'New Arrivals in Home & Kitchen', type: 'new-arrival' },
-    { id: '5', label: 'Samsung Galaxy S23', type: 'product' },
-    { id: '6', label: 'Top Deals', type: 'trending' },
-    { id: '7', label: 'Nike Brand', type: 'brand' },
+    {
+      id: 'cat-2',
+      label: 'Home & Kitchen',
+      type: 'category',
+      categories: [
+        {
+          id: 'cat-2-1',
+          name: 'Appliances',
+          children: [
+            { id: 'cat-2-1-1', name: 'Refrigerators' },
+            { id: 'cat-2-1-2', name: 'Microwaves' },
+            { id: 'cat-2-1-3', name: 'Coffee Machines' },
+          ],
+        },
+        {
+          id: 'cat-2-2',
+          name: 'Furniture',
+          children: [
+            { id: 'cat-2-2-1', name: 'Sofas' },
+            { id: 'cat-2-2-2', name: 'Dining Tables' },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'cat-3',
+      label: 'Sports & Outdoors',
+      type: 'category',
+      categories: [
+        {
+          id: 'cat-3-1',
+          name: 'Cycling',
+          children: [
+            { id: 'cat-3-1-1', name: 'Mountain Bikes' },
+            { id: 'cat-3-1-2', name: 'Road Bikes' },
+          ],
+        },
+        {
+          id: 'cat-3-2',
+          name: 'Camping',
+          children: [
+            { id: 'cat-3-2-1', name: 'Tents' },
+            { id: 'cat-3-2-2', name: 'Sleeping Bags' },
+          ],
+        },
+      ],
+    },
+
+    // Products
+    {
+      id: 'prod-1',
+      label: 'Samsung Galaxy S23 Ultra',
+      type: 'product',
+      metadata: { brand: 'Samsung', price: 1199 },
+    },
+    {
+      id: 'prod-2',
+      label: 'Apple MacBook Air M3',
+      type: 'product',
+      metadata: { brand: 'Apple', price: 1499 },
+    },
+    {
+      id: 'prod-3',
+      label: 'Sony WH-1000XM5 Noise Cancelling Headphones',
+      type: 'product',
+      metadata: { brand: 'Sony', price: 399 },
+    },
+    {
+      id: 'prod-4',
+      label: 'Dyson V15 Detect Cordless Vacuum',
+      type: 'product',
+      metadata: { brand: 'Dyson', price: 749 },
+    },
+
+    // Deals
+    {
+      id: 'deal-1',
+      label: 'Summer Sale – Up to 50% Off Electronics',
+      type: 'deal',
+    },
+    {
+      id: 'deal-2',
+      label: 'Buy 1 Get 1 Free – Kitchen Essentials',
+      type: 'deal',
+    },
+
+    // Trending
+    {
+      id: 'trend-1',
+      label: 'Top Deals on Smart Home Devices',
+      type: 'trending',
+    },
+    {
+      id: 'trend-2',
+      label: 'Trending: Minimalist Furniture Designs',
+      type: 'trending',
+    },
+
+    // New Arrivals
+    {
+      id: 'new-1',
+      label: 'New Arrival: GoPro Hero 12 Black',
+      type: 'new-arrival',
+    },
+    {
+      id: 'new-2',
+      label: 'Just Launched: Nike Air Zoom Pegasus 40',
+      type: 'new-arrival',
+    },
+
+    // Brands
+    {
+      id: 'brand-1',
+      label: 'Nike',
+      type: 'brand',
+      metadata: { country: 'USA' },
+    },
+    {
+      id: 'brand-2',
+      label: 'Adidas',
+      type: 'brand',
+      metadata: { country: 'Germany' },
+    },
+    {
+      id: 'brand-3',
+      label: 'Samsung',
+      type: 'brand',
+      metadata: { country: 'South Korea' },
+    },
+    {
+      id: 'brand-4',
+      label: 'Apple',
+      type: 'brand',
+      metadata: { country: 'USA' },
+    },
   ]);
+
+  /**
+   * Get a flat list of { id, name } for all categories.
+   * This is used for the category dropdown.
+   */
+  getCategoryList(): { id: string; name: string }[] {
+    const seen = new Set<string>();
+    const result: { id: string; name: string }[] = [];
+
+    const collectCategories = (categories: Category[]) => {
+      for (const category of categories) {
+        if (!seen.has(category.name)) {
+          seen.add(category.name);
+          result.push({ id: category.id, name: category.name });
+        }
+        if (category.children) {
+          collectCategories(category.children);
+        }
+      }
+    };
+
+    this.options()
+      .filter((opt) => opt.type === 'category' && opt.categories)
+      .forEach((opt) => collectCategories(opt.categories!));
+
+    // Sort alphabetically by name
+    return result.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  /**
+   * Get all autocomplete labels (for search autocomplete panel).
+   */
+  getAutocompleteLabels(): string[] {
+    return this.options().map((opt) => opt.label);
+  }
 
   /**
    * Filters options by category and search term.
    * Detects exact match and triggers optional callback.
    */
+
   filterByCategoryAndSearch(
-    categoryId: string,
-    searchTerm: string,
+    categoryId: string | null,
+    searchTerm: string | null,
     options: AutocompleteOption[],
     onExactMatch?: (option: AutocompleteOption) => void
   ): AutocompleteOption[] {
-    const term = (searchTerm || '').trim().toLowerCase();
-    if (!term && !categoryId) return options;
+    const normalizedCategoryId = categoryId ?? '';
+    const term = (searchTerm ?? '').trim().toLowerCase();
+
+    if (!term && !normalizedCategoryId) return options;
 
     const filtered = options.filter((option) => {
-      // Filter by category if provided
-      if (categoryId && !this.optionMatchesCategory(option, categoryId)) {
+      if (
+        normalizedCategoryId &&
+        !optionMatchesCategory(option, normalizedCategoryId)
+      )
         return false;
-      }
-      // Filter by search term if provided
-      if (term && !this.optionMatchesTerm(option, term)) {
-        return false;
-      }
+      if (term && !optionMatchesTerm(option, term)) return false;
       return true;
     });
 
-    // Handle exact match case
     if (term && onExactMatch) {
       const match = options.find((opt) => opt.label.toLowerCase() === term);
       if (match) {
@@ -75,56 +252,5 @@ export class SearchService {
     }
 
     return filtered;
-  }
-
-  /** Checks if an option matches a search term in its label or nested categories */
-  private optionMatchesTerm(option: AutocompleteOption, term: string): boolean {
-    if (option.label.toLowerCase().includes(term)) {
-      return true;
-    }
-    return (
-      !!option.categories && this.searchInCategories(option.categories, term)
-    );
-  }
-
-  /** Checks if an option belongs to a specific category id */
-  private optionMatchesCategory(
-    option: AutocompleteOption,
-    categoryId: string
-  ): boolean {
-    if (!option.categories) return false;
-    return this.categoryTreeContainsId(option.categories, categoryId);
-  }
-
-  /** Recursively searches categories for a term */
-  private searchInCategories(categories: Category[], term: string): boolean {
-    for (const category of categories) {
-      if (category.name.toLowerCase().includes(term)) {
-        return true;
-      }
-      if (
-        category.children &&
-        this.searchInCategories(category.children, term)
-      ) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /** Recursively checks if a category tree contains a specific id */
-  private categoryTreeContainsId(categories: Category[], id: string): boolean {
-    for (const category of categories) {
-      if (category.id === id) {
-        return true;
-      }
-      if (
-        category.children &&
-        this.categoryTreeContainsId(category.children, id)
-      ) {
-        return true;
-      }
-    }
-    return false;
   }
 }

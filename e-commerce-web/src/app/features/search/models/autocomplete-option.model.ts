@@ -4,6 +4,11 @@ export interface Category {
   children?: Category[];
 }
 
+export interface CategoryDropdownItem {
+  id: string;
+  name: string;
+}
+
 export interface AutocompleteOption {
   id: string;
   label: string;
