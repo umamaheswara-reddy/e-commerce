@@ -1,19 +1,5 @@
-export enum EntityType {
-  Category = 'category',
-  Product = 'product',
-  Brand = 'brand',
-  Deal = 'deal',
-  Trending = 'trending',
-  NewArrival = 'new-arrival',
-}
-export interface KeyValuePair<T extends string | number> {
-  id: T;
-  label: string;
-}
-export interface BaseEntity<T extends string | number> extends KeyValuePair<T> {
-  type: EntityType;
-  metadata?: Record<string, any>;
-}
+import { BaseEntity } from './base-entity.interface';
+import { EntityType } from './entity-type.enum';
 
 export interface Category extends BaseEntity<string> {
   type: EntityType.Category;
@@ -43,11 +29,3 @@ export interface Trending extends BaseEntity<string> {
 export interface NewArrival extends BaseEntity<string> {
   type: EntityType.NewArrival;
 }
-
-export type SearchEntity =
-  | Category
-  | Product
-  | Brand
-  | Deal
-  | Trending
-  | NewArrival;

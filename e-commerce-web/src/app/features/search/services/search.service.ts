@@ -1,16 +1,14 @@
 import { Injectable, signal } from '@angular/core';
 import {
-  Category,
-  EntityType,
-  KeyValuePair,
-  SearchEntity,
-} from '../models/entity.models';
-import {
   optionMatchesCategory,
   optionMatchesTerm,
 } from '../../../utils/search-utils';
 import { STUB_CATEGORIES } from '../models/categories.stub';
 import { STUB_ENTITIES } from '../models/entities.stub';
+import { Category } from '../../../core/models/entities.interface';
+import { EntityType } from '../../../core/models/entity-type.enum';
+import { KeyValuePair } from '../../../core/models/key-value-pair.interface';
+import { SearchEntity } from '../models/search.models';
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {
@@ -38,10 +36,10 @@ export class SearchService {
     return result.sort((a, b) => a.label.localeCompare(b.label));
   }
 
-  getAutocompleteLabels(): string[] {
-    return this.categories().map((opt) => opt.label);
-  }
-
+  /**
+   * Filters entities by category and search term.
+   * Category filter is skipped for non-category-aware entity types.
+   */
   filterByCategoryAndSearch(
     categoryId: string | null,
     searchTerm: string | null,
@@ -57,9 +55,8 @@ export class SearchService {
 
     const filtered = searchEntities.filter(
       (entity) =>
-        (!normalizedCategoryId ||
-          optionMatchesCategory(entity, normalizedCategoryId)) &&
-        (!normalizedTerm || optionMatchesTerm(entity, normalizedTerm))
+        optionMatchesCategory(entity, normalizedCategoryId) &&
+        optionMatchesTerm(entity, normalizedTerm)
     );
 
     if (normalizedTerm && onExactMatch) {

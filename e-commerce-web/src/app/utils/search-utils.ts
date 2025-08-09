@@ -1,11 +1,6 @@
-// src/app/utils/search-utils.ts
-
-import {
-  Category,
-  EntityType,
-  SearchEntity,
-  Product,
-} from '../features/search/models/entity.models';
+import { Category, Product } from '../core/models/entities.interface';
+import { EntityType } from '../core/models/entity-type.enum';
+import { SearchEntity } from '../features/search/models/search.models';
 
 /**
  * Checks if an entity matches a search term in its label
@@ -25,9 +20,8 @@ export function optionMatchesTerm(
 
   // Recursively search children for categories
   if (searchEntity.type === EntityType.Category) {
-    const category = searchEntity as Category;
     return (
-      category.children?.some((child) =>
+      (searchEntity as Category).children?.some((child) =>
         optionMatchesTerm(child, normalized)
       ) ?? false
     );
@@ -36,28 +30,36 @@ export function optionMatchesTerm(
   return false;
 }
 
+/**
+ * Matches entity by category ID.
+ * Only applies if:
+ *  - entity is a category (self/child match)
+ *  - entity is a product (categoryIds array contains it)
+ * Other entity types skip category matching.
+ */
 export function optionMatchesCategory(
   searchEntity: SearchEntity,
   categoryId: string
 ): boolean {
   if (!categoryId) return true;
 
-  // For categories: check self or children recursively
-  if (searchEntity.type === EntityType.Category) {
-    const category = searchEntity as Category;
-    if (category.id === categoryId) return true;
-    return (
-      category.children?.some((child) =>
-        optionMatchesCategory(child, categoryId)
-      ) ?? false
-    );
+  switch (searchEntity.type) {
+    case EntityType.Category: {
+      const category = searchEntity as Category;
+      if (category.id === categoryId) return true;
+      return (
+        category.children?.some((child) =>
+          optionMatchesCategory(child, categoryId)
+        ) ?? false
+      );
+    }
+    case EntityType.Product: {
+      return (
+        (searchEntity as Product).categoryIds?.includes(categoryId) ?? false
+      );
+    }
+    default:
+      // Deals, Brands, Services, etc. ignore category filtering
+      return true;
   }
-
-  // For products: check categoryIds array
-  if (searchEntity.type === EntityType.Product) {
-    const product = searchEntity as Product;
-    return product.categoryIds?.includes(categoryId) ?? false;
-  }
-
-  return false;
 }

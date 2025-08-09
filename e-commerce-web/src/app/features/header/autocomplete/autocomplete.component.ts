@@ -1,4 +1,11 @@
-import { Component, signal, inject, input, computed } from '@angular/core';
+import {
+  Component,
+  signal,
+  inject,
+  input,
+  computed,
+  effect,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -7,8 +14,9 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
 
 import { SearchService } from '../../search/services/search.service';
-import { SearchEntity } from '../../search/models/entity.models';
 import { formControlSignal } from '../../../utils/form-utils';
+import { EntityType } from '../../../core/models/entity-type.enum';
+import { SearchEntity } from '../../search/models/search.models';
 
 @Component({
   selector: 'app-header-autocomplete',
@@ -43,24 +51,41 @@ export class HeaderAutocompleteComponent {
     this.searchService.getCategoryList().filter((c) => !!c.label)
   );
 
-  // Filtered options (only entities, never categories)
+  // Filtered options (exclude categories)
   readonly filteredOptions = computed(() => {
-    // We only need entities for autocomplete options
-    const searchableEntities = this.searchService.entities();
+    const searchableEntities = this.searchService
+      .entities()
+      .filter((e) => e.type !== EntityType.Category);
 
-    // Get filtered entities
-    const filteredEntities = this.searchService.filterByCategoryAndSearch(
+    return this.searchService.filterByCategoryAndSearch(
       this.selectedCategoryIdSig(),
       this.searchTermSig(),
       searchableEntities,
       (exactMatch) => this.onOptionSelected(exactMatch)
     );
-
-    return filteredEntities;
   });
 
-  // Selected option signal
+  // Selected option
   readonly selectedSearchEntity = signal<SearchEntity | undefined>(undefined);
+
+  constructor() {
+    // Auto-select category if search term exactly matches one
+    effect(() => {
+      const term = this.searchTermSig()?.trim().toLowerCase();
+      if (!term) return;
+
+      const matchingCategory = this.categoryList().find(
+        (c) => c.label.toLowerCase() === term
+      );
+
+      if (
+        matchingCategory &&
+        this.selectedCategoryIdSig() !== matchingCategory.id
+      ) {
+        this.categoryControl.setValue(matchingCategory.id);
+      }
+    });
+  }
 
   // Handle option selection
   onOptionSelected(selectedSearchEntity: SearchEntity) {
@@ -68,7 +93,7 @@ export class HeaderAutocompleteComponent {
     this.searchControl.setValue(selectedSearchEntity.label);
   }
 
-  // Clear everything
+  // Clear all fields
   clearSearch(): void {
     this.searchControl.setValue(null);
     this.categoryControl.setValue('');
