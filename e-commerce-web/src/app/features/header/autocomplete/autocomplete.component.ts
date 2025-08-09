@@ -5,11 +5,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { startWith } from 'rxjs';
 
 import { SearchService } from '../../search/services/search.service';
-import { SearchEntity, EntityType } from '../../search/models/entity.models';
+import { SearchEntity } from '../../search/models/entity.models';
 import { formControlSignal } from '../../../utils/form-utils';
 
 @Component({
@@ -45,29 +43,20 @@ export class HeaderAutocompleteComponent {
     this.searchService.getCategoryList().filter((c) => !!c.label)
   );
 
-  // Filtered options (now includes products)
+  // Filtered options (only entities, never categories)
   readonly filteredOptions = computed(() => {
-    const allEntities = [
-      ...this.searchService.categories(),
-      ...this.searchService.products(),
-    ];
+    // We only need entities for autocomplete options
+    const searchableEntities = this.searchService.entities();
 
     // Get filtered entities
-    let entities = this.searchService.filterByCategoryAndSearch(
+    const filteredEntities = this.searchService.filterByCategoryAndSearch(
       this.selectedCategoryIdSig(),
       this.searchTermSig(),
-      allEntities,
+      searchableEntities,
       (exactMatch) => this.onOptionSelected(exactMatch)
     );
 
-    // If "All Categories" is selected, remove categories completely
-    if (this.selectedCategoryIdSig() === '') {
-      entities = entities.filter(
-        (entity) => entity.type !== EntityType.Category
-      );
-    }
-
-    return entities;
+    return filteredEntities;
   });
 
   // Selected option signal

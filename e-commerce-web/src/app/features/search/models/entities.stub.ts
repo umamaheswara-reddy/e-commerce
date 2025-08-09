@@ -1,7 +1,7 @@
 import { SearchEntity } from './entity.models';
 import { EntityType } from './entity.models';
 
-export const STUB_PRODUCTS: SearchEntity[] = [
+export const STUB_ENTITIES: SearchEntity[] = [
   {
     id: 'prod-1',
     label: 'Samsung Galaxy S23 Ultra',

@@ -10,12 +10,12 @@ import {
   optionMatchesTerm,
 } from '../../../utils/search-utils';
 import { STUB_CATEGORIES } from '../models/categories.stub';
-import { STUB_PRODUCTS } from '../models/products.stub';
+import { STUB_ENTITIES } from '../models/entities.stub';
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {
   readonly categories = signal<SearchEntity[]>(STUB_CATEGORIES);
-  readonly products = signal<SearchEntity[]>(STUB_PRODUCTS);
+  readonly entities = signal<SearchEntity[]>(STUB_ENTITIES);
 
   getCategoryList(includeNested = false): KeyValuePair<string>[] {
     const seen = new Set<string>();
@@ -74,11 +74,11 @@ export class SearchService {
   }
 
   private handleExactCategoryMatch(
-    entities: SearchEntity[],
+    searchEntities: SearchEntity[],
     term: string,
     callback: (category: Category) => void
   ): void {
-    const match = entities.find(
+    const match = searchEntities.find(
       (opt): opt is Category =>
         opt.type === EntityType.Category && opt.label.toLowerCase() === term
     );
