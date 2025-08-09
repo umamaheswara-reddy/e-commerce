@@ -1,5 +1,5 @@
-import { SearchEntity } from './product.models';
-import { EntityType } from './product.models';
+import { SearchEntity } from './entity.models';
+import { EntityType } from './entity.models';
 
 export const STUB_PRODUCTS: SearchEntity[] = [
   {

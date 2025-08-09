@@ -25,7 +25,7 @@ export interface Product extends BaseEntity<string> {
   type: EntityType.Product;
   brand?: string;
   price?: number;
-  categoryId?: string;
+  categoryIds?: string[]; // Array of category IDs this product belongs to
 }
 
 export interface Brand extends BaseEntity<string> {

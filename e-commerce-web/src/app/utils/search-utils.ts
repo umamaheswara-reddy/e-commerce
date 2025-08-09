@@ -4,7 +4,7 @@ import {
   Category,
   EntityType,
   SearchEntity,
-} from '../features/search/models/product.models';
+} from '../features/search/models/entity.models';
 
 /** Checks if an option matches a search term in its label or nested categories */
 export function optionMatchesTerm(
