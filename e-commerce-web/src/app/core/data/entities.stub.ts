@@ -1,5 +1,5 @@
-import { EntityType } from '../../../core/models/entity-type.enum';
-import { ExcludeSearchEntityTypes } from './search.models';
+import { EntityType } from '../models/entity-type.enum';
+import { ExcludeSearchEntityTypes } from '../../features/search/models/search.types';
 
 export const STUB_ENTITIES: ExcludeSearchEntityTypes<EntityType.Category>[] = [
   {

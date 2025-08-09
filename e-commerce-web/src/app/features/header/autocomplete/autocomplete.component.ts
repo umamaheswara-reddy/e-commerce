@@ -16,7 +16,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { SearchService } from '../../search/services/search.service';
 import { formControlSignal } from '../../../utils/form-utils';
 import { EntityType } from '../../../core/models/entity-type.enum';
-import { SearchEntity } from '../../search/models/search.models';
+import { SearchEntity } from '../../search/models/search.types';
 
 @Component({
   selector: 'app-header-autocomplete',

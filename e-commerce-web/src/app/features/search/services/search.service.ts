@@ -3,12 +3,12 @@ import {
   optionMatchesCategory,
   optionMatchesTerm,
 } from '../../../utils/search-utils';
-import { STUB_CATEGORIES } from '../models/categories.stub';
-import { STUB_ENTITIES } from '../models/entities.stub';
+import { STUB_CATEGORIES } from '../../../core/data/categories.stub';
+import { STUB_ENTITIES } from '../../../core/data/entities.stub';
 import { Category } from '../../../core/models/entities.interface';
 import { EntityType } from '../../../core/models/entity-type.enum';
 import { KeyValuePair } from '../../../core/models/key-value-pair.interface';
-import { SearchEntity } from '../models/search.models';
+import { SearchEntity } from '../models/search.types';
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {

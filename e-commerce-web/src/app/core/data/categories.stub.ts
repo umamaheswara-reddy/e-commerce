@@ -1,5 +1,5 @@
-import { EntityType } from '../../../core/models/entity-type.enum';
-import { SearchEntity } from './search.models';
+import { EntityType } from '../models/entity-type.enum';
+import { SearchEntity } from '../../features/search/models/search.types';
 
 export const STUB_CATEGORIES: SearchEntity[] = [
   {

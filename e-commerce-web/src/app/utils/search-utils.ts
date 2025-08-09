@@ -1,6 +1,6 @@
 import { Category, Product } from '../core/models/entities.interface';
 import { EntityType } from '../core/models/entity-type.enum';
-import { SearchEntity } from '../features/search/models/search.models';
+import { SearchEntity } from '../features/search/models/search.types';
 
 /**
  * Checks if an entity matches a search term in its label
