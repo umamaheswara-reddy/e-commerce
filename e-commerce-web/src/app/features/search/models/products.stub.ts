@@ -6,24 +6,28 @@ export const STUB_PRODUCTS: SearchEntity[] = [
     id: 'prod-1',
     label: 'Samsung Galaxy S23 Ultra',
     type: EntityType.Product,
+    categoryIds: ['cat-1-2-1', 'cat-1-2'], // Android Phones + Smartphones
     metadata: { brand: 'Samsung', price: 1199 },
   },
   {
     id: 'prod-2',
     label: 'Apple MacBook Air M3',
     type: EntityType.Product,
+    categoryIds: ['cat-1-1-2', 'cat-1-1'], // Ultrabooks + Laptops & Computers
     metadata: { brand: 'Apple', price: 1499 },
   },
   {
     id: 'prod-3',
     label: 'Sony WH-1000XM5 Noise Cancelling Headphones',
     type: EntityType.Product,
+    categoryIds: ['cat-1', 'cat-1-3'], // Electronics & Gadgets + Wearable Tech
     metadata: { brand: 'Sony', price: 399 },
   },
   {
     id: 'prod-4',
     label: 'Dyson V15 Detect Cordless Vacuum',
     type: EntityType.Product,
+    categoryIds: ['cat-2-1'], // Appliances
     metadata: { brand: 'Dyson', price: 749 },
   },
 
