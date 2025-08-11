@@ -47,8 +47,8 @@ export class HeaderAutocompleteComponent {
   readonly selectedCategoryIdSig = formControlSignal(this.categoryControl, '');
 
   // Category dropdown list
-  readonly categoryList = computed(() =>
-    this.searchService.getCategoryList().filter((c) => !!c.label)
+  readonly entityDropdownOptions = computed(() =>
+    this.searchService.getEntityDropdownOptions().filter((e) => !!e.label)
   );
 
   // Filtered options (exclude categories)
@@ -74,7 +74,7 @@ export class HeaderAutocompleteComponent {
       const term = this.searchTermSig()?.trim().toLowerCase();
       if (!term) return;
 
-      const matchingCategory = this.categoryList().find(
+      const matchingCategory = this.entityDropdownOptions().find(
         (c) => c.label.toLowerCase() === term
       );
 

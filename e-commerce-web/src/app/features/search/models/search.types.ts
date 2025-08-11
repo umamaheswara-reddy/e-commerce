@@ -23,3 +23,12 @@ export type ExcludeSearchEntityTypes<TExcluded extends EntityType> = Exclude<
   SearchEntity,
   { type: TExcluded }
 >;
+
+export const ENTITY_TYPE_LABELS: Record<string, string> = {
+  [EntityType.Category]: 'All Categories',
+  [EntityType.Product]: 'Products',
+  [EntityType.Deal]: 'Deals',
+  [EntityType.Trending]: 'Trending',
+  [EntityType.NewArrival]: 'New Arrivals',
+  [EntityType.Brand]: 'Brands',
+};

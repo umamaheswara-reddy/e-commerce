@@ -5,9 +5,8 @@
                 <mat-select placeholder="All" [formControl]="categoryControl"
                     (selectionChange)="searchControl.setValue(searchControl.value)"
                     [class]="(noOptionCheck()) ? 'no-option-check' : ''">
-                    <mat-option value="">All Categories</mat-option>
-                    @for (category of categoryList(); track category) {
-                    <mat-option [value]="category.id">{{ category.label }}</mat-option>
+                    @for (option of entityDropdownOptions(); track option) {
+                    <mat-option [value]="option.id">{{ option.label }}</mat-option>
                     }
                 </mat-select>
             </mat-form-field>
