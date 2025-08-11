@@ -1,7 +1,7 @@
 import { EntityType } from '../models/entity-type.enum';
-import { SearchEntity } from '../../features/search/models/search.types';
+import { SearchTermEntity } from '../../features/search/models/search.types';
 
-export const STUB_CATEGORIES: SearchEntity[] = [
+export const STUB_CATEGORIES: SearchTermEntity[] = [
   {
     id: 'cat-1',
     label: 'Electronics & Gadgets',

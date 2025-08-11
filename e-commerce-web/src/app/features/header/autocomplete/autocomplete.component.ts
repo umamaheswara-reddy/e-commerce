@@ -16,7 +16,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { SearchService } from '../../search/services/search.service';
 import { formControlSignal } from '../../../utils/form-utils';
 import { EntityType } from '../../../core/models/entity-type.enum';
-import { SearchEntity } from '../../search/models/search.types';
+import { SearchTermEntity } from '../../search/models/search.types';
 
 @Component({
   selector: 'app-header-autocomplete',
@@ -48,7 +48,7 @@ export class HeaderAutocompleteComponent {
 
   // Category dropdown list
   readonly entityDropdownOptions = computed(() =>
-    this.searchService.getEntityDropdownOptions().filter((e) => !!e.label)
+    this.searchService.getEntityDropdownOptions()
   );
 
   // Filtered options (exclude categories)
@@ -66,7 +66,9 @@ export class HeaderAutocompleteComponent {
   });
 
   // Selected option
-  readonly selectedSearchEntity = signal<SearchEntity | undefined>(undefined);
+  readonly selectedSearchEntity = signal<SearchTermEntity | undefined>(
+    undefined
+  );
 
   constructor() {
     // Auto-select category if search term exactly matches one
@@ -88,7 +90,7 @@ export class HeaderAutocompleteComponent {
   }
 
   // Handle option selection
-  onOptionSelected(selectedSearchEntity: SearchEntity) {
+  onOptionSelected(selectedSearchEntity: SearchTermEntity) {
     this.selectedSearchEntity.set(selectedSearchEntity);
     this.searchControl.setValue(selectedSearchEntity.label);
   }

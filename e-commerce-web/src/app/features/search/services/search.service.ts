@@ -5,23 +5,25 @@ import { STUB_ENTITIES } from '../../../core/data/entities.stub';
 import { Category } from '../../../core/models/entities.interface';
 import { EntityType } from '../../../core/models/entity-type.enum';
 import { KeyValuePair } from '../../../core/models/key-value-pair.interface';
-import { ENTITY_TYPE_LABELS, SearchEntity } from '../models/search.types';
+import { ENTITY_TYPE_LABELS, SearchTermEntity } from '../models/search.types';
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {
-  readonly categories = signal<SearchEntity[]>(STUB_CATEGORIES);
-  readonly entities = signal<SearchEntity[]>(STUB_ENTITIES);
+  readonly categories = signal<SearchTermEntity[]>(STUB_CATEGORIES);
+  readonly entities = signal<SearchTermEntity[]>(STUB_ENTITIES);
 
   getEntityDropdownOptions(): KeyValuePair<string>[] {
-    const options = this.getFilteredEntities();
+    const options = this.getTransformedEntities();
 
-    return options.map((option) => ({
-      id: option.label === 'All Categories' ? '' : option.id,
-      label: option.label,
-    }));
+    return options
+      .map((option: KeyValuePair<string>) => ({
+        id: option.label === 'All Categories' ? '' : option.id,
+        label: option.label,
+      }))
+      .filter((e) => !!e.label);
   }
 
-  getFilteredEntities(includeNested = false): KeyValuePair<string>[] {
+  getTransformedEntities(includeNested = false): KeyValuePair<string>[] {
     const options: KeyValuePair<string>[] = [];
 
     // 1. Add "All Categories" option from ENTITY_TYPE_LABELS first
@@ -54,9 +56,9 @@ export class SearchService {
   filterByCategoryAndSearch(
     selectedId: string | null,
     searchTerm: string | null,
-    searchEntities: SearchEntity[],
+    searchEntities: SearchTermEntity[],
     onExactMatch?: (category: Category) => void
-  ): SearchEntity[] {
+  ): SearchTermEntity[] {
     const normalizedId = selectedId?.trim() ?? '';
     const normalizedTerm = searchTerm?.trim().toLowerCase() ?? '';
 
@@ -64,7 +66,7 @@ export class SearchService {
       return searchEntities;
     }
 
-    let filtered: SearchEntity[];
+    let filtered: SearchTermEntity[];
 
     if (!normalizedId) {
       // no filter id, just filter by search term
@@ -116,7 +118,7 @@ export class SearchService {
   }
 
   private handleExactCategoryMatch(
-    searchEntities: SearchEntity[],
+    searchEntities: SearchTermEntity[],
     term: string,
     callback: (category: Category) => void
   ): void {

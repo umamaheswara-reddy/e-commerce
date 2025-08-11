@@ -1,13 +1,13 @@
 import { Category, Product } from '../../core/models/entities.interface';
 import { EntityType } from '../../core/models/entity-type.enum';
-import { SearchEntity } from './models/search.types';
+import { SearchTermEntity } from './models/search.types';
 
 /**
  * Checks if an entity matches a search term in its label
  * (and recursively for nested categories).
  */
 export function optionMatchesTerm(
-  searchEntity: SearchEntity,
+  searchEntity: SearchTermEntity,
   term: string
 ): boolean {
   const normalized = term.trim().toLowerCase();
@@ -38,7 +38,7 @@ export function optionMatchesTerm(
  * Other entity types skip category matching.
  */
 export function optionMatchesCategory(
-  searchEntity: SearchEntity,
+  searchEntity: SearchTermEntity,
   categoryId: string
 ): boolean {
   if (!categoryId) return true;

@@ -11,7 +11,7 @@ import { EntityType } from '../../../core/models/entity-type.enum';
 /**
  * Union type for all searchable entities.
  */
-export type SearchEntity =
+export type SearchTermEntity =
   | Category
   | Product
   | Brand
@@ -20,7 +20,7 @@ export type SearchEntity =
   | NewArrival;
 
 export type ExcludeSearchEntityTypes<TExcluded extends EntityType> = Exclude<
-  SearchEntity,
+  SearchTermEntity,
   { type: TExcluded }
 >;
 
