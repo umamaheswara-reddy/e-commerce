@@ -1,5 +1,5 @@
 import { Product } from '../../core/models/entity.models';
-import { ProductCategory } from './models/search.models';
+import { Category } from './models/search.models';
 
 /**
  * Checks if an entity matches a search term in its label
@@ -20,7 +20,7 @@ export function optionMatchingTerm(term: string, label: string): boolean {
 export function productOptionsMatchingTerm<T extends Product>(
   term: string,
   productEntity: Product,
-  productCategory: ProductCategory
+  productCategory: Category
 ): boolean {
   const normalized = term.trim().toLowerCase();
   if (!normalized) return true;
@@ -38,7 +38,7 @@ export function productOptionsMatchingTerm<T extends Product>(
 
 function productCategoryChildrenMatchingTerm(
   normalized: string,
-  productCategory: ProductCategory
+  productCategory: Category
 ): boolean {
   if (productCategory.label.toLowerCase().includes(normalized)) {
     return true;

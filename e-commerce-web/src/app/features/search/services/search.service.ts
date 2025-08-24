@@ -6,7 +6,7 @@ import {
 import { ENTITY_TYPE_LABELS } from '../../../core/models/entity.models';
 import { EntityType } from '../../../core/models/entity-type.enum';
 import { KeyValuePair } from '../../../core/models/key-value-pair.interface';
-import { ProductCategory, SearchTermEntity } from '../models/search.models';
+import { Category, SearchTermEntity } from '../models/search.models';
 import { SearchRepository } from './search.repository';
 
 @Injectable({ providedIn: 'root' })
@@ -74,7 +74,7 @@ export class SearchService {
           id: 'root',
           label: 'root',
           children: this.repo.getProductCategories(),
-        } as ProductCategory);
+        } as Category);
 
       case EntityType.Brand:
       case EntityType.Deal:

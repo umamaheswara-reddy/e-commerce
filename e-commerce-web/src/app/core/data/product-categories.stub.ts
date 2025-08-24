@@ -1,6 +1,6 @@
-import { ProductCategory } from '../../features/search/models/search.models';
+import { Category } from '../../features/search/models/search.models';
 
-export const STUB_PRODUCT_CATEGORIES: ProductCategory[] = [
+export const STUB_PRODUCT_CATEGORIES: Category[] = [
   {
     id: 'cat-1',
     label: 'Electronics & Gadgets',
