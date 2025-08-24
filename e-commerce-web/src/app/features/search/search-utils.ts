@@ -1,8 +1,5 @@
-import {
-  ProductCategory,
-  Product,
-  Entity,
-} from '../../core/models/entities.interface';
+import { Product } from '../../core/models/entity.models';
+import { ProductCategory } from './models/search.models';
 
 /**
  * Checks if an entity matches a search term in its label

@@ -1,18 +1,22 @@
-import { BaseEntity } from './base-entity.interface';
 import { EntityType } from './entity-type.enum';
+import { KeyValuePair } from './key-value-pair.interface';
 
-export interface ProductCategory {
-  id: string;
-  label: string;
+export interface BaseEntity<T extends string | number> extends KeyValuePair<T> {
+  type: EntityType;
+  metadata?: Record<string, any>;
+}
+
+export interface Category extends BaseEntity<string> {
+  type: EntityType.Category;
   parentId?: string;
-  children?: ProductCategory[];
+  children?: Category[];
 }
 
 export interface Product extends BaseEntity<string> {
   type: EntityType.Product;
   brand?: string;
   price?: number;
-  categoryIds?: string[]; // Array of category IDs this product belongs to
+  categoryIds?: string[];
 }
 
 export interface Brand extends BaseEntity<string> {
@@ -32,8 +36,8 @@ export interface NewArrival extends BaseEntity<string> {
 }
 
 export type Entity = Product | Brand | Deal | Trending | NewArrival;
-
-export const ENTITY_TYPE_LABELS: Record<EntityType, string> = {
+type LabelEntityType = Exclude<EntityType, EntityType.Category>;
+export const ENTITY_TYPE_LABELS: Record<LabelEntityType, string> = {
   [EntityType.All]: 'All',
   [EntityType.Product]: 'Products',
   [EntityType.Deal]: 'Deals',

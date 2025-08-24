@@ -1,4 +1,4 @@
-import { ProductCategory } from '../models/entities.interface';
+import { ProductCategory } from '../../features/search/models/search.models';
 
 export const STUB_PRODUCT_CATEGORIES: ProductCategory[] = [
   {

@@ -13,7 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
 import { formControlSignal } from '../../../utils/form-utils';
-import { SearchTermEntity } from '../../search/models/search.types';
+import { SearchTermEntity } from '../../search/models/search.models';
 import { EntityType } from '../../../core/models/entity-type.enum';
 import { SearchFacade } from '../../search/services/search.facade';
 

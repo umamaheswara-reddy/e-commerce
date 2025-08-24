@@ -5,4 +5,5 @@ export enum EntityType {
   Deal = 'deal',
   Trending = 'trending',
   NewArrival = 'new-arrival',
+  Category = 'category',
 }

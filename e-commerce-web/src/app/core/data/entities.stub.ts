@@ -1,5 +1,5 @@
 import { EntityType } from '../models/entity-type.enum';
-import { Entity } from '../models/entities.interface';
+import { Entity } from '../models/entity.models';
 
 export const STUB_ENTITIES: Entity[] = [
   {
