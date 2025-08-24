@@ -2,7 +2,7 @@
     <div class="autocomplete__container">
         <div class="autocomplete__category-dropdown">
             <mat-form-field subscriptSizing="dynamic">
-                <mat-select placeholder="All" [formControl]="categoryControl"
+                <mat-select placeholder="All" [formControl]="entityControl"
                     (selectionChange)="searchControl.setValue(searchControl.value)"
                     [class]="(noOptionCheck()) ? 'no-option-check' : ''">
                     @for (option of entityDropdownOptions(); track option) {

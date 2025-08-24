@@ -2,9 +2,9 @@ import { Injectable, signal } from '@angular/core';
 import {
   optionMatchingTerm,
   productOptionsMatchingTerm,
-  allEntityOptionsMatchingTerm,
 } from '../search-utils';
 import {
+  Entity,
   ENTITY_TYPE_LABELS,
   ProductCategory,
 } from '../../../core/models/entities.interface';
@@ -21,11 +21,11 @@ export class SearchService {
     STUB_PRODUCT_CATEGORIES
   );
 
-  getEntityDropdownOptions(): KeyValuePair<string>[] {
-    const entityOptions: KeyValuePair<string>[] = [];
+  getEntityDropdownOptions(): KeyValuePair<EntityType>[] {
+    const entityOptions: KeyValuePair<EntityType>[] = [];
 
-    Object.entries(ENTITY_TYPE_LABELS).forEach(([key, label]) =>
-      entityOptions.push({ id: key, label })
+    Object.entries(ENTITY_TYPE_LABELS).map(([key, label]) =>
+      entityOptions.push({ id: key as EntityType, label })
     );
 
     return entityOptions;
@@ -35,63 +35,73 @@ export class SearchService {
    * Filters entities by enitty and search term.
    */
   filterByEntityAndSearch(
-    selectedId: string | null,
-    searchTerm: string | null
+    selectedEntityType: EntityType | null,
+    term: string | null
   ): SearchTermEntity[] {
-    const normalizedId = selectedId?.trim() ?? '';
-    const normalizedTerm = searchTerm?.trim().toLowerCase() ?? '';
+    const normalizedTerm = term?.trim().toLowerCase() ?? '';
 
-    if (!normalizedTerm && !normalizedId) {
-      return this.entities();
+    if (!selectedEntityType && normalizedTerm) {
+      return this.entities(); // no filter
     }
 
-    let filtered: SearchTermEntity[];
+    switch (selectedEntityType) {
+      case EntityType.Product:
+        return this.entities().filter(
+          (entity) =>
+            entity.type === EntityType.Product &&
+            productOptionsMatchingTerm(normalizedTerm, entity, {
+              id: 'root',
+              label: 'root',
+              children: this.productCategories(),
+            } as ProductCategory)
+        );
 
-    if (!normalizedId) {
-      // no entity filter id, just filter by search term
-      filtered = allEntityOptionsMatchingTerm(
-        normalizedTerm,
-        this.entities(),
-        this.productCategories()
-      );
-    } else {
-      // get entity type of selected id from entities
-      const selectedEntity = this.entities().find((e) => e.id === normalizedId);
-      if (!selectedEntity) {
-        filtered = this.entities();
-      } else {
-        switch (selectedEntity.type) {
-          case EntityType.Product:
-            var productEntities = this.entities().filter(
-              (pe) => pe.type === EntityType.Product
-            );
-            filtered = productEntities.filter((entity) =>
-              productOptionsMatchingTerm(
-                normalizedId,
-                entity,
-                this.productCategories()[0]
-              )
-            );
-            break;
-          case EntityType.Deal:
-          case EntityType.Trending:
-          case EntityType.NewArrival:
-          case EntityType.Brand:
-            // filter entities that exactly match the selected entity id or type
-            filtered = this.entities().filter(
-              (entity) =>
-                entity.id === normalizedId &&
-                optionMatchingTerm(normalizedTerm, entity.label)
-            );
-            break;
-          default:
-            filtered = this.entities().filter((entity) =>
-              optionMatchingTerm(normalizedTerm, entity.label)
-            );
-        }
+      case EntityType.Brand:
+      case EntityType.Deal:
+      case EntityType.Trending:
+      case EntityType.NewArrival:
+        return this.entities().filter(
+          (entity) =>
+            entity.type === selectedEntityType &&
+            optionMatchingTerm(normalizedTerm, entity.label)
+        );
+
+      case EntityType.All:
+      default:
+        return this.allEntityOptionsMatchingTerm(
+          normalizedTerm,
+          this.productCategories()
+        );
+    }
+  }
+
+  allEntityOptionsMatchingTerm(
+    term: string,
+    productCategories: ProductCategory[]
+  ): any {
+    if (!term) {
+      return this.entities(); // no filter, return all
+    }
+
+    return this.entities().filter((entity) => {
+      switch (entity.type) {
+        case EntityType.Product:
+          // match product label or any product category
+          return productOptionsMatchingTerm(term, entity, {
+            id: 'root',
+            label: 'root',
+            children: productCategories,
+          } as ProductCategory);
+
+        case EntityType.Brand:
+        case EntityType.Deal:
+        case EntityType.Trending:
+        case EntityType.NewArrival:
+          return optionMatchingTerm(term, entity.label);
+
+        default:
+          return false;
       }
-    }
-
-    return filtered;
+    });
   }
 }

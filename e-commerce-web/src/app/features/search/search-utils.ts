@@ -20,12 +20,6 @@ export function optionMatchingTerm(term: string, label: string): boolean {
   return false;
 }
 
-export function allEntityOptionsMatchingTerm(
-  term: string,
-  entities: Entity[],
-  productCategory: ProductCategory[]
-): any {}
-
 export function productOptionsMatchingTerm<T extends Product>(
   term: string,
   productEntity: Product,

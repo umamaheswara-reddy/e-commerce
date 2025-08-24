@@ -16,6 +16,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { SearchService } from '../../search/services/search.service';
 import { formControlSignal } from '../../../utils/form-utils';
 import { SearchTermEntity } from '../../search/models/search.types';
+import { EntityType } from '../../../core/models/entity-type.enum';
 
 @Component({
   selector: 'app-header-autocomplete',
@@ -38,12 +39,15 @@ export class HeaderAutocompleteComponent {
   noOptionCheck = input<boolean>(false);
 
   // Form controls
+  readonly entityControl = new FormControl<EntityType>(EntityType.All);
   readonly searchControl = new FormControl<string | null>(null);
-  readonly categoryControl = new FormControl<string>('');
 
   // Reactive signals from form controls
   readonly searchTermSig = formControlSignal(this.searchControl, '');
-  readonly selectedCategoryIdSig = formControlSignal(this.categoryControl, '');
+  readonly selectedCategoryIdSig = formControlSignal(
+    this.entityControl,
+    EntityType.All
+  );
 
   // Category dropdown list
   readonly entityDropdownOptions = computed(() =>
@@ -77,7 +81,7 @@ export class HeaderAutocompleteComponent {
         matchingCategory &&
         this.selectedCategoryIdSig() !== matchingCategory.id
       ) {
-        this.categoryControl.setValue(matchingCategory.id);
+        this.entityControl.setValue(matchingCategory.id);
       }
     });
   }
@@ -91,7 +95,7 @@ export class HeaderAutocompleteComponent {
   // Clear all fields
   clearSearch(): void {
     this.searchControl.setValue(null);
-    this.categoryControl.setValue('');
+    this.entityControl.setValue(EntityType.All);
     this.selectedSearchEntity.set(undefined);
   }
 }
