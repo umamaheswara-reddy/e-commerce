@@ -1,52 +1,34 @@
 import { Injectable, signal } from '@angular/core';
-import { optionMatchesCategory, optionMatchesTerm } from '../search-utils';
-import { STUB_CATEGORIES } from '../../../core/data/categories.stub';
-import { STUB_ENTITIES } from '../../../core/data/entities.stub';
-import { Category } from '../../../core/models/entities.interface';
+import {
+  optionMatchingTerm,
+  productOptionsMatchingTerm,
+  allEntityOptionsMatchingTerm,
+} from '../search-utils';
+import {
+  ENTITY_TYPE_LABELS,
+  ProductCategory,
+} from '../../../core/models/entities.interface';
 import { EntityType } from '../../../core/models/entity-type.enum';
 import { KeyValuePair } from '../../../core/models/key-value-pair.interface';
-import { ENTITY_TYPE_LABELS, SearchTermEntity } from '../models/search.types';
+import { SearchTermEntity } from '../models/search.types';
+import { STUB_PRODUCT_CATEGORIES } from '../../../core/data/product-categories.stub';
+import { STUB_ENTITIES } from '../../../core/data/entities.stub';
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {
-  readonly categories = signal<SearchTermEntity[]>(STUB_CATEGORIES);
   readonly entities = signal<SearchTermEntity[]>(STUB_ENTITIES);
+  readonly productCategories = signal<ProductCategory[]>(
+    STUB_PRODUCT_CATEGORIES
+  );
 
   getEntityDropdownOptions(): KeyValuePair<string>[] {
-    const options = this.getTransformedEntities();
+    const entityOptions: KeyValuePair<string>[] = [];
 
-    return options
-      .map((option: KeyValuePair<string>) => ({
-        id: option.label === 'All Categories' ? '' : option.id,
-        label: option.label,
-      }))
-      .filter((e) => !!e.label);
-  }
-
-  getTransformedEntities(includeNested = false): KeyValuePair<string>[] {
-    const options: KeyValuePair<string>[] = [];
-
-    // 1. Add "All Categories" option from ENTITY_TYPE_LABELS first
-    options.push({
-      id: EntityType.Category,
-      label: ENTITY_TYPE_LABELS[EntityType.Category],
-    });
-
-    // 2. Add top-level categories from data (actual category entities)
-    const topCategories = this.categories().filter(
-      (c) => c.type === EntityType.Category
+    Object.entries(ENTITY_TYPE_LABELS).forEach(([key, label]) =>
+      entityOptions.push({ id: key, label })
     );
 
-    topCategories.forEach((cat) =>
-      options.push({ id: cat.id, label: cat.label })
-    );
-
-    // 3. Add other entity types except 'category' to avoid duplication
-    Object.entries(ENTITY_TYPE_LABELS)
-      .filter(([key]) => key !== EntityType.Category)
-      .forEach(([key, label]) => options.push({ id: key, label }));
-
-    return options;
+    return entityOptions;
   }
 
   /**
@@ -55,36 +37,41 @@ export class SearchService {
    */
   filterByCategoryAndSearch(
     selectedId: string | null,
-    searchTerm: string | null,
-    searchEntities: SearchTermEntity[],
-    onExactMatch?: (category: Category) => void
+    searchTerm: string | null
   ): SearchTermEntity[] {
     const normalizedId = selectedId?.trim() ?? '';
     const normalizedTerm = searchTerm?.trim().toLowerCase() ?? '';
 
     if (!normalizedTerm && !normalizedId) {
-      return searchEntities;
+      return this.entities();
     }
 
     let filtered: SearchTermEntity[];
 
     if (!normalizedId) {
       // no filter id, just filter by search term
-      filtered = searchEntities.filter((entity) =>
-        optionMatchesTerm(entity, normalizedTerm)
+      filtered = allEntityOptionsMatchingTerm(
+        normalizedTerm,
+        this.entities(),
+        this.productCategories()
       );
     } else {
       // get entity type of selected id from entities
       const selectedEntity = this.entities().find((e) => e.id === normalizedId);
       if (!selectedEntity) {
-        filtered = searchEntities;
+        filtered = this.entities();
       } else {
         switch (selectedEntity.type) {
-          case EntityType.Category:
-            filtered = searchEntities.filter(
-              (entity) =>
-                optionMatchesCategory(entity, normalizedId) &&
-                optionMatchesTerm(entity, normalizedTerm)
+          case EntityType.Product:
+            var productEntities = this.entities().filter(
+              (pe) => pe.type === EntityType.Product
+            );
+            filtered = productEntities.filter((entity) =>
+              productOptionsMatchingTerm(
+                normalizedId,
+                entity,
+                this.productCategories()[0]
+              )
             );
             break;
           case EntityType.Deal:
@@ -92,40 +79,20 @@ export class SearchService {
           case EntityType.NewArrival:
           case EntityType.Brand:
             // filter entities that exactly match the selected entity id or type
-            filtered = searchEntities.filter(
+            filtered = this.entities().filter(
               (entity) =>
                 entity.id === normalizedId &&
-                optionMatchesTerm(entity, normalizedTerm)
+                optionMatchingTerm(normalizedTerm, entity.label)
             );
             break;
           default:
-            filtered = searchEntities.filter((entity) =>
-              optionMatchesTerm(entity, normalizedTerm)
+            filtered = this.entities().filter((entity) =>
+              optionMatchingTerm(normalizedTerm, entity.label)
             );
         }
       }
     }
 
-    if (normalizedTerm && onExactMatch) {
-      this.handleExactCategoryMatch(
-        searchEntities,
-        normalizedTerm,
-        onExactMatch
-      );
-    }
-
     return filtered;
-  }
-
-  private handleExactCategoryMatch(
-    searchEntities: SearchTermEntity[],
-    term: string,
-    callback: (category: Category) => void
-  ): void {
-    const match = searchEntities.find(
-      (opt): opt is Category =>
-        opt.type === EntityType.Category && opt.label.toLowerCase() === term
-    );
-    if (match) callback(match);
   }
 }

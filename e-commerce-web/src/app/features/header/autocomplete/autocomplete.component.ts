@@ -53,15 +53,9 @@ export class HeaderAutocompleteComponent {
 
   // Filtered options (exclude categories)
   readonly filteredOptions = computed(() => {
-    const searchableEntities = this.searchService
-      .entities()
-      .filter((e) => e.type !== EntityType.Category);
-
     return this.searchService.filterByCategoryAndSearch(
       this.selectedCategoryIdSig(),
-      this.searchTermSig(),
-      searchableEntities,
-      (exactMatch) => this.onOptionSelected(exactMatch)
+      this.searchTermSig()
     );
   });
 

@@ -1,7 +1,7 @@
 import { EntityType } from '../models/entity-type.enum';
-import { ExcludeSearchEntityTypes } from '../../features/search/models/search.types';
+import { Entity } from '../models/entities.interface';
 
-export const STUB_ENTITIES: ExcludeSearchEntityTypes<EntityType.Category>[] = [
+export const STUB_ENTITIES: Entity[] = [
   {
     id: 'prod-1',
     label: 'Samsung Galaxy S23 Ultra',

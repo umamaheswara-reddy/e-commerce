@@ -1,65 +1,58 @@
-import { Category, Product } from '../../core/models/entities.interface';
-import { EntityType } from '../../core/models/entity-type.enum';
-import { SearchTermEntity } from './models/search.types';
+import {
+  ProductCategory,
+  Product,
+  Entity,
+} from '../../core/models/entities.interface';
 
 /**
  * Checks if an entity matches a search term in its label
  * (and recursively for nested categories).
  */
-export function optionMatchesTerm(
-  searchEntity: SearchTermEntity,
-  term: string
-): boolean {
+export function optionMatchingTerm(term: string, label: string): boolean {
   const normalized = term.trim().toLowerCase();
   if (!normalized) return true;
 
   // Direct match
-  if (searchEntity.label.toLowerCase().includes(normalized)) {
+  if (label.toLowerCase().includes(normalized)) {
     return true;
-  }
-
-  // Recursively search children for categories
-  if (searchEntity.type === EntityType.Category) {
-    return (
-      (searchEntity as Category).children?.some((child) =>
-        optionMatchesTerm(child, normalized)
-      ) ?? false
-    );
   }
 
   return false;
 }
 
-/**
- * Matches entity by category ID.
- * Only applies if:
- *  - entity is a category (self/child match)
- *  - entity is a product (categoryIds array contains it)
- * Other entity types skip category matching.
- */
-export function optionMatchesCategory(
-  searchEntity: SearchTermEntity,
-  categoryId: string
-): boolean {
-  if (!categoryId) return true;
+export function allEntityOptionsMatchingTerm(
+  term: string,
+  entities: Entity[],
+  productCategory: ProductCategory[]
+): any {}
 
-  switch (searchEntity.type) {
-    case EntityType.Category: {
-      const category = searchEntity as Category;
-      if (category.id === categoryId) return true;
-      return (
-        category.children?.some((child) =>
-          optionMatchesCategory(child, categoryId)
-        ) ?? false
-      );
-    }
-    case EntityType.Product: {
-      return (
-        (searchEntity as Product).categoryIds?.includes(categoryId) ?? false
-      );
-    }
-    default:
-      // Deals, Brands, Services, etc. ignore category filtering
-      return true;
+export function productOptionsMatchingTerm<T extends Product>(
+  term: string,
+  productEntity: Product,
+  productCategory: ProductCategory
+): boolean {
+  const normalized = term.trim().toLowerCase();
+  if (!normalized) return true;
+
+  // Direct match
+  if (optionMatchingTerm(term, productEntity.label)) return true;
+
+  // Search children in product categories
+  return (
+    productCategory.children?.some((child) =>
+      productCategoryChildrenMatchingTerm(normalized, child)
+    ) ?? false
+  );
+}
+
+function productCategoryChildrenMatchingTerm<T extends Product>(
+  normalized: string,
+  productCategory: ProductCategory
+): boolean {
+  if (productCategory.label.toLowerCase().includes(normalized)) {
+    return true;
   }
+  return (
+    productCategoryChildrenMatchingTerm(normalized, productCategory) ?? false
+  );
 }

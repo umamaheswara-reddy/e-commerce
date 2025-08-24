@@ -1,5 +1,5 @@
 export enum EntityType {
-  Category = 'category',
+  All = 'all',
   Product = 'product',
   Brand = 'brand',
   Deal = 'deal',

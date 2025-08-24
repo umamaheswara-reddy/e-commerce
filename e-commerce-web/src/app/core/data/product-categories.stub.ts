@@ -1,57 +1,47 @@
-import { EntityType } from '../models/entity-type.enum';
-import { SearchTermEntity } from '../../features/search/models/search.types';
+import { ProductCategory } from '../models/entities.interface';
 
-export const STUB_CATEGORIES: SearchTermEntity[] = [
+export const STUB_PRODUCT_CATEGORIES: ProductCategory[] = [
   {
     id: 'cat-1',
     label: 'Electronics & Gadgets',
-    type: EntityType.Category,
     children: [
       {
         id: 'cat-1-1',
         label: 'Laptops & Computers',
-        type: EntityType.Category,
         children: [
           {
             id: 'cat-1-1-1',
             label: 'Gaming Laptops',
-            type: EntityType.Category,
           },
-          { id: 'cat-1-1-2', label: 'Ultrabooks', type: EntityType.Category },
+          { id: 'cat-1-1-2', label: 'Ultrabooks' },
           {
             id: 'cat-1-1-3',
             label: '2-in-1 Convertibles',
-            type: EntityType.Category,
           },
         ],
       },
       {
         id: 'cat-1-2',
         label: 'Smartphones',
-        type: EntityType.Category,
         children: [
           {
             id: 'cat-1-2-1',
             label: 'Android Phones',
-            type: EntityType.Category,
           },
-          { id: 'cat-1-2-2', label: 'iPhones', type: EntityType.Category },
+          { id: 'cat-1-2-2', label: 'iPhones' },
         ],
       },
       {
         id: 'cat-1-3',
         label: 'Wearable Tech',
-        type: EntityType.Category,
         children: [
           {
             id: 'cat-1-3-1',
             label: 'Smartwatches',
-            type: EntityType.Category,
           },
           {
             id: 'cat-1-3-2',
             label: 'Fitness Trackers',
-            type: EntityType.Category,
           },
         ],
       },
@@ -60,36 +50,30 @@ export const STUB_CATEGORIES: SearchTermEntity[] = [
   {
     id: 'cat-2',
     label: 'Home & Kitchen',
-    type: EntityType.Category,
     children: [
       {
         id: 'cat-2-1',
         label: 'Appliances',
-        type: EntityType.Category,
         children: [
           {
             id: 'cat-2-1-1',
             label: 'Refrigerators',
-            type: EntityType.Category,
           },
-          { id: 'cat-2-1-2', label: 'Microwaves', type: EntityType.Category },
+          { id: 'cat-2-1-2', label: 'Microwaves' },
           {
             id: 'cat-2-1-3',
             label: 'Coffee Machines',
-            type: EntityType.Category,
           },
         ],
       },
       {
         id: 'cat-2-2',
         label: 'Furniture',
-        type: EntityType.Category,
         children: [
-          { id: 'cat-2-2-1', label: 'Sofas', type: EntityType.Category },
+          { id: 'cat-2-2-1', label: 'Sofas' },
           {
             id: 'cat-2-2-2',
             label: 'Dining Tables',
-            type: EntityType.Category,
           },
         ],
       },
@@ -98,31 +82,26 @@ export const STUB_CATEGORIES: SearchTermEntity[] = [
   {
     id: 'cat-3',
     label: 'Sports & Outdoors',
-    type: EntityType.Category,
     children: [
       {
         id: 'cat-3-1',
         label: 'Cycling',
-        type: EntityType.Category,
         children: [
           {
             id: 'cat-3-1-1',
             label: 'Mountain Bikes',
-            type: EntityType.Category,
           },
-          { id: 'cat-3-1-2', label: 'Road Bikes', type: EntityType.Category },
+          { id: 'cat-3-1-2', label: 'Road Bikes' },
         ],
       },
       {
         id: 'cat-3-2',
         label: 'Camping',
-        type: EntityType.Category,
         children: [
-          { id: 'cat-3-2-1', label: 'Tents', type: EntityType.Category },
+          { id: 'cat-3-2-1', label: 'Tents' },
           {
             id: 'cat-3-2-2',
             label: 'Sleeping Bags',
-            type: EntityType.Category,
           },
         ],
       },
