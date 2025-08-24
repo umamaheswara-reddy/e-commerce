@@ -22,86 +22,66 @@ export class SearchService {
   );
 
   getEntityDropdownOptions(): KeyValuePair<EntityType>[] {
-    const entityOptions: KeyValuePair<EntityType>[] = [];
-
-    Object.entries(ENTITY_TYPE_LABELS).map(([key, label]) =>
-      entityOptions.push({ id: key as EntityType, label })
-    );
-
-    return entityOptions;
+    return Object.entries(ENTITY_TYPE_LABELS).map(([key, label]) => ({
+      id: key as EntityType,
+      label,
+    }));
   }
 
   /**
-   * Filters entities by enitty and search term.
+   * Main filter method.
    */
   filterByEntityAndSearch(
-    selectedEntityType: EntityType | null,
+    selectedEntityType: EntityType,
     term: string | null
   ): SearchTermEntity[] {
     const normalizedTerm = term?.trim().toLowerCase() ?? '';
 
-    if (!selectedEntityType && normalizedTerm) {
-      return this.entities(); // no filter
+    return this.entities().filter((entity) =>
+      this.matchesEntity(entity, selectedEntityType, normalizedTerm)
+    );
+  }
+
+  /**
+   * Determines whether a given entity matches the search term
+   * and selected entity type.
+   */
+  private matchesEntity(
+    entity: SearchTermEntity,
+    filterType: EntityType,
+    term: string
+  ): boolean {
+    // "All" → just match by term
+    if (filterType === EntityType.All) {
+      return this.matchesEntityByType(entity, term);
     }
 
-    switch (selectedEntityType) {
+    // Other types → must match both type and term
+    if (entity.type !== filterType) return false;
+
+    return this.matchesEntityByType(entity, term);
+  }
+
+  /**
+   * Type-specific filtering logic (reused everywhere).
+   */
+  private matchesEntityByType(entity: SearchTermEntity, term: string): boolean {
+    switch (entity.type) {
       case EntityType.Product:
-        return this.entities().filter(
-          (entity) =>
-            entity.type === EntityType.Product &&
-            productOptionsMatchingTerm(normalizedTerm, entity, {
-              id: 'root',
-              label: 'root',
-              children: this.productCategories(),
-            } as ProductCategory)
-        );
+        return productOptionsMatchingTerm(term, entity, {
+          id: 'root',
+          label: 'root',
+          children: this.productCategories(),
+        } as ProductCategory);
 
       case EntityType.Brand:
       case EntityType.Deal:
       case EntityType.Trending:
       case EntityType.NewArrival:
-        return this.entities().filter(
-          (entity) =>
-            entity.type === selectedEntityType &&
-            optionMatchingTerm(normalizedTerm, entity.label)
-        );
+        return optionMatchingTerm(term, entity.label);
 
-      case EntityType.All:
       default:
-        return this.allEntityOptionsMatchingTerm(
-          normalizedTerm,
-          this.productCategories()
-        );
+        return false;
     }
-  }
-
-  allEntityOptionsMatchingTerm(
-    term: string,
-    productCategories: ProductCategory[]
-  ): any {
-    if (!term) {
-      return this.entities(); // no filter, return all
-    }
-
-    return this.entities().filter((entity) => {
-      switch (entity.type) {
-        case EntityType.Product:
-          // match product label or any product category
-          return productOptionsMatchingTerm(term, entity, {
-            id: 'root',
-            label: 'root',
-            children: productCategories,
-          } as ProductCategory);
-
-        case EntityType.Brand:
-        case EntityType.Deal:
-        case EntityType.Trending:
-        case EntityType.NewArrival:
-          return optionMatchingTerm(term, entity.label);
-
-        default:
-          return false;
-      }
-    });
   }
 }

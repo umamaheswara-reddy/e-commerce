@@ -39,12 +39,14 @@ export class HeaderAutocompleteComponent {
   noOptionCheck = input<boolean>(false);
 
   // Form controls
-  readonly entityControl = new FormControl<EntityType>(EntityType.All);
+  readonly entityControl = new FormControl<EntityType>(EntityType.All, {
+    nonNullable: true,
+  });
   readonly searchControl = new FormControl<string | null>(null);
 
   // Reactive signals from form controls
   readonly searchTermSig = formControlSignal(this.searchControl, '');
-  readonly selectedCategoryIdSig = formControlSignal(
+  readonly selectedEntityTypeSig = formControlSignal(
     this.entityControl,
     EntityType.All
   );
@@ -57,7 +59,7 @@ export class HeaderAutocompleteComponent {
   // Filtered options (exclude categories)
   readonly filteredOptions = computed(() => {
     return this.searchService.filterByEntityAndSearch(
-      this.selectedCategoryIdSig(),
+      this.selectedEntityTypeSig(),
       this.searchTermSig()
     );
   });
@@ -79,7 +81,7 @@ export class HeaderAutocompleteComponent {
 
       if (
         matchingCategory &&
-        this.selectedCategoryIdSig() !== matchingCategory.id
+        this.selectedEntityTypeSig() !== matchingCategory.id
       ) {
         this.entityControl.setValue(matchingCategory.id);
       }
