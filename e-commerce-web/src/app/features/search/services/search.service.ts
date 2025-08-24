@@ -1,25 +1,20 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
 import {
   optionMatchingTerm,
   productOptionsMatchingTerm,
 } from '../search-utils';
 import {
-  Entity,
   ENTITY_TYPE_LABELS,
   ProductCategory,
 } from '../../../core/models/entities.interface';
 import { EntityType } from '../../../core/models/entity-type.enum';
 import { KeyValuePair } from '../../../core/models/key-value-pair.interface';
 import { SearchTermEntity } from '../models/search.types';
-import { STUB_PRODUCT_CATEGORIES } from '../../../core/data/product-categories.stub';
-import { STUB_ENTITIES } from '../../../core/data/entities.stub';
+import { SearchRepository } from './search.repository';
 
 @Injectable({ providedIn: 'root' })
 export class SearchService {
-  readonly entities = signal<SearchTermEntity[]>(STUB_ENTITIES);
-  readonly productCategories = signal<ProductCategory[]>(
-    STUB_PRODUCT_CATEGORIES
-  );
+  constructor(private repo: SearchRepository) {}
 
   getEntityDropdownOptions(): KeyValuePair<EntityType>[] {
     return Object.entries(ENTITY_TYPE_LABELS).map(([key, label]) => ({
@@ -36,10 +31,20 @@ export class SearchService {
     term: string | null
   ): SearchTermEntity[] {
     const normalizedTerm = term?.trim().toLowerCase() ?? '';
+    return this.repo
+      .getEntities()
+      .filter((entity) =>
+        this.matchesEntity(entity, selectedEntityType, normalizedTerm)
+      );
+  }
 
-    return this.entities().filter((entity) =>
-      this.matchesEntity(entity, selectedEntityType, normalizedTerm)
+  autoSelectEntityType(term: string): EntityType | null {
+    if (!term) return null;
+    const options = this.getEntityDropdownOptions();
+    const match = options.find(
+      (c) => c.label.toLowerCase() === term.toLowerCase()
     );
+    return match ? match.id : null;
   }
 
   /**
@@ -71,7 +76,7 @@ export class SearchService {
         return productOptionsMatchingTerm(term, entity, {
           id: 'root',
           label: 'root',
-          children: this.productCategories(),
+          children: this.repo.getProductCategories(),
         } as ProductCategory);
 
       case EntityType.Brand:
