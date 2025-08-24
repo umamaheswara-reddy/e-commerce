@@ -15,7 +15,6 @@ import { MatSelectModule } from '@angular/material/select';
 
 import { SearchService } from '../../search/services/search.service';
 import { formControlSignal } from '../../../utils/form-utils';
-import { EntityType } from '../../../core/models/entity-type.enum';
 import { SearchTermEntity } from '../../search/models/search.types';
 
 @Component({
@@ -53,7 +52,7 @@ export class HeaderAutocompleteComponent {
 
   // Filtered options (exclude categories)
   readonly filteredOptions = computed(() => {
-    return this.searchService.filterByCategoryAndSearch(
+    return this.searchService.filterByEntityAndSearch(
       this.selectedCategoryIdSig(),
       this.searchTermSig()
     );

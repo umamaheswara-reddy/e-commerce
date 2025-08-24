@@ -45,7 +45,7 @@ export function productOptionsMatchingTerm<T extends Product>(
   );
 }
 
-function productCategoryChildrenMatchingTerm<T extends Product>(
+function productCategoryChildrenMatchingTerm(
   normalized: string,
   productCategory: ProductCategory
 ): boolean {
@@ -53,6 +53,8 @@ function productCategoryChildrenMatchingTerm<T extends Product>(
     return true;
   }
   return (
-    productCategoryChildrenMatchingTerm(normalized, productCategory) ?? false
+    productCategory.children?.some((child) =>
+      productCategoryChildrenMatchingTerm(normalized, child)
+    ) ?? false
   );
 }

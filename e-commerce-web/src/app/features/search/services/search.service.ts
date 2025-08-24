@@ -32,10 +32,9 @@ export class SearchService {
   }
 
   /**
-   * Filters entities by category and search term.
-   * Category filter is skipped for non-category-aware entity types.
+   * Filters entities by enitty and search term.
    */
-  filterByCategoryAndSearch(
+  filterByEntityAndSearch(
     selectedId: string | null,
     searchTerm: string | null
   ): SearchTermEntity[] {
@@ -49,7 +48,7 @@ export class SearchService {
     let filtered: SearchTermEntity[];
 
     if (!normalizedId) {
-      // no filter id, just filter by search term
+      // no entity filter id, just filter by search term
       filtered = allEntityOptionsMatchingTerm(
         normalizedTerm,
         this.entities(),
