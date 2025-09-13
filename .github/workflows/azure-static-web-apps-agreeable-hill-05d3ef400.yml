@@ -24,10 +24,10 @@ jobs:
           lfs: false
       - name: Install OIDC Client from Core Package # ✅ Install OIDC Client from Core Package
         run: npm install @actions/core@1.6.0 @actions/http-client
-      - name: Use Node.js 22.19 # ✅ Set the correct Node.js version (avoids Oryx problems)
+      - name: Use Node.js 22.12 # ✅ Set the correct Node.js version (avoids Oryx problems)
         uses: actions/setup-node@v3
         with:
-          node-version: '22.19'
+          node-version: '22.12'
       - name: Install dependencies # ✅ Install dependencies and build manually
         run: npm ci
         working-directory: ./e-commerce-web
@@ -66,6 +66,7 @@ jobs:
         uses: Azure/static-web-apps-deploy@v1
         with:
           action: "close"
+
 
 
 
