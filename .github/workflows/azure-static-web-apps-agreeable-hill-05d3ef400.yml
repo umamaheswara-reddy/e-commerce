@@ -22,12 +22,18 @@ jobs:
         with:
           submodules: true
           lfs: false
-      - name: Use Node.js 22.19 # ✅ Add Node.js version setup
+      - name: Install OIDC Client from Core Package # ✅ Install OIDC Client from Core Package
+        run: npm install @actions/core@1.6.0 @actions/http-client
+      - name: Use Node.js 22.12 # ✅ Set the correct Node.js version (avoids Oryx problems)
         uses: actions/setup-node@v3
         with:
-          node-version: '22.19'
-      - name: Install OIDC Client from Core Package
-        run: npm install @actions/core@1.6.0 @actions/http-client
+          node-version: '22.12'
+      - name: Install dependencies # ✅ Install dependencies and build manually
+        run: npm ci
+        working-directory: ./e-commerce-web
+      - name: Build Angular app
+        run: npm run build
+        working-directory: ./e-commerce-web
       - name: Get Id Token
         uses: actions/github-script@v6
         id: idtoken
@@ -36,17 +42,16 @@ jobs:
                const coredemo = require('@actions/core')
                return await coredemo.getIDToken()
            result-encoding: string
-      - name: Build And Deploy
+      - name: 🚀 Deploy to Azure Static Web Apps
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_AGREEABLE_HILL_05D3EF400 }}
           action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "./e-commerce-web" # App source code path
+          app_location: "./e-commerce-web/dist/e-commerce/browser" # index.html path
           api_location: "" # Api source code path - optional
-          output_location: "dist/e-commerce" # Built app content directory - optional
+          output_location: "" # ✅ Skipping this as the app is already built
+          skip_app_build: true # ✅ Skipping oryx build
           github_id_token: ${{ steps.idtoken.outputs.result }}
           ###### End of Repository/Build Configurations ######
 
@@ -60,5 +65,12 @@ jobs:
         uses: Azure/static-web-apps-deploy@v1
         with:
           action: "close"
+
+
+
+
+
+
+
 
 
