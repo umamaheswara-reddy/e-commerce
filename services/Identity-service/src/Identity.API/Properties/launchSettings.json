@@ -1,0 +1,17 @@
+{
+  "profiles": {
+    "IdentityAPI": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "http://identity-api:9003;https://identity-api:9004",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        //"ASPNETCORE_URLS": "http://identity-api:9003;https://identity-api:9004",
+        "ASPNETCORE_Kestrel__Certificates__Default__Path": "../../../infra/certs/dev-cert.pfx",
+        "ASPNETCORE_Kestrel__Certificates__Default__Password": "m@#E$#@550"
+      }
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json"
+}
