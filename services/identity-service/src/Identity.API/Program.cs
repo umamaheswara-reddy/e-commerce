@@ -2,6 +2,7 @@ using Identity.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Shared.Events;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,10 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-app.MapGet("/", () => "Identity API is running!");
+app.MapGet("/", () =>
+{
+    var testEvent = new AccountRegisteredEvent(Guid.NewGuid(), "test@example.com", DateTime.UtcNow);
+    return $"Identity API is running! Test event created for user {testEvent.Email} at {testEvent.RegisteredAt}";
+});
 
 app.Run();
