@@ -1,10 +1,10 @@
 using Identity.Application.Abstractions;
-using Identity.Application.Behaviors;
 using Identity.Application.Registration;
 using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.Factories;
 using Identity.Application.Registration.Strategies;
 using Identity.Domain.Entities;
+using Identity.Infrastructure.Behaviors;
 using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Services;
 using MediatR;
@@ -80,6 +80,7 @@ builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(TransactionBehavior<,>).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(Identity.Application.Registration.Commands.RegisterUserCommand).Assembly);
 });
 
 // Register pipeline behaviors

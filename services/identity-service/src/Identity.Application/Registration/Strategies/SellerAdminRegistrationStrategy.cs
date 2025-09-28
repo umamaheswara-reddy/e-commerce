@@ -1,6 +1,7 @@
 using Identity.Application.Abstractions;
 using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.DTOs;
+using Identity.Domain.Events;
 using Microsoft.Extensions.Logging;
 
 namespace Identity.Application.Registration.Strategies;
@@ -10,7 +11,6 @@ public class SellerAdminRegistrationStrategy(
     IUserFactory userFactory,
     IRoleAssigner roleAssigner,
     ITokenGenerator tokenGenerator,
-    IEventPublisher eventPublisher,
     ILogger<SellerAdminRegistrationStrategy> logger) : IRegistrationStrategy
 {
     public async Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto request)
@@ -65,11 +65,11 @@ public class SellerAdminRegistrationStrategy(
                 };
             }
 
+            // Raise domain event
+            user.AddDomainEvent(new UserRegisteredDomainEvent(user.Id, user.Email!, request.Role));
+
             // Generate token via ITokenGenerator
             var token = tokenGenerator.GenerateToken(user, request.Role);
-
-            // Publish event via IEventPublisher
-            await eventPublisher.PublishAccountRegisteredEventAsync(user, request.Role);
 
             logger.LogInformation("SellerAdmin registered successfully: {Email} with tenant {TenantId}", request.Email, tenantId);
 

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Identity.Domain.Entities;
 
-public class ApplicationUser : IdentityUser<Guid>
+public class ApplicationUser : BaseEntity
 {
     public Guid? TenantId { get; set; } // For multi-tenancy
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

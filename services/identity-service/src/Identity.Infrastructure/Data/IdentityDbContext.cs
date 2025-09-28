@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Identity.Domain.Entities;
+using Identity.Domain;
 
 namespace Identity.Infrastructure.Data;
 
@@ -41,5 +42,24 @@ public class IdentityDbContext : IdentityDbContext<ApplicationUser, Role, Guid, 
             .Property(r => r.RowVersion)
             .IsRowVersion()
             .HasColumnType("bytea");
+    }
+
+    public IEnumerable<IDomainEvent> GetDomainEvents<TEntity>() where TEntity : class
+    {
+        return ChangeTracker.Entries<TEntity>()
+            .Select(e => e.Entity)
+            .OfType<IDomainEventSource>()
+            .SelectMany(e => e.DomainEvents);
+    }
+
+    public void ClearDomainEvents<TEntity>() where TEntity : class
+    {
+        foreach (var entry in ChangeTracker.Entries<TEntity>())
+        {
+            if (entry.Entity is IDomainEventSource entityWithEvents)
+            {
+                entityWithEvents.ClearDomainEvents();
+            }
+        }
     }
 }
