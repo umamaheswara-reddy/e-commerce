@@ -5,7 +5,7 @@ import {
   signal,
   computed,
 } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
@@ -20,8 +20,10 @@ export interface User {
 export interface AuthResponse {
   success: boolean;
   user?: User;
+  userId?: string;
   token?: string;
   message?: string;
+  tenantId?: string;
 }
 
 export interface IAuthResult {
@@ -33,7 +35,7 @@ export interface IAuthResult {
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly API_BASE_URL = '/api/auth';
+  private readonly API_BASE_URL = 'http://localhost:9003/api/auth';
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'user_data';
 
@@ -59,15 +61,35 @@ export class AuthService {
   register(userData: {
     email: string;
     password: string;
-    name: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    tenantId?: string;
   }): Observable<AuthResponse> {
-    // Mock registration - replace with actual API call
+    // Call actual API
     return this.http
       .post<AuthResponse>(`${this.API_BASE_URL}/register`, userData)
       .pipe(
-        catchError(() => {
-          // Fallback to mock if API not available
-          return this.mockRegister(userData);
+        map((response) => {
+          if (response.success && response.token) {
+            this.setSession(
+              {
+                id: response.userId?.toString() || '',
+                email: userData.email,
+                name: `${userData.firstName} ${userData.lastName}`,
+                role: 'user',
+              },
+              response.token
+            );
+          }
+          return response;
+        }),
+        catchError((error) => {
+          // Handle error
+          return of({
+            success: false,
+            message: error.error?.message || 'Registration failed',
+          });
         })
       );
   }

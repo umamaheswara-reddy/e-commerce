@@ -1,0 +1,145 @@
+<div class="register-container">
+    <mat-card class="register-card">
+        <mat-card-header>
+            <mat-card-title>Create Account</mat-card-title>
+            <mat-card-subtitle>Join us today</mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content>
+            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+                <!-- First Name Field -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>First Name</mat-label>
+                    <input matInput type="text" formControlName="firstName" placeholder="Enter your first name"
+                        autocomplete="given-name" />
+                    <mat-icon matSuffix class="form-icon">person</mat-icon>
+                    <mat-error>
+                        @if (firstName.invalid && firstName.touched) {
+                        @if (firstName.errors?.['required']) {
+                        First name is required
+                        }
+                        }
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Last Name Field -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Last Name</mat-label>
+                    <input matInput type="text" formControlName="lastName" placeholder="Enter your last name"
+                        autocomplete="family-name" />
+                    <mat-icon matSuffix class="form-icon">person</mat-icon>
+                    <mat-error>
+                        @if (lastName.invalid && lastName.touched) {
+                        @if (lastName.errors?.['required']) {
+                        Last name is required
+                        }
+                        }
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Email Field -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Email</mat-label>
+                    <input matInput type="email" formControlName="email" placeholder="Enter your email"
+                        autocomplete="email" />
+                    <mat-icon matSuffix class="form-icon">email</mat-icon>
+                    <mat-error>
+                        @if (email.invalid && email.touched) {
+                        @if (email.errors?.['required']) {
+                        Email is required
+                        } @else if (email.errors?.['email']) {
+                        Please enter a valid email
+                        }
+                        }
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Password Field -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Password</mat-label>
+                    <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password"
+                        placeholder="Enter your password" autocomplete="new-password" />
+                    <button mat-icon-button matSuffix (click)="hidePassword.set(!hidePassword())" type="button"
+                        [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword()">
+                        <mat-icon class="form-icon">{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                    <mat-error>
+                        @if (password.invalid && password.touched) {
+                        @if (password.errors?.['required']) {
+                        Password is required
+                        } @else if (password.errors?.['minlength']) {
+                        Password must be at least 6 characters
+                        }
+                        }
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Confirm Password Field -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Confirm Password</mat-label>
+                    <input matInput [type]="hideConfirmPassword() ? 'password' : 'text'"
+                        formControlName="confirmPassword" placeholder="Confirm your password"
+                        autocomplete="new-password" />
+                    <button mat-icon-button matSuffix (click)="hideConfirmPassword.set(!hideConfirmPassword())"
+                        type="button" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hideConfirmPassword()">
+                        <mat-icon class="form-icon">{{ hideConfirmPassword() ? 'visibility_off' : 'visibility'
+                            }}</mat-icon>
+                    </button>
+                    <mat-error>
+                        @if (confirmPassword.invalid && confirmPassword.touched) {
+                        @if (confirmPassword.errors?.['required']) {
+                        Please confirm your password
+                        } @else if (confirmPassword.errors?.['mismatch']) {
+                        Passwords do not match
+                        }
+                        }
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Role Field -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Role</mat-label>
+                    <mat-select formControlName="role">
+                        <mat-option value="Customer">Customer</mat-option>
+                        <mat-option value="SellerAdmin">Seller Admin</mat-option>
+                    </mat-select>
+                    <mat-icon matSuffix class="form-icon">work</mat-icon>
+                    <mat-error>
+                        @if (registerForm.get('role')?.invalid && registerForm.get('role')?.touched) {
+                        @if (registerForm.get('role')?.errors?.['required']) {
+                        Role is required
+                        }
+                        }
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Error Message -->
+                @if (registerError()) {
+                <div class="error-message">
+                    <mat-icon>error</mat-icon>
+                    <span>{{ registerError() }}</span>
+                </div>
+                }
+
+                <!-- Submit Button -->
+                <button mat-raised-button color="primary" type="submit" class="register-button"
+                    [disabled]="isLoading()">
+                    @if (isLoading()) {
+                    <ng-container>
+                        <mat-icon>refresh</mat-icon>
+                        <span>Creating Account...</span>
+                    </ng-container>
+                    } @else {
+                    <span>Create Account</span>
+                    }
+                </button>
+            </form>
+        </mat-card-content>
+
+        <mat-card-actions class="register-actions">
+            <button mat-button type="button" (click)="navigateToLogin()">
+                Already have an account? Sign In
+            </button>
+        </mat-card-actions>
+    </mat-card>
+</div>

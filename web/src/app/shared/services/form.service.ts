@@ -9,7 +9,7 @@ import {
   ValidationErrors,
   ValidatorFn,
 } from '@angular/forms';
-import { ILoginFormGroup } from '../types/form.types';
+import { ILoginFormGroup, IRegisterFormControls } from '../types/form.types';
 import { UtilsService } from './utils.service';
 
 export interface FormConfig {
@@ -254,5 +254,39 @@ export class FormService {
         nonNullable: true,
       }),
     });
+  }
+
+  createRegisterForm(): FormGroup<IRegisterFormControls> {
+    return new FormGroup(
+      {
+        email: new FormControl('', {
+          validators: [Validators.required, Validators.email],
+          nonNullable: true,
+        }),
+        password: new FormControl('', {
+          validators: [Validators.required, Validators.minLength(6)],
+          nonNullable: true,
+        }),
+        confirmPassword: new FormControl('', {
+          validators: [Validators.required],
+          nonNullable: true,
+        }),
+        firstName: new FormControl('', {
+          validators: [Validators.required],
+          nonNullable: true,
+        }),
+        lastName: new FormControl('', {
+          validators: [Validators.required],
+          nonNullable: true,
+        }),
+        role: new FormControl('Customer', {
+          validators: [Validators.required],
+          nonNullable: true,
+        }),
+      },
+      {
+        validators: this.matchingFieldsValidator('password', 'confirmPassword'),
+      }
+    );
   }
 }
