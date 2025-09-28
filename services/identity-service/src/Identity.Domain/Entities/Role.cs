@@ -8,6 +8,7 @@ public class Role : IdentityRole<Guid>
     public Guid? TenantId { get; set; } // For multi-tenancy
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
+    public byte[] RowVersion { get; set; } = Array.Empty<byte>(); // For optimistic concurrency
 
     // Navigation properties
     public ICollection<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();

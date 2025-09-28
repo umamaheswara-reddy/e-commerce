@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20250927082017_InitialCreate")]
+    [Migration("20250928095549_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -70,6 +70,12 @@ namespace Identity.Infrastructure.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
@@ -159,6 +165,12 @@ namespace Identity.Infrastructure.Migrations
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("bytea");
 
                     b.Property<Guid?>("TenantId")
                         .HasColumnType("uuid");

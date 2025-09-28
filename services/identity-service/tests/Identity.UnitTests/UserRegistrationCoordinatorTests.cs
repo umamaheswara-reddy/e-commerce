@@ -1,3 +1,4 @@
+using Identity.Application.Abstractions;
 using Identity.Application.Registration.DTOs;
 using Moq;
 using Microsoft.Extensions.Logging;
@@ -11,6 +12,7 @@ public class UserRegistrationCoordinatorTests
     private readonly Mock<IRegistrationStrategyFactory> _strategyFactoryMock;
     private readonly Mock<ILogger<UserRegistrationCoordinator>> _loggerMock;
     private readonly Mock<IRegistrationStrategy> _strategyMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly UserRegistrationCoordinator _coordinator;
 
     public UserRegistrationCoordinatorTests()
@@ -18,9 +20,11 @@ public class UserRegistrationCoordinatorTests
         _strategyFactoryMock = new Mock<IRegistrationStrategyFactory>();
         _loggerMock = new Mock<ILogger<UserRegistrationCoordinator>>();
         _strategyMock = new Mock<IRegistrationStrategy>();
+        _unitOfWorkMock = new Mock<IUnitOfWork>();
 
         _coordinator = new UserRegistrationCoordinator(
             _strategyFactoryMock.Object,
+            _unitOfWorkMock.Object,
             _loggerMock.Object);
     }
 

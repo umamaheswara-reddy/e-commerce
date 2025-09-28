@@ -14,16 +14,11 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-if (builder.Environment.IsDevelopment())
+builder.Services.AddDbContext<IdentityDbContext>(options =>
 {
-    builder.Services.AddDbContext<IdentityDbContext>(options =>
-        options.UseInMemoryDatabase("IdentityDb"));
-}
-else
-{
-    builder.Services.AddDbContext<IdentityDbContext>(options =>
-        options.UseNpgsql(builder.Configuration.GetConnectionString("IdentityDb")));
-}
+    var connectionString = builder.Configuration.GetConnectionString("IdentityDb");
+    options.UseNpgsql(connectionString);
+});
 
 builder.Services.AddIdentity<ApplicationUser, Role>()
     .AddEntityFrameworkStores<IdentityDbContext>()
@@ -61,6 +56,7 @@ builder.Services.AddScoped<IEventPublisher, EventPublisher>();
 
 builder.Services.AddScoped<IMessagePublisher, RabbitMQMessagePublisher>();
 builder.Services.AddScoped<DataSeeder>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Add CORS policy
 builder.Services.AddCors(options =>

@@ -30,5 +30,16 @@ public class IdentityDbContext : IdentityDbContext<ApplicationUser, Role, Guid, 
             .HasOne(rp => rp.Permission)
             .WithMany()
             .HasForeignKey(rp => rp.PermissionId);
+
+        // Configure concurrency tokens
+        builder.Entity<ApplicationUser>()
+            .Property(u => u.RowVersion)
+            .IsRowVersion()
+            .HasColumnType("bytea");
+
+        builder.Entity<Role>()
+            .Property(r => r.RowVersion)
+            .IsRowVersion()
+            .HasColumnType("bytea");
     }
 }
