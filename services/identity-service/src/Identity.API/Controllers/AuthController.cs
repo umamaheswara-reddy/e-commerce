@@ -1,19 +1,15 @@
-using Identity.Application.Registration.Abstractions;
+using Identity.Application.Registration.Commands;
 using Identity.Application.Registration.DTOs;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Identity.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController : ControllerBase
+public class AuthController(IMediator mediator) : ControllerBase
 {
-    private readonly IRegistrationService _registrationService;
-
-    public AuthController(IRegistrationService registrationService)
-    {
-        _registrationService = registrationService;
-    }
+    private readonly IMediator _mediator = mediator;
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
@@ -23,13 +19,8 @@ public class AuthController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var result = await _registrationService.RegisterUserAsync(request);
+        var userId = await _mediator.Send(new RegisterUserCommand(request.Email, request.Password, request.Role, request.FirstName, request.LastName));
 
-        if (!result.Success)
-        {
-            return BadRequest(new { message = result.Message });
-        }
-
-        return Ok(result);
+        return Ok(new { UserId = userId });
     }
 }

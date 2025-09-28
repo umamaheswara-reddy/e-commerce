@@ -1,12 +1,10 @@
 ﻿using Identity.Application.Abstractions;
-using Identity.Application.Registration;
-using Identity.Application.Registration.Abstractions;
-using Identity.Application.Registration.DTOs;
-using Identity.Application.Registration.Factories;
-using Identity.Application.Registration.Strategies;
+using Identity.Application.Behaviors;
+using Identity.Application.Registration.Commands;
 using Identity.Domain.Entities;
 using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Services;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -48,11 +46,11 @@ public class RegistrationIntegrationTests : IDisposable
             .AddEntityFrameworkStores<IdentityDbContext>()
             .AddDefaultTokenProviders();
 
-        // Register application services
-        services.AddScoped<IRegistrationService, UserRegistrationCoordinator>();
-        services.AddScoped<IRegistrationStrategyFactory, RegistrationStrategyFactory>();
-        services.AddScoped<SellerAdminRegistrationStrategy>();
-        services.AddScoped<CustomerRegistrationStrategy>();
+        // Register MediatR
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(TransactionBehavior<,>).Assembly));
+
+        // Register pipeline behaviors
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
 
         // Register supporting service abstractions
         services.AddScoped<IUserValidator, UserValidator>();
@@ -61,7 +59,6 @@ public class RegistrationIntegrationTests : IDisposable
         services.AddScoped<ITokenGenerator, TokenGenerator>();
         services.AddScoped<IEventPublisher, EventPublisher>();
         services.AddScoped<IMessagePublisher, RabbitMQMessagePublisher>();
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<DataSeeder>();
 
         _serviceProvider = services.BuildServiceProvider();
@@ -84,30 +81,13 @@ public class RegistrationIntegrationTests : IDisposable
         // Arrange
         await SeedDatabaseAsync();
         using var scope = _serviceProvider.CreateScope();
-        var registrationService = scope.ServiceProvider.GetRequiredService<IRegistrationService>();
-
-        var request = new RegisterRequestDto
-        {
-            Email = "testcustomer@example.com",
-            Password = "TestPassword123!",
-            FirstName = "Test",
-            LastName = "Customer",
-            Role = "Customer"
-        };
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         // Act
-        var result = await registrationService.RegisterUserAsync(request);
+        var userId = await mediator.Send(new RegisterUserCommand("testcustomer@example.com", "TestPassword123!", "Customer"));
 
         // Assert
-        Assert.NotNull(result);
-        if (!result.Success)
-        {
-            // Debug: print the actual error message
-            System.Console.WriteLine($"Registration failed: {result.Message}");
-        }
-        Assert.True(result.Success, $"Registration failed: {result.Message}");
-        Assert.Equal("Registration successful.", result.Message);
-        Assert.NotEqual(Guid.Empty, result.UserId);
+        Assert.NotEqual(Guid.Empty, userId);
     }
 
     [Fact]
@@ -116,28 +96,15 @@ public class RegistrationIntegrationTests : IDisposable
         // Arrange
         await SeedDatabaseAsync();
         using var scope = _serviceProvider.CreateScope();
-        var registrationService = scope.ServiceProvider.GetRequiredService<IRegistrationService>();
-
-        var request = new RegisterRequestDto
-        {
-            Email = "duplicate@example.com",
-            Password = "TestPassword123!",
-            FirstName = "Test",
-            LastName = "Customer",
-            Role = "Customer"
-        };
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         // First registration
-        var firstResult = await registrationService.RegisterUserAsync(request);
-        Assert.True(firstResult.Success);
+        var firstUserId = await mediator.Send(new RegisterUserCommand("duplicate@example.com", "TestPassword123!", "Customer"));
+        Assert.NotEqual(Guid.Empty, firstUserId);
 
-        // Second registration with same email
-        var secondResult = await registrationService.RegisterUserAsync(request);
-
-        // Assert
-        Assert.NotNull(secondResult);
-        Assert.False(secondResult.Success);
-        Assert.Contains("already exists", secondResult.Message);
+        // Second registration with same email should fail
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            mediator.Send(new RegisterUserCommand("duplicate@example.com", "TestPassword123!", "Customer")));
     }
 
     public void Dispose()

@@ -41,6 +41,8 @@ public class UserValidatorTests
         {
             Email = "test@example.com",
             Password = "password123",
+            FirstName = "John",
+            LastName = "Doe",
             Role = "Customer"
         };
 
@@ -63,6 +65,8 @@ public class UserValidatorTests
         {
             Email = "existing@example.com",
             Password = "password123",
+            FirstName = "Jane",
+            LastName = "Smith",
             Role = "Customer"
         };
 
@@ -85,6 +89,8 @@ public class UserValidatorTests
         {
             Email = "",
             Password = "password123",
+            FirstName = "Bob",
+            LastName = "Wilson",
             Role = "Customer"
         };
 
@@ -104,6 +110,8 @@ public class UserValidatorTests
         {
             Email = "test@example.com",
             Password = "",
+            FirstName = "Alice",
+            LastName = "Brown",
             Role = "Customer"
         };
 
@@ -126,6 +134,8 @@ public class UserValidatorTests
         {
             Email = "test@example.com",
             Password = "password123",
+            FirstName = "Charlie",
+            LastName = "Davis",
             Role = ""
         };
 

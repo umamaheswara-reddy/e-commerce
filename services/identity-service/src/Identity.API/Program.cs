@@ -1,4 +1,5 @@
 using Identity.Application.Abstractions;
+using Identity.Application.Behaviors;
 using Identity.Application.Registration;
 using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.Factories;
@@ -6,6 +7,7 @@ using Identity.Application.Registration.Strategies;
 using Identity.Domain.Entities;
 using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -41,11 +43,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-// Register application services
-builder.Services.AddScoped<IRegistrationService, UserRegistrationCoordinator>();
-builder.Services.AddScoped<IRegistrationStrategyFactory, RegistrationStrategyFactory>();
-builder.Services.AddScoped<SellerAdminRegistrationStrategy>();
-builder.Services.AddScoped<CustomerRegistrationStrategy>();
 
 // Register supporting service abstractions
 builder.Services.AddScoped<IUserValidator, UserValidator>();
@@ -54,9 +51,13 @@ builder.Services.AddScoped<IRoleAssigner, RoleAssigner>();
 builder.Services.AddScoped<ITokenGenerator, TokenGenerator>();
 builder.Services.AddScoped<IEventPublisher, EventPublisher>();
 
+// Register strategy factory and strategies (needed for RegisterUserCommandHandler)
+builder.Services.AddScoped<IRegistrationStrategyFactory, RegistrationStrategyFactory>();
+builder.Services.AddScoped<SellerAdminRegistrationStrategy>();
+builder.Services.AddScoped<CustomerRegistrationStrategy>();
+
 builder.Services.AddScoped<IMessagePublisher, RabbitMQMessagePublisher>();
 builder.Services.AddScoped<DataSeeder>();
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Add CORS policy
 builder.Services.AddCors(options =>
@@ -73,6 +74,16 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
+
+// Register MediatR
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(TransactionBehavior<,>).Assembly);
+});
+
+// Register pipeline behaviors
+builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
 
 var app = builder.Build();
 
