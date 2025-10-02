@@ -48,7 +48,7 @@ public class UserFactoryTests
             });
 
         // Act
-        var result = await _factory.CreateUserAsync(email, password, tenantId);
+        var result = await _factory.CreateUserAsync(email, password, tenantId, CancellationToken.None);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -83,7 +83,7 @@ public class UserFactoryTests
             });
 
         // Act
-        var result = await _factory.CreateUserAsync(email, password, null);
+        var result = await _factory.CreateUserAsync(email, password, null, CancellationToken.None);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -120,7 +120,7 @@ public class UserFactoryTests
             .ReturnsAsync(IdentityResult.Failed(identityErrors));
 
         // Act
-        var result = await _factory.CreateUserAsync(email, password, tenantId);
+        var result = await _factory.CreateUserAsync(email, password, tenantId, CancellationToken.None);
 
         // Assert
         Assert.False(result.Succeeded);

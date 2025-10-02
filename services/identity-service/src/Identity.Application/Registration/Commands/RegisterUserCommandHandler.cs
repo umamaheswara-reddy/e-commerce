@@ -1,30 +1,41 @@
+using Identity.Application.Abstractions;
 using Identity.Application.Registration.Abstractions;
+using Identity.Application.Registration.DTOs;
+using Identity.Domain.Constants;
+using Identity.Domain.Events;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Identity.Application.Registration.Commands;
 
-public class RegisterUserCommandHandler(IRegistrationStrategyFactory strategyFactory) : IRequestHandler<RegisterUserCommand, Guid>
+public class RegisterUserCommandHandler(
+    IRegistrationStrategyFactory strategyFactory,
+    ILogger<RegisterUserCommandHandler> logger) : IRequestHandler<RegisterUserCommand, Result<RegisterResponseDto>>
 {
-    public async Task<Guid> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result<RegisterResponseDto>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        // Moved from UserRegistrationCoordinator: Get the appropriate strategy based on the role
-        var strategy = strategyFactory.GetStrategy(request.Role);
-
-        // Delegate the registration to the specific strategy (moved from UserRegistrationCoordinator)
-        var result = await strategy.RegisterAsync(new Registration.DTOs.RegisterRequestDto
+        try
         {
-            Email = request.Email,
-            Password = request.Password,
-            Role = request.Role,
-            FirstName = request.FirstName,
-            LastName = request.LastName
-        });
+            // Get the appropriate strategy based on the role
+            var strategy = strategyFactory.GetStrategy(request.Role);
 
-        if (!result.Success)
-        {
-            throw new InvalidOperationException(result.Message);
+            // Create registration request
+            var registerRequest = new RegisterRequestDto
+            {
+                Email = request.Email,
+                Password = request.Password,
+                Role = request.Role,
+                FirstName = request.FirstName,
+                LastName = request.LastName
+            };
+
+            // Delegate registration to the strategy
+            return await strategy.RegisterAsync(registerRequest, cancellationToken);
         }
-
-        return result.UserId;
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error during registration for {Email}", request.Email);
+            return Result<RegisterResponseDto>.Failure("An error occurred during registration.", ErrorCodes.InternalError);
+        }
     }
 }

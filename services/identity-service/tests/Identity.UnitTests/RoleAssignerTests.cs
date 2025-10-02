@@ -55,7 +55,7 @@ public class RoleAssignerTests
             .ReturnsAsync(IdentityResult.Success);
 
         // Act
-        var result = await _assigner.AssignRoleAsync(user, roleName);
+        var result = await _assigner.AssignRoleAsync(user, roleName, CancellationToken.None);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -76,7 +76,7 @@ public class RoleAssignerTests
             .ReturnsAsync((Role)null);
 
         // Act
-        var result = await _assigner.AssignRoleAsync(user, roleName);
+        var result = await _assigner.AssignRoleAsync(user, roleName, CancellationToken.None);
 
         // Assert
         Assert.False(result.Succeeded);
@@ -108,7 +108,7 @@ public class RoleAssignerTests
             .ReturnsAsync(IdentityResult.Failed(identityErrors));
 
         // Act
-        var result = await _assigner.AssignRoleAsync(user, roleName);
+        var result = await _assigner.AssignRoleAsync(user, roleName, CancellationToken.None);
 
         // Assert
         Assert.False(result.Succeeded);

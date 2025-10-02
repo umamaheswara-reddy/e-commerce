@@ -4,7 +4,7 @@ namespace Identity.Application.Abstractions;
 
 public interface IUserValidator
 {
-    Task<ValidationResult> ValidateAsync(RegisterRequestDto request);
+    Task<ValidationResult> ValidateAsync(RegisterRequestDto request, CancellationToken cancellationToken);
 }
 
 public class ValidationResult

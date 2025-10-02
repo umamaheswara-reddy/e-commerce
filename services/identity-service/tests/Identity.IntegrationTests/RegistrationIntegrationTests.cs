@@ -1,6 +1,8 @@
 ﻿using Identity.Application.Abstractions;
-using Identity.Application.Behaviors;
+using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.Commands;
+using Identity.Application.Registration.Factories;
+using Identity.Infrastructure.Behaviors;
 using Identity.Domain.Entities;
 using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Services;
@@ -61,6 +63,11 @@ public class RegistrationIntegrationTests : IDisposable
         services.AddScoped<IMessagePublisher, RabbitMQMessagePublisher>();
         services.AddScoped<DataSeeder>();
 
+        // Register registration strategies
+        services.AddScoped<Identity.Application.Registration.Strategies.SellerAdminRegistrationStrategy>();
+        services.AddScoped<Identity.Application.Registration.Strategies.CustomerRegistrationStrategy>();
+        services.AddScoped<IRegistrationStrategyFactory, Identity.Application.Registration.Factories.RegistrationStrategyFactory>();
+
         _serviceProvider = services.BuildServiceProvider();
 
         // Get the DbContext and migrate the database
@@ -84,10 +91,12 @@ public class RegistrationIntegrationTests : IDisposable
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         // Act
-        var userId = await mediator.Send(new RegisterUserCommand("testcustomer@example.com", "TestPassword123!", "Customer"));
+        var result = await mediator.Send(new RegisterUserCommand("testcustomer@example.com", "TestPassword123!", "Customer", "Test", "Customer"));
 
         // Assert
-        Assert.NotEqual(Guid.Empty, userId);
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Value);
+        Assert.NotEqual(Guid.Empty, result.Value.UserId);
     }
 
     [Fact]
@@ -99,12 +108,14 @@ public class RegistrationIntegrationTests : IDisposable
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
         // First registration
-        var firstUserId = await mediator.Send(new RegisterUserCommand("duplicate@example.com", "TestPassword123!", "Customer"));
-        Assert.NotEqual(Guid.Empty, firstUserId);
+        var firstResult = await mediator.Send(new RegisterUserCommand("duplicate@example.com", "TestPassword123!", "Customer", "Test", "User"));
+        Assert.True(firstResult.IsSuccess);
+        Assert.NotEqual(Guid.Empty, firstResult.Value.UserId);
 
         // Second registration with same email should fail
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            mediator.Send(new RegisterUserCommand("duplicate@example.com", "TestPassword123!", "Customer")));
+        var secondResult = await mediator.Send(new RegisterUserCommand("duplicate@example.com", "TestPassword123!", "Customer", "Test", "User"));
+        Assert.True(secondResult.IsFailure);
+        Assert.Contains("already exists", secondResult.Error);
     }
 
     public void Dispose()

@@ -1,6 +1,7 @@
 using Identity.Application.Abstractions;
 using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.DTOs;
+using Identity.Domain.Constants;
 using Identity.Domain.Events;
 using Microsoft.Extensions.Logging;
 
@@ -13,57 +14,35 @@ public class SellerAdminRegistrationStrategy(
     ITokenGenerator tokenGenerator,
     ILogger<SellerAdminRegistrationStrategy> logger) : IRegistrationStrategy
 {
-    public async Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto request)
+    public async Task<Result<RegisterResponseDto>> RegisterAsync(RegisterRequestDto request, CancellationToken cancellationToken)
     {
         try
         {
             // Validate input using IUserValidator
-            var validationResult = await userValidator.ValidateAsync(request);
-            if (!validationResult.IsValid)
-            {
-                return new RegisterResponseDto
-                {
-                    Success = false,
-                    Message = validationResult.ErrorMessage!
-                };
-            }
+            var validation = await userValidator.ValidateAsync(request, cancellationToken);
+            if (!validation.IsValid)
+                return Result<RegisterResponseDto>.Failure(validation.ErrorMessage!, ErrorCodes.ValidationFailed);
 
             // Validate role-tenant rules: SellerAdmin must generate new TenantId
             if (request.Role != "SellerAdmin")
             {
-                return new RegisterResponseDto
-                {
-                    Success = false,
-                    Message = "Invalid role for SellerAdmin registration strategy."
-                };
+                return Result<RegisterResponseDto>.Failure("Invalid role for SellerAdmin registration strategy.", ErrorCodes.UserCreationFailed);
             }
 
             // Generate tenant ID for SellerAdmin
             var tenantId = Guid.NewGuid();
 
             // Create user via IUserFactory
-            var userCreationResult = await userFactory.CreateUserAsync(request.Email, request.Password, tenantId);
-            if (!userCreationResult.Succeeded)
-            {
-                return new RegisterResponseDto
-                {
-                    Success = false,
-                    Message = string.Join(", ", userCreationResult.Errors)
-                };
-            }
+            var userCreation = await userFactory.CreateUserAsync(request.Email, request.Password, tenantId, cancellationToken);
+            if (!userCreation.Succeeded)
+                return Result<RegisterResponseDto>.Failure(string.Join(", ", userCreation.Errors), ErrorCodes.UserCreationFailed);
 
-            var user = userCreationResult.User!;
+            var user = userCreation.User!;
 
             // Assign role via IRoleAssigner
-            var roleAssignmentResult = await roleAssigner.AssignRoleAsync(user, request.Role);
-            if (!roleAssignmentResult.Succeeded)
-            {
-                return new RegisterResponseDto
-                {
-                    Success = false,
-                    Message = string.Join(", ", roleAssignmentResult.Errors)
-                };
-            }
+            var roleAssignment = await roleAssigner.AssignRoleAsync(user, request.Role, cancellationToken);
+            if (!roleAssignment.Succeeded)
+                return Result<RegisterResponseDto>.Failure(string.Join(", ", roleAssignment.Errors), ErrorCodes.RoleAssignmentFailed);
 
             // Raise domain event
             user.AddDomainEvent(new UserRegisteredDomainEvent(user.Id, user.Email!, request.Role));
@@ -71,25 +50,21 @@ public class SellerAdminRegistrationStrategy(
             // Generate token via ITokenGenerator
             var token = tokenGenerator.GenerateToken(user, request.Role);
 
+            var response = new RegisterResponseDto
+            {
+                UserId = user.Id,
+                TenantId = tenantId,
+                Token = token
+            };
+
             logger.LogInformation("SellerAdmin registered successfully: {Email} with tenant {TenantId}", request.Email, tenantId);
 
-            return new RegisterResponseDto
-            {
-                Success = true,
-                Message = "Registration successful.",
-                UserId = user.Id,
-                Token = token,
-                TenantId = tenantId
-            };
+            return Result<RegisterResponseDto>.Success(response);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error during SellerAdmin registration for {Email}", request.Email);
-            return new RegisterResponseDto
-            {
-                Success = false,
-                Message = "An error occurred during registration."
-            };
+            return Result<RegisterResponseDto>.Failure("An error occurred during registration.", ErrorCodes.InternalError);
         }
     }
 }

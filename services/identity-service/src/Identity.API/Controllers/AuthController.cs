@@ -1,3 +1,4 @@
+using Identity.Application.Abstractions;
 using Identity.Application.Registration.Commands;
 using Identity.Application.Registration.DTOs;
 using MediatR;
@@ -19,8 +20,8 @@ public class AuthController(IMediator mediator) : ControllerBase
             return BadRequest(ModelState);
         }
 
-        var userId = await _mediator.Send(new RegisterUserCommand(request.Email, request.Password, request.Role, request.FirstName, request.LastName));
+        var result = await _mediator.Send(new RegisterUserCommand(request.Email, request.Password, request.Role, request.FirstName, request.LastName));
 
-        return Ok(new { UserId = userId });
+        return result.ToActionResult();
     }
 }

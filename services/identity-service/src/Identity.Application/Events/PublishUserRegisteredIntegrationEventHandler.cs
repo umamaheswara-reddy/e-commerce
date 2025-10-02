@@ -1,5 +1,4 @@
 using Identity.Application.Abstractions;
-using Identity.Domain.Entities;
 using Identity.Domain.Events;
 using MediatR;
 
@@ -9,14 +8,7 @@ public class PublishUserRegisteredIntegrationEventHandler(IEventPublisher eventP
 {
     public async Task Handle(UserRegisteredDomainEvent notification, CancellationToken cancellationToken)
     {
-        // Create a dummy user object for the event publisher
-        var user = new ApplicationUser
-        {
-            Id = notification.UserId,
-            Email = notification.Email,
-            UserName = notification.Email
-        };
-
-        await eventPublisher.PublishAccountRegisteredEventAsync(user, notification.Role);
+        // Publish integration event using the domain event data
+        await eventPublisher.PublishAccountRegisteredEventAsync(notification.UserId, notification.Email, notification.Role);
     }
 }

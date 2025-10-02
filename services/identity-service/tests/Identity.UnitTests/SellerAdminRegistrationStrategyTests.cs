@@ -1,9 +1,11 @@
-using Identity.Application.Registration.DTOs;
-using Moq;
-using Identity.Domain.Entities;
-using Microsoft.Extensions.Logging;
-using Identity.Application.Registration.Strategies;
 using Identity.Application.Abstractions;
+using Identity.Application.Registration.Abstractions;
+using Identity.Application.Registration.DTOs;
+using Identity.Application.Registration.Strategies;
+using Identity.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace Identity.UnitTests;
 
@@ -13,7 +15,6 @@ public class SellerAdminRegistrationStrategyTests
     private readonly Mock<IUserFactory> _userFactoryMock;
     private readonly Mock<IRoleAssigner> _roleAssignerMock;
     private readonly Mock<ITokenGenerator> _tokenGeneratorMock;
-    private readonly Mock<IEventPublisher> _eventPublisherMock;
     private readonly Mock<ILogger<SellerAdminRegistrationStrategy>> _loggerMock;
     private readonly SellerAdminRegistrationStrategy _strategy;
 
@@ -23,7 +24,6 @@ public class SellerAdminRegistrationStrategyTests
         _userFactoryMock = new Mock<IUserFactory>();
         _roleAssignerMock = new Mock<IRoleAssigner>();
         _tokenGeneratorMock = new Mock<ITokenGenerator>();
-        _eventPublisherMock = new Mock<IEventPublisher>();
         _loggerMock = new Mock<ILogger<SellerAdminRegistrationStrategy>>();
 
         _strategy = new SellerAdminRegistrationStrategy(
@@ -31,54 +31,47 @@ public class SellerAdminRegistrationStrategyTests
             _userFactoryMock.Object,
             _roleAssignerMock.Object,
             _tokenGeneratorMock.Object,
-            _eventPublisherMock.Object,
             _loggerMock.Object);
     }
 
     [Fact]
-    public async Task RegisterAsync_ShouldCreateSellerAdminWithTenantId()
+    public async Task RegisterAsync_ShouldReturnSuccess_WhenValidSellerAdminRequest()
     {
         // Arrange
         var request = new RegisterRequestDto
         {
-            Email = "seller@example.com",
-            Password = "password123",
-            FirstName = "John",
-            LastName = "Doe",
-            Role = "SellerAdmin"
+            Email = "selleradmin@example.com",
+            Password = "Password123!",
+            Role = "SellerAdmin",
+            FirstName = "Jane",
+            LastName = "Smith"
         };
 
         var user = new ApplicationUser { Id = Guid.NewGuid(), Email = request.Email };
+        var token = "jwt-token";
 
-        _userValidatorMock.Setup(uv => uv.ValidateAsync(request))
-            .ReturnsAsync(ValidationResult.Success());
+        _userValidatorMock.Setup(uv => uv.ValidateAsync(request, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult { IsValid = true });
 
-        _userFactoryMock.Setup(uf => uf.CreateUserAsync(request.Email, request.Password, It.Is<Guid>(g => g != Guid.Empty)))
+        _userFactoryMock.Setup(uf => uf.CreateUserAsync(request.Email, request.Password, It.IsAny<Guid?>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new UserCreationResult { Succeeded = true, User = user });
 
-        _roleAssignerMock.Setup(ra => ra.AssignRoleAsync(user, request.Role))
+        _roleAssignerMock.Setup(ra => ra.AssignRoleAsync(user, request.Role, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new RoleAssignmentResult { Succeeded = true });
 
         _tokenGeneratorMock.Setup(tg => tg.GenerateToken(user, request.Role))
-            .Returns("jwt-token");
-
-        _eventPublisherMock.Setup(ep => ep.PublishAccountRegisteredEventAsync(user, request.Role))
-            .Returns(Task.CompletedTask);
+            .Returns(token);
 
         // Act
-        var result = await _strategy.RegisterAsync(request);
+        var result = await _strategy.RegisterAsync(request, CancellationToken.None);
 
         // Assert
-        Assert.True(result.Success);
-        Assert.Equal(user.Id, result.UserId);
-        Assert.Equal("jwt-token", result.Token);
-        Assert.NotNull(result.TenantId);
-
-        _userValidatorMock.Verify(uv => uv.ValidateAsync(request), Times.Once);
-        _userFactoryMock.Verify(uf => uf.CreateUserAsync(request.Email, request.Password, It.Is<Guid>(g => g != Guid.Empty)), Times.Once);
-        _roleAssignerMock.Verify(ra => ra.AssignRoleAsync(user, request.Role), Times.Once);
-        _tokenGeneratorMock.Verify(tg => tg.GenerateToken(user, request.Role), Times.Once);
-        _eventPublisherMock.Verify(ep => ep.PublishAccountRegisteredEventAsync(user, request.Role), Times.Once);
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Value);
+        Assert.Equal(user.Id, result.Value.UserId);
+        Assert.Equal(token, result.Value.Token);
+        Assert.NotNull(result.Value.TenantId);
+        Assert.NotEqual(Guid.Empty, result.Value.TenantId);
     }
 
     [Fact]
@@ -87,48 +80,45 @@ public class SellerAdminRegistrationStrategyTests
         // Arrange
         var request = new RegisterRequestDto
         {
-            Email = "existing@example.com",
-            Password = "password123",
-            FirstName = "John",
-            LastName = "Doe",
-            Role = "SellerAdmin"
+            Email = "invalid@example.com",
+            Password = "Password123!",
+            Role = "SellerAdmin",
+            FirstName = "Jane",
+            LastName = "Smith"
         };
 
-        _userValidatorMock.Setup(uv => uv.ValidateAsync(request))
-            .ReturnsAsync(ValidationResult.Failure("User with this email already exists."));
+        _userValidatorMock.Setup(uv => uv.ValidateAsync(request, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult { IsValid = false, ErrorMessage = "Validation failed" });
 
         // Act
-        var result = await _strategy.RegisterAsync(request);
+        var result = await _strategy.RegisterAsync(request, CancellationToken.None);
 
         // Assert
-        Assert.False(result.Success);
-        Assert.Equal("User with this email already exists.", result.Message);
+        Assert.True(result.IsFailure);
+        Assert.Contains("Validation failed", result.Error);
     }
 
     [Fact]
-    public async Task RegisterAsync_ShouldReturnFailure_WhenUserCreationFails()
+    public async Task RegisterAsync_ShouldReturnFailure_WhenWrongRole()
     {
         // Arrange
         var request = new RegisterRequestDto
         {
-            Email = "seller@example.com",
-            Password = "password123",
-            FirstName = "John",
-            LastName = "Doe",
-            Role = "SellerAdmin"
+            Email = "selleradmin@example.com",
+            Password = "Password123!",
+            Role = "Customer", // Wrong role for SellerAdmin strategy
+            FirstName = "Jane",
+            LastName = "Smith"
         };
 
-        _userValidatorMock.Setup(uv => uv.ValidateAsync(request))
-            .ReturnsAsync(ValidationResult.Success());
-
-        _userFactoryMock.Setup(uf => uf.CreateUserAsync(request.Email, request.Password, It.IsAny<Guid?>()))
-            .ReturnsAsync(new UserCreationResult { Succeeded = false, Errors = new[] { "Password too weak" } });
+        _userValidatorMock.Setup(uv => uv.ValidateAsync(request, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ValidationResult { IsValid = true });
 
         // Act
-        var result = await _strategy.RegisterAsync(request);
+        var result = await _strategy.RegisterAsync(request, CancellationToken.None);
 
         // Assert
-        Assert.False(result.Success);
-        Assert.Contains("Password too weak", result.Message);
+        Assert.True(result.IsFailure);
+        Assert.Contains("Invalid role for SellerAdmin registration strategy", result.Error);
     }
 }

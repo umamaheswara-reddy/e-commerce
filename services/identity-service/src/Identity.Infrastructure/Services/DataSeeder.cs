@@ -1,3 +1,4 @@
+using Identity.Domain.Constants;
 using Identity.Domain.Entities;
 using Identity.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
@@ -38,9 +39,9 @@ public class DataSeeder
     {
         var roles = new[]
         {
-            new { Name = "SuperAdmin", Description = "Global system administrator with full access" },
-            new { Name = "SellerAdmin", Description = "Tenant-specific administrator for sellers" },
-            new { Name = "Customer", Description = "Regular customer user" }
+            new { Name = Roles.SuperAdmin, Description = "Global system administrator with full access" },
+            new { Name = Roles.SellerAdmin, Description = "Tenant-specific administrator for sellers" },
+            new { Name = Roles.Customer, Description = "Regular customer user" }
         };
 
         foreach (var roleInfo in roles)

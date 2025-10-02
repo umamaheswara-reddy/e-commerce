@@ -15,7 +15,7 @@ public class RoleAssigner : IRoleAssigner
         _roleManager = roleManager;
     }
 
-    public async Task<RoleAssignmentResult> AssignRoleAsync(ApplicationUser user, string roleName)
+    public async Task<RoleAssignmentResult> AssignRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken)
     {
         var role = await _roleManager.FindByNameAsync(roleName);
         if (role == null)

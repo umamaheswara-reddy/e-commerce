@@ -34,7 +34,7 @@ public class EventPublisherTests
 
         AccountRegisteredEvent capturedEvent = null;
         _messagePublisherMock.Setup(mp => mp.PublishAccountRegisteredEventAsync(It.IsAny<AccountRegisteredEvent>()))
-            .Callback<AccountRegisteredEvent>(@event => capturedEvent = @event)
+            .Callback<AccountRegisteredEvent>(evt => capturedEvent = evt)
             .Returns(Task.CompletedTask);
 
         // Act
@@ -66,7 +66,7 @@ public class EventPublisherTests
 
         AccountRegisteredEvent capturedEvent = null;
         _messagePublisherMock.Setup(mp => mp.PublishAccountRegisteredEventAsync(It.IsAny<AccountRegisteredEvent>()))
-            .Callback<AccountRegisteredEvent>(@event => capturedEvent = @event)
+            .Callback<AccountRegisteredEvent>(evt => capturedEvent = evt)
             .Returns(Task.CompletedTask);
 
         // Act
@@ -116,7 +116,7 @@ public class EventPublisherTests
 
         AccountRegisteredEvent capturedEvent = null;
         _messagePublisherMock.Setup(mp => mp.PublishAccountRegisteredEventAsync(It.IsAny<AccountRegisteredEvent>()))
-            .Callback<AccountRegisteredEvent>(@event => capturedEvent = @event)
+            .Callback<AccountRegisteredEvent>(evt => capturedEvent = evt)
             .Returns(Task.CompletedTask);
 
         // Act

@@ -13,7 +13,7 @@ public class UserFactory : IUserFactory
         _userManager = userManager;
     }
 
-    public async Task<UserCreationResult> CreateUserAsync(string email, string password, Guid? tenantId = null)
+    public async Task<UserCreationResult> CreateUserAsync(string email, string password, Guid? tenantId, CancellationToken cancellationToken)
     {
         var user = new ApplicationUser
         {

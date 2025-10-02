@@ -4,7 +4,7 @@ namespace Identity.Application.Abstractions;
 
 public interface IRoleAssigner
 {
-    Task<RoleAssignmentResult> AssignRoleAsync(ApplicationUser user, string roleName);
+    Task<RoleAssignmentResult> AssignRoleAsync(ApplicationUser user, string roleName, CancellationToken cancellationToken);
 }
 
 public class RoleAssignmentResult

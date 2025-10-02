@@ -14,7 +14,7 @@ public class UserValidator : IUserValidator
         _userManager = userManager;
     }
 
-    public async Task<ValidationResult> ValidateAsync(RegisterRequestDto request)
+    public async Task<ValidationResult> ValidateAsync(RegisterRequestDto request, CancellationToken cancellationToken)
     {
         // Check if user already exists
         var existingUser = await _userManager.FindByEmailAsync(request.Email);

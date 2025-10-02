@@ -4,7 +4,7 @@ namespace Identity.Application.Abstractions;
 
 public interface IUserFactory
 {
-    Task<UserCreationResult> CreateUserAsync(string email, string password, Guid? tenantId = null);
+    Task<UserCreationResult> CreateUserAsync(string email, string password, Guid? tenantId, CancellationToken cancellationToken);
 }
 
 public class UserCreationResult

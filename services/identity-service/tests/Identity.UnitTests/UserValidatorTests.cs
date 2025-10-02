@@ -50,7 +50,7 @@ public class UserValidatorTests
             .ReturnsAsync((ApplicationUser)null);
 
         // Act
-        var result = await _validator.ValidateAsync(request);
+        var result = await _validator.ValidateAsync(request, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsValid);
@@ -74,7 +74,7 @@ public class UserValidatorTests
             .ReturnsAsync(new ApplicationUser { Email = request.Email });
 
         // Act
-        var result = await _validator.ValidateAsync(request);
+        var result = await _validator.ValidateAsync(request, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsValid);
@@ -95,7 +95,7 @@ public class UserValidatorTests
         };
 
         // Act
-        var result = await _validator.ValidateAsync(request);
+        var result = await _validator.ValidateAsync(request, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsValid);
@@ -119,7 +119,7 @@ public class UserValidatorTests
             .ReturnsAsync((ApplicationUser)null);
 
         // Act
-        var result = await _validator.ValidateAsync(request);
+        var result = await _validator.ValidateAsync(request, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsValid);
@@ -143,7 +143,7 @@ public class UserValidatorTests
             .ReturnsAsync((ApplicationUser)null);
 
         // Act
-        var result = await _validator.ValidateAsync(request);
+        var result = await _validator.ValidateAsync(request, CancellationToken.None);
 
         // Assert
         Assert.False(result.IsValid);

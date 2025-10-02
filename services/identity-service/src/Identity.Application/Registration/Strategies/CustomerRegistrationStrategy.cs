@@ -1,6 +1,7 @@
 using Identity.Application.Abstractions;
 using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.DTOs;
+using Identity.Domain.Constants;
 using Identity.Domain.Events;
 using Microsoft.Extensions.Logging;
 
@@ -13,53 +14,37 @@ public class CustomerRegistrationStrategy(
     ITokenGenerator tokenGenerator,
     ILogger<CustomerRegistrationStrategy> logger) : IRegistrationStrategy
 {
-    public async Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto request)
+    public async Task<Result<RegisterResponseDto>> RegisterAsync(RegisterRequestDto request, CancellationToken cancellationToken)
     {
         try
         {
             // Validate input using IUserValidator
-            var validationResult = await userValidator.ValidateAsync(request);
+            var validationResult = await userValidator.ValidateAsync(request, cancellationToken);
             if (!validationResult.IsValid)
             {
-                return new RegisterResponseDto
-                {
-                    Success = false,
-                    Message = validationResult.ErrorMessage!
-                };
+                return Result<RegisterResponseDto>.Failure(validationResult.ErrorMessage!, ErrorCodes.ValidationFailed);
             }
 
             // Validate that Customer has no tenant association
             if (request.Role != "Customer")
             {
-                return new RegisterResponseDto
-                {
-                    Success = false,
-                    Message = "Invalid role for Customer registration strategy."
-                };
+                return Result<RegisterResponseDto>.Failure("Invalid role for Customer registration strategy.", ErrorCodes.ValidationFailed);
             }
 
             // Create user via IUserFactory (no tenant for Customer)
-            var userCreationResult = await userFactory.CreateUserAsync(request.Email, request.Password, null);
+            var userCreationResult = await userFactory.CreateUserAsync(request.Email, request.Password, null, cancellationToken);
             if (!userCreationResult.Succeeded)
             {
-                return new RegisterResponseDto
-                {
-                    Success = false,
-                    Message = string.Join(", ", userCreationResult.Errors)
-                };
+                return Result<RegisterResponseDto>.Failure(string.Join(", ", userCreationResult.Errors), ErrorCodes.ValidationFailed);
             }
 
             var user = userCreationResult.User!;
 
             // Assign role via IRoleAssigner
-            var roleAssignmentResult = await roleAssigner.AssignRoleAsync(user, request.Role);
+            var roleAssignmentResult = await roleAssigner.AssignRoleAsync(user, request.Role, cancellationToken);
             if (!roleAssignmentResult.Succeeded)
             {
-                return new RegisterResponseDto
-                {
-                    Success = false,
-                    Message = string.Join(", ", roleAssignmentResult.Errors)
-                };
+                return Result<RegisterResponseDto>.Failure(string.Join(", ", roleAssignmentResult.Errors), ErrorCodes.ValidationFailed);
             }
 
             // Raise domain event
@@ -70,23 +55,17 @@ public class CustomerRegistrationStrategy(
 
             logger.LogInformation("Customer registered successfully: {Email}", request.Email);
 
-            return new RegisterResponseDto
+            return Result<RegisterResponseDto>.Success(new RegisterResponseDto
             {
-                Success = true,
-                Message = "Registration successful.",
                 UserId = user.Id,
                 Token = token,
                 TenantId = null
-            };
+            });
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error during Customer registration for {Email}", request.Email);
-            return new RegisterResponseDto
-            {
-                Success = false,
-                Message = "An error occurred during registration."
-            };
+            return Result<RegisterResponseDto>.Failure("An error occurred during registration.", ErrorCodes.ValidationFailed);
         }
     }
 }

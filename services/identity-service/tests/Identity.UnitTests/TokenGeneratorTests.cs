@@ -152,7 +152,6 @@ public class TokenGeneratorTests
         var handler = new JwtSecurityTokenHandler();
         var jwtToken = handler.ReadJwtToken(token);
 
-        Assert.NotNull(jwtToken.ValidTo);
         Assert.True(jwtToken.ValidTo > beforeGeneration);
 
         // Should expire in 7 days
