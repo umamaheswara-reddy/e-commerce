@@ -2,7 +2,7 @@
 using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.Commands;
 using Identity.Application.Registration.Factories;
-using Identity.Infrastructure.Behaviors;
+using ECommerce.Common.Behaviors;
 using Identity.Domain.Entities;
 using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Services;

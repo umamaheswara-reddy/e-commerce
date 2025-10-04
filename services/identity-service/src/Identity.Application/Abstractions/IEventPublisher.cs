@@ -1,9 +1,8 @@
-using Identity.Domain.Entities;
+using System.Threading.Tasks;
 
 namespace Identity.Application.Abstractions;
 
 public interface IEventPublisher
 {
-    Task PublishAccountRegisteredEventAsync(ApplicationUser user, string role);
-    Task PublishAccountRegisteredEventAsync(Guid userId, string email, string role);
+    Task PublishAccountRegisteredEventAsync(System.Guid userId, string email, string role);
 }

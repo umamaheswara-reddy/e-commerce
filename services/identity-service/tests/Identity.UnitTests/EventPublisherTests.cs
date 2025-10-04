@@ -3,7 +3,7 @@ using Identity.Domain.Entities;
 using Identity.Infrastructure.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
-using ECommerce.Shared.Contracts.Identity.Events;
+using ECommerce.Common.Contracts.Identity.Events;
 
 namespace Identity.UnitTests;
 

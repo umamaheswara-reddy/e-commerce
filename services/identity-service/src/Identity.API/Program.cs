@@ -1,10 +1,11 @@
+using ECommerce.Common;
+using ECommerce.Common.Behaviors;
 using Identity.Application.Abstractions;
 using Identity.Application.Registration;
 using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.Factories;
 using Identity.Application.Registration.Strategies;
 using Identity.Domain.Entities;
-using Identity.Infrastructure.Behaviors;
 using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Services;
 using MediatR;
@@ -45,7 +46,7 @@ builder.Services.AddAuthorization();
 
 
 // Register supporting service abstractions
-builder.Services.AddScoped<IUserValidator, UserValidator>();
+builder.Services.AddScoped<Identity.Application.Abstractions.IUserValidator, UserValidator>();
 builder.Services.AddScoped<IUserFactory, UserFactory>();
 builder.Services.AddScoped<IRoleAssigner, RoleAssigner>();
 builder.Services.AddScoped<ITokenGenerator, TokenGenerator>();

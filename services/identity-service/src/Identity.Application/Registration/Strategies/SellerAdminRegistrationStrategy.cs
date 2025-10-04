@@ -1,3 +1,5 @@
+using ECommerce.Common;
+using ECommerce.Common.Abstractions;
 using Identity.Application.Abstractions;
 using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.DTOs;
@@ -24,7 +26,7 @@ public class SellerAdminRegistrationStrategy(
                 return Result<RegisterResponseDto>.Failure(validation.ErrorMessage!, ErrorCodes.ValidationFailed);
 
             // Validate role-tenant rules: SellerAdmin must generate new TenantId
-            if (request.Role != "SellerAdmin")
+            if (request.Role != Roles.SellerAdmin)
             {
                 return Result<RegisterResponseDto>.Failure("Invalid role for SellerAdmin registration strategy.", ErrorCodes.UserCreationFailed);
             }

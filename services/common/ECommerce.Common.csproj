@@ -6,15 +6,17 @@
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>ECommerce.Common</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>Umamaheswar Reddy</Authors>
     <Description>Shared library for e-commerce microservices</Description>
     <RepositoryUrl>https://github.com/umamaheswara-reddy/e-commerce</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="13.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9" />
   </ItemGroup>
 
 </Project>

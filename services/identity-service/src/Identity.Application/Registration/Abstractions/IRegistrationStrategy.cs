@@ -1,4 +1,5 @@
-using Identity.Application.Abstractions;
+using ECommerce.Common;
+using ECommerce.Common.Abstractions;
 using Identity.Application.Registration.DTOs;
 
 namespace Identity.Application.Registration.Abstractions;

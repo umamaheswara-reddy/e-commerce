@@ -1,4 +1,4 @@
-using ECommerce.Shared.Contracts.Identity.Events;
+using ECommerce.Common.Contracts.Identity.Events;
 
 namespace Identity.Infrastructure.Services;
 

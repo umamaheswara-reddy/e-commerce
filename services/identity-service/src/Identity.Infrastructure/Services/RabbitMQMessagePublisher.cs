@@ -1,7 +1,7 @@
 using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
-using ECommerce.Shared.Contracts.Identity.Events;
+using ECommerce.Common.Contracts.Identity.Events;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 

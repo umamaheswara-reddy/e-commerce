@@ -1,3 +1,4 @@
+using ECommerce.Common;
 using Identity.Application.Abstractions;
 using Identity.Domain.Events;
 using MediatR;

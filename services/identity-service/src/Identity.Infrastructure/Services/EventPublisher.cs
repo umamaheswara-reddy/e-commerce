@@ -1,4 +1,5 @@
-using ECommerce.Shared.Contracts.Identity.Events;
+using ECommerce.Common.Contracts.Identity.Events;
+using ECommerce.Common;
 using Identity.Application.Abstractions;
 using Identity.Domain.Entities;
 
