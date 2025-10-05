@@ -38,7 +38,7 @@ public class EventPublisherTests
             .Returns(Task.CompletedTask);
 
         // Act
-        await _publisher.PublishAccountRegisteredEventAsync(user, role);
+        await _publisher.PublishAccountRegisteredEventAsync(user.Id, user.Email!, role);
 
         // Assert
         Assert.NotNull(capturedEvent);
@@ -70,7 +70,7 @@ public class EventPublisherTests
             .Returns(Task.CompletedTask);
 
         // Act
-        await _publisher.PublishAccountRegisteredEventAsync(user, role);
+        await _publisher.PublishAccountRegisteredEventAsync(user.Id, user.Email!, role);
 
         // Assert
         Assert.NotNull(capturedEvent);
@@ -97,7 +97,7 @@ public class EventPublisherTests
             .ThrowsAsync(new Exception("Message broker unavailable"));
 
         // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() => _publisher.PublishAccountRegisteredEventAsync(user, role));
+        await Assert.ThrowsAsync<Exception>(() => _publisher.PublishAccountRegisteredEventAsync(user.Id, user.Email!, role));
 
         _messagePublisherMock.Verify(mp => mp.PublishAccountRegisteredEventAsync(It.IsAny<AccountRegisteredEvent>()), Times.Once);
     }
@@ -120,7 +120,7 @@ public class EventPublisherTests
             .Returns(Task.CompletedTask);
 
         // Act
-        await _publisher.PublishAccountRegisteredEventAsync(user, role);
+        await _publisher.PublishAccountRegisteredEventAsync(user.Id, user.Email!, role);
 
         // Assert
         Assert.NotNull(capturedEvent);

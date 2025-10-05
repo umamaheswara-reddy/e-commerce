@@ -14,12 +14,6 @@ public class EventPublisher : IEventPublisher
         _messagePublisher = messagePublisher;
     }
 
-    public async Task PublishAccountRegisteredEventAsync(ApplicationUser user, string role)
-    {
-        var eventData = new AccountRegisteredEvent(user.Id, user.Email!, role, user.TenantId, DateTime.UtcNow);
-        await _messagePublisher.PublishAccountRegisteredEventAsync(eventData);
-    }
-
     public async Task PublishAccountRegisteredEventAsync(Guid userId, string email, string role)
     {
         var eventData = new AccountRegisteredEvent(userId, email, role, null, DateTime.UtcNow);
