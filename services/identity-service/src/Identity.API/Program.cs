@@ -1,7 +1,7 @@
-using ECommerce.Common;
 using ECommerce.Common.Behaviors;
+using ECommerce.Common.Infrastructure.Abstractions;
+using ECommerce.Common.Infrastructure.Services;
 using Identity.Application.Abstractions;
-using Identity.Application.Registration;
 using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.Factories;
 using Identity.Application.Registration.Strategies;
@@ -22,6 +22,8 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
     var connectionString = builder.Configuration.GetConnectionString("IdentityDb");
     options.UseNpgsql(connectionString);
 });
+
+builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<IdentityDbContext>());
 
 builder.Services.AddIdentity<ApplicationUser, Role>()
     .AddEntityFrameworkStores<IdentityDbContext>()

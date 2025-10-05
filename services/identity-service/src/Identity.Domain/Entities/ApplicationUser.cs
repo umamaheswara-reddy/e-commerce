@@ -1,3 +1,4 @@
+using ECommerce.Common.Domain;
 using Microsoft.AspNetCore.Identity;
 
 namespace Identity.Domain.Entities;

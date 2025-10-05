@@ -1,4 +1,4 @@
-namespace Identity.Domain;
+namespace ECommerce.Common.Domain;
 
 public abstract class BaseEntity : IDomainEventSource
 {

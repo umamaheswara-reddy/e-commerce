@@ -1,10 +1,10 @@
-using ECommerce.Common;
 using ECommerce.Common.Abstractions;
 using Identity.Application.Abstractions;
 using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.DTOs;
 using Identity.Domain.Constants;
 using Identity.Domain.Events;
+using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Identity.Application.Registration.Strategies;
@@ -14,6 +14,7 @@ public class CustomerRegistrationStrategy(
     IUserFactory userFactory,
     IRoleAssigner roleAssigner,
     ITokenGenerator tokenGenerator,
+    IMediator mediator,
     ILogger<CustomerRegistrationStrategy> logger) : IRegistrationStrategy
 {
     public async Task<Result<RegisterResponseDto>> RegisterAsync(RegisterRequestDto request, CancellationToken cancellationToken)
@@ -28,7 +29,7 @@ public class CustomerRegistrationStrategy(
             }
 
             // Validate that Customer has no tenant association
-            if (request.Role != "Customer")
+            if (request.Role != Roles.Customer)
             {
                 return Result<RegisterResponseDto>.Failure("Invalid role for Customer registration strategy.", ErrorCodes.ValidationFailed);
             }
@@ -50,7 +51,7 @@ public class CustomerRegistrationStrategy(
             }
 
             // Raise domain event
-            user.AddDomainEvent(new UserRegisteredDomainEvent(user.Id, user.Email!, request.Role));
+            await mediator.Publish(new UserRegisteredDomainEvent(user.Id, user.Email!, request.Role), cancellationToken);
 
             // Generate token via ITokenGenerator
             var token = tokenGenerator.GenerateToken(user, request.Role);

@@ -1,8 +1,11 @@
-﻿using Identity.Application.Abstractions;
+﻿using ECommerce.Common.Behaviors;
+using ECommerce.Common.Infrastructure.Abstractions;
+using ECommerce.Common.Infrastructure.Services;
+using Identity.Application.Abstractions;
 using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.Commands;
 using Identity.Application.Registration.Factories;
-using ECommerce.Common.Behaviors;
+using Identity.Application.Registration.Strategies;
 using Identity.Domain.Entities;
 using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Services;
@@ -11,7 +14,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Identity.IntegrationTests;
@@ -64,9 +66,9 @@ public class RegistrationIntegrationTests : IDisposable
         services.AddScoped<DataSeeder>();
 
         // Register registration strategies
-        services.AddScoped<Identity.Application.Registration.Strategies.SellerAdminRegistrationStrategy>();
-        services.AddScoped<Identity.Application.Registration.Strategies.CustomerRegistrationStrategy>();
-        services.AddScoped<IRegistrationStrategyFactory, Identity.Application.Registration.Factories.RegistrationStrategyFactory>();
+        services.AddScoped<SellerAdminRegistrationStrategy>();
+        services.AddScoped<CustomerRegistrationStrategy>();
+        services.AddScoped<IRegistrationStrategyFactory, RegistrationStrategyFactory>();
 
         _serviceProvider = services.BuildServiceProvider();
 

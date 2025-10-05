@@ -1,15 +1,21 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using ECommerce.Common.Domain;
+using ECommerce.Common.Infrastructure.Services;
 using Identity.Domain.Entities;
-using Identity.Domain;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace Identity.Infrastructure.Data;
 
 public class IdentityDbContext : IdentityDbContext<ApplicationUser, Role, Guid, IdentityUserClaim<Guid>, IdentityUserRole<Guid>, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
 {
-    public IdentityDbContext(DbContextOptions<IdentityDbContext> options)
-        : base(options) { }
+    private readonly DomainEventDispatcher? _dispatcher;
+
+    public IdentityDbContext(DbContextOptions<IdentityDbContext> options, DomainEventDispatcher? dispatcher = null)
+        : base(options)
+    {
+        _dispatcher = dispatcher;
+    }
 
     public DbSet<Permission> Permissions { get; set; } = null!;
     public DbSet<RolePermission> RolePermissions { get; set; } = null!;
@@ -44,22 +50,15 @@ public class IdentityDbContext : IdentityDbContext<ApplicationUser, Role, Guid, 
             .HasColumnType("bytea");
     }
 
-    public IEnumerable<IDomainEvent> GetDomainEvents<TEntity>() where TEntity : class
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        return ChangeTracker.Entries<TEntity>()
-            .Select(e => e.Entity)
-            .OfType<IDomainEventSource>()
-            .SelectMany(e => e.DomainEvents);
-    }
+        var result = await base.SaveChangesAsync(cancellationToken);
 
-    public void ClearDomainEvents<TEntity>() where TEntity : class
-    {
-        foreach (var entry in ChangeTracker.Entries<TEntity>())
+        if (_dispatcher != null)
         {
-            if (entry.Entity is IDomainEventSource entityWithEvents)
-            {
-                entityWithEvents.ClearDomainEvents();
-            }
+            await _dispatcher.DispatchEventsAsync(this);
         }
+
+        return result;
     }
 }

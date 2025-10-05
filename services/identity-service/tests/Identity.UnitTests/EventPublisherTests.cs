@@ -1,9 +1,11 @@
-using Identity.Application.Abstractions;
+using ECommerce.Common.Contracts.Identity.IntegrationEvents;
+using ECommerce.Common.Domain;
+using ECommerce.Common.Infrastructure.Abstractions;
+using ECommerce.Common.Infrastructure.Services;
 using Identity.Domain.Entities;
-using Identity.Infrastructure.Services;
+using Identity.Domain.Events;
 using Microsoft.Extensions.Logging;
 using Moq;
-using ECommerce.Common.Contracts.Identity.Events;
 
 namespace Identity.UnitTests;
 
@@ -11,13 +13,13 @@ public class EventPublisherTests
 {
     private readonly Mock<IMessagePublisher> _messagePublisherMock;
     private readonly Mock<ILogger<EventPublisher>> _loggerMock;
-    private readonly EventPublisher _publisher;
+    private readonly EventPublisher _eventPublisher;
 
     public EventPublisherTests()
     {
         _messagePublisherMock = new Mock<IMessagePublisher>();
         _loggerMock = new Mock<ILogger<EventPublisher>>();
-        _publisher = new EventPublisher(_messagePublisherMock.Object);
+        _eventPublisher = new EventPublisher(_messagePublisherMock.Object);
     }
 
     [Fact]
@@ -32,13 +34,14 @@ public class EventPublisherTests
         };
         var role = "SellerAdmin";
 
-        AccountRegisteredEvent capturedEvent = null;
-        _messagePublisherMock.Setup(mp => mp.PublishAccountRegisteredEventAsync(It.IsAny<AccountRegisteredEvent>()))
-            .Callback<AccountRegisteredEvent>(evt => capturedEvent = evt)
+        AccountRegisteredIntegrationEvent capturedEvent = null;
+        _messagePublisherMock.Setup(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default))
+            .Callback<AccountRegisteredIntegrationEvent>((evt) => capturedEvent = evt)
             .Returns(Task.CompletedTask);
 
         // Act
-        await _publisher.PublishAccountRegisteredEventAsync(user.Id, user.Email!, role);
+        var userRegisteredDomainEvent = new UserRegisteredDomainEvent(user.Id, user.Email!, role);
+        await _eventPublisher.PublishAsync(userRegisteredDomainEvent, cancellationToken: default);
 
         // Assert
         Assert.NotNull(capturedEvent);
@@ -49,7 +52,7 @@ public class EventPublisherTests
         Assert.True(capturedEvent.RegisteredAt <= DateTime.UtcNow);
         Assert.True(capturedEvent.RegisteredAt >= DateTime.UtcNow.AddSeconds(-1)); // Allow small time difference
 
-        _messagePublisherMock.Verify(mp => mp.PublishAccountRegisteredEventAsync(It.IsAny<AccountRegisteredEvent>()), Times.Once);
+        _messagePublisherMock.Verify(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default), Times.Once);
     }
 
     [Fact]
@@ -64,13 +67,14 @@ public class EventPublisherTests
         };
         var role = "Customer";
 
-        AccountRegisteredEvent capturedEvent = null;
-        _messagePublisherMock.Setup(mp => mp.PublishAccountRegisteredEventAsync(It.IsAny<AccountRegisteredEvent>()))
-            .Callback<AccountRegisteredEvent>(evt => capturedEvent = evt)
+        AccountRegisteredIntegrationEvent capturedEvent = null;
+        _messagePublisherMock.Setup(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default))
+            .Callback<AccountRegisteredIntegrationEvent>((evt) => capturedEvent = evt)
             .Returns(Task.CompletedTask);
 
         // Act
-        await _publisher.PublishAccountRegisteredEventAsync(user.Id, user.Email!, role);
+        var userRegisteredDomainEvent = new UserRegisteredDomainEvent(user.Id, user.Email!, role);
+        await _eventPublisher.PublishAsync(userRegisteredDomainEvent, cancellationToken: default);
 
         // Assert
         Assert.NotNull(capturedEvent);
@@ -79,7 +83,8 @@ public class EventPublisherTests
         Assert.Equal(role, capturedEvent.Role);
         Assert.Null(capturedEvent.TenantId);
 
-        _messagePublisherMock.Verify(mp => mp.PublishAccountRegisteredEventAsync(It.IsAny<AccountRegisteredEvent>()), Times.Once);
+
+        _messagePublisherMock.Verify(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default), Times.Once);
     }
 
     [Fact]
@@ -93,13 +98,14 @@ public class EventPublisherTests
         };
         var role = "Customer";
 
-        _messagePublisherMock.Setup(mp => mp.PublishAccountRegisteredEventAsync(It.IsAny<AccountRegisteredEvent>()))
+        _messagePublisherMock.Setup(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default))
             .ThrowsAsync(new Exception("Message broker unavailable"));
 
         // Act & Assert
-        await Assert.ThrowsAsync<Exception>(() => _publisher.PublishAccountRegisteredEventAsync(user.Id, user.Email!, role));
+        var userRegisteredDomainEvent = new UserRegisteredDomainEvent(user.Id, user.Email!, role);
+        await Assert.ThrowsAsync<Exception>(() => _eventPublisher.PublishAsync(userRegisteredDomainEvent, cancellationToken: default));
 
-        _messagePublisherMock.Verify(mp => mp.PublishAccountRegisteredEventAsync(It.IsAny<AccountRegisteredEvent>()), Times.Once);
+        _messagePublisherMock.Verify(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default), Times.Once);
     }
 
     [Fact]
@@ -114,13 +120,14 @@ public class EventPublisherTests
         var role = "Customer";
         var beforeCall = DateTime.UtcNow;
 
-        AccountRegisteredEvent capturedEvent = null;
-        _messagePublisherMock.Setup(mp => mp.PublishAccountRegisteredEventAsync(It.IsAny<AccountRegisteredEvent>()))
-            .Callback<AccountRegisteredEvent>(evt => capturedEvent = evt)
+        AccountRegisteredIntegrationEvent capturedEvent = null;
+        _messagePublisherMock.Setup(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default))
+            .Callback<AccountRegisteredIntegrationEvent>((evt) => capturedEvent = evt)
             .Returns(Task.CompletedTask);
 
         // Act
-        await _publisher.PublishAccountRegisteredEventAsync(user.Id, user.Email!, role);
+        var userRegisteredDomainEvent = new UserRegisteredDomainEvent(user.Id, user.Email!, role);
+        await _eventPublisher.PublishAsync(userRegisteredDomainEvent, cancellationToken: default);
 
         // Assert
         Assert.NotNull(capturedEvent);
