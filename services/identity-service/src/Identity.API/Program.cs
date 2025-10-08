@@ -48,7 +48,7 @@ builder.Services.AddAuthorization();
 
 
 // Register supporting service abstractions
-builder.Services.AddScoped<Identity.Application.Abstractions.IUserValidator, UserValidator>();
+builder.Services.AddScoped<IUserValidator, UserValidator>();
 builder.Services.AddScoped<IUserFactory, UserFactory>();
 builder.Services.AddScoped<IRoleAssigner, RoleAssigner>();
 builder.Services.AddScoped<ITokenGenerator, TokenGenerator>();
@@ -59,7 +59,7 @@ builder.Services.AddScoped<IRegistrationStrategyFactory, RegistrationStrategyFac
 builder.Services.AddScoped<SellerAdminRegistrationStrategy>();
 builder.Services.AddScoped<CustomerRegistrationStrategy>();
 
-builder.Services.AddScoped<IMessagePublisher, RabbitMQMessagePublisher>();
+builder.Services.AddSingleton<IMessagePublisher, RabbitMQMessagePublisher>();
 builder.Services.AddScoped<DataSeeder>();
 
 // Add CORS policy

@@ -1,9 +1,7 @@
 using ECommerce.Common.Contracts.Identity.IntegrationEvents;
-using ECommerce.Common.Domain;
 using ECommerce.Common.Infrastructure.Abstractions;
 using ECommerce.Common.Infrastructure.Services;
 using Identity.Domain.Entities;
-using Identity.Domain.Events;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -35,12 +33,12 @@ public class EventPublisherTests
         var role = "SellerAdmin";
 
         AccountRegisteredIntegrationEvent capturedEvent = null;
-        _messagePublisherMock.Setup(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default))
+        _messagePublisherMock.Setup(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default, default, default))
             .Callback<AccountRegisteredIntegrationEvent>((evt) => capturedEvent = evt)
             .Returns(Task.CompletedTask);
 
         // Act
-        var userRegisteredDomainEvent = new UserRegisteredDomainEvent(user.Id, user.Email!, role);
+        var userRegisteredDomainEvent = new AccountRegisteredIntegrationEvent(user.Id, user.Email!, role, null, DateTime.UtcNow);
         await _eventPublisher.PublishAsync(userRegisteredDomainEvent, cancellationToken: default);
 
         // Assert
@@ -52,7 +50,7 @@ public class EventPublisherTests
         Assert.True(capturedEvent.RegisteredAt <= DateTime.UtcNow);
         Assert.True(capturedEvent.RegisteredAt >= DateTime.UtcNow.AddSeconds(-1)); // Allow small time difference
 
-        _messagePublisherMock.Verify(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default), Times.Once);
+        _messagePublisherMock.Verify(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default, default, default), Times.Once);
     }
 
     [Fact]
@@ -68,12 +66,12 @@ public class EventPublisherTests
         var role = "Customer";
 
         AccountRegisteredIntegrationEvent capturedEvent = null;
-        _messagePublisherMock.Setup(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default))
+        _messagePublisherMock.Setup(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default, default, default))
             .Callback<AccountRegisteredIntegrationEvent>((evt) => capturedEvent = evt)
             .Returns(Task.CompletedTask);
 
         // Act
-        var userRegisteredDomainEvent = new UserRegisteredDomainEvent(user.Id, user.Email!, role);
+        var userRegisteredDomainEvent = new AccountRegisteredIntegrationEvent(user.Id, user.Email!, role, null, DateTime.UtcNow);
         await _eventPublisher.PublishAsync(userRegisteredDomainEvent, cancellationToken: default);
 
         // Assert
@@ -84,7 +82,7 @@ public class EventPublisherTests
         Assert.Null(capturedEvent.TenantId);
 
 
-        _messagePublisherMock.Verify(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default), Times.Once);
+        _messagePublisherMock.Verify(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default, default, default), Times.Once);
     }
 
     [Fact]
@@ -98,14 +96,14 @@ public class EventPublisherTests
         };
         var role = "Customer";
 
-        _messagePublisherMock.Setup(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default))
+        _messagePublisherMock.Setup(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default, default, default))
             .ThrowsAsync(new Exception("Message broker unavailable"));
 
         // Act & Assert
-        var userRegisteredDomainEvent = new UserRegisteredDomainEvent(user.Id, user.Email!, role);
+        var userRegisteredDomainEvent = new AccountRegisteredIntegrationEvent(user.Id, user.Email!, role, null, DateTime.UtcNow);
         await Assert.ThrowsAsync<Exception>(() => _eventPublisher.PublishAsync(userRegisteredDomainEvent, cancellationToken: default));
 
-        _messagePublisherMock.Verify(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default), Times.Once);
+        _messagePublisherMock.Verify(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default, default, default), Times.Once);
     }
 
     [Fact]
@@ -121,12 +119,12 @@ public class EventPublisherTests
         var beforeCall = DateTime.UtcNow;
 
         AccountRegisteredIntegrationEvent capturedEvent = null;
-        _messagePublisherMock.Setup(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default))
+        _messagePublisherMock.Setup(mp => mp.PublishAsync(It.IsAny<AccountRegisteredIntegrationEvent>(), default, default, default))
             .Callback<AccountRegisteredIntegrationEvent>((evt) => capturedEvent = evt)
             .Returns(Task.CompletedTask);
 
         // Act
-        var userRegisteredDomainEvent = new UserRegisteredDomainEvent(user.Id, user.Email!, role);
+        var userRegisteredDomainEvent = new AccountRegisteredIntegrationEvent(user.Id, user.Email!, role, null, DateTime.UtcNow);
         await _eventPublisher.PublishAsync(userRegisteredDomainEvent, cancellationToken: default);
 
         // Assert

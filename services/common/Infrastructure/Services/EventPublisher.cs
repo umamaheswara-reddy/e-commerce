@@ -11,6 +11,6 @@ public class EventPublisher(IMessagePublisher messagePublisher) : IEventPublishe
         , CancellationToken cancellationToken = default) where TEvent : IIntegrationEvent
     {
         ArgumentNullException.ThrowIfNull(@integrationEvent);
-        await _messagePublisher.PublishAsync(@integrationEvent, cancellationToken);
+        await _messagePublisher.PublishAsync(@integrationEvent, cancellationToken: cancellationToken);
     }
 }
