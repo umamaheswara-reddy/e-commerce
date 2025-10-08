@@ -1,9 +1,10 @@
-using ECommerce.Common.Infrastructure.Abstractions;
+﻿using ECommerce.Common.Infrastructure.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Polly;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
+using System.Collections.Concurrent;
 using System.Net.Security;
 using System.Security.Authentication;
 using System.Text;
@@ -11,19 +12,30 @@ using System.Text.Json;
 
 namespace ECommerce.Common.Infrastructure.Services;
 
-public class RabbitMQMessagePublisher : IMessagePublisher, IDisposable
+/// <summary>
+/// A resilient, convention-based RabbitMQ message publisher for integration events.
+/// Supports retry, TLS, and connection reuse.
+/// </summary>
+public sealed class RabbitMQMessagePublisher : IMessagePublisher, IAsyncDisposable
 {
     private readonly IConfiguration _configuration;
     private readonly ILogger<RabbitMQMessagePublisher> _logger;
     private readonly ConnectionFactory _factory;
-    private IConnection? _persistentConnection;
+    private IConnection? _connection;
     private readonly AsyncPolicy _retryPolicy;
+    private readonly JsonSerializerOptions _jsonOptions;
 
-    public RabbitMQMessagePublisher(IConfiguration configuration, ILogger<RabbitMQMessagePublisher> logger)
+    // Cache exchange declarations to avoid duplicate broker calls
+    private static readonly ConcurrentDictionary<string, bool> DeclaredExchanges = new();
+
+    public RabbitMQMessagePublisher(
+        IConfiguration configuration,
+        ILogger<RabbitMQMessagePublisher> logger)
     {
         _configuration = configuration;
         _logger = logger;
 
+        // Configure connection factory
         _factory = new ConnectionFactory
         {
             HostName = _configuration["RabbitMQ:HostName"],
@@ -41,7 +53,15 @@ public class RabbitMQMessagePublisher : IMessagePublisher, IDisposable
             }
         };
 
-        // Retry transient issues like connection drop or broker unreachable
+        // Configure JSON serialization options
+        _jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = false,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+        };
+
+        // Retry policy for transient broker/network issues
         _retryPolicy = Policy
             .Handle<BrokerUnreachableException>()
             .Or<AlreadyClosedException>()
@@ -58,13 +78,14 @@ public class RabbitMQMessagePublisher : IMessagePublisher, IDisposable
                 });
     }
 
+    /// <inheritdoc/>
     public async Task PublishAsync<TEvent>(
         TEvent eventData,
         string? exchange = null,
         string? routingKey = null,
-        CancellationToken cancellationToken = default) where TEvent : IIntegrationEvent
+        CancellationToken cancellationToken = default)
+        where TEvent : IIntegrationEvent
     {
-        // Determine exchange & routing key (client override > convention)
         var exchangeName = !string.IsNullOrWhiteSpace(exchange)
             ? exchange
             : ResolveExchangeName<TEvent>();
@@ -75,30 +96,22 @@ public class RabbitMQMessagePublisher : IMessagePublisher, IDisposable
 
         await _retryPolicy.ExecuteAsync(async () =>
         {
+            var connection = await GetOrCreateConnectionAsync(cancellationToken);
+            await using var channel = await connection.CreateChannelAsync(cancellationToken:cancellationToken);
+
+            await EnsureExchangeDeclaredAsync(channel, exchangeName, cancellationToken);
+
+            var message = JsonSerializer.Serialize(eventData, _jsonOptions);
+            var body = Encoding.UTF8.GetBytes(message);
+
+            var properties = new BasicProperties
+            {
+                Persistent = true,
+                ContentType = "application/json"
+            };
+
             try
             {
-                using var connection = await CreateConnectionAsync(cancellationToken);
-                using var channel = await connection.CreateChannelAsync(cancellationToken: cancellationToken);
-
-                await channel.ExchangeDeclareAsync(
-                    exchange: exchangeName,
-                    type: ExchangeType.Direct,
-                    durable: true,
-                    autoDelete: false,
-                    arguments: null,
-                    cancellationToken: cancellationToken
-                );
-
-                // Serialize message
-                var message = JsonSerializer.Serialize(eventData);
-                var body = Encoding.UTF8.GetBytes(message);
-
-                var properties = new BasicProperties
-                {
-                    Persistent = true,
-                    ContentType = "application/json"
-                };
-
                 await channel.BasicPublishAsync(
                     exchange: exchangeName,
                     routingKey: routingKeyName,
@@ -108,50 +121,72 @@ public class RabbitMQMessagePublisher : IMessagePublisher, IDisposable
                     cancellationToken: cancellationToken);
 
                 _logger.LogInformation(
-                    "Published event {EventType} to exchange '{Exchange}' with routing key '{RoutingKey}'",
+                    "✅ Published {EventType} to exchange '{Exchange}' with routing key '{RoutingKey}'",
                     typeof(TEvent).Name, exchangeName, routingKeyName);
-            }
-            catch (BrokerUnreachableException ex)
-            {
-                _logger.LogCritical(ex, "RabbitMQ unreachable. Check host, network, or credentials.");
-                throw;
-            }
-            catch (AuthenticationFailureException ex)
-            {
-                _logger.LogCritical(ex, "RabbitMQ authentication failed. Check credentials or vhost.");
-                throw;
-            }
-            catch (TopologyRecoveryException ex)
-            {
-                _logger.LogError(ex, "RabbitMQ topology recovery failed.");
-            }
-            catch (RabbitMQClientException ex)
-            {
-                _logger.LogError(ex, "RabbitMQ client error occurred.");
-                throw;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex,
-                    "Unexpected exception while publishing {EventType}", typeof(TEvent).Name);
+                    "❌ Failed to publish {EventType} to {Exchange}/{RoutingKey}",
+                    typeof(TEvent).Name, exchangeName, routingKeyName);
                 throw;
             }
         });
     }
 
-    private async Task<IConnection> CreateConnectionAsync(CancellationToken cancellationToken)
-    {
-        if (_persistentConnection?.IsOpen == true)
-            return _persistentConnection;
+    #region 🔧 Helpers
 
-        _persistentConnection = await _factory.CreateConnectionAsync(cancellationToken);
-        return _persistentConnection;
+    /// <summary>
+    /// Creates or reuses a persistent RabbitMQ connection.
+    /// </summary>
+    private async Task<IConnection> GetOrCreateConnectionAsync(CancellationToken cancellationToken)
+    {
+        if (_connection?.IsOpen == true)
+            return _connection;
+
+        try
+        {
+            _connection = await _factory.CreateConnectionAsync(cancellationToken);
+            _logger.LogInformation("RabbitMQ connection established to {Host}", _factory.HostName);
+        }
+        catch (AuthenticationFailureException ex)
+        {
+            _logger.LogCritical(ex, "RabbitMQ authentication failed.");
+            throw;
+        }
+        catch (BrokerUnreachableException ex)
+        {
+            _logger.LogCritical(ex, "RabbitMQ unreachable.");
+            throw;
+        }
+
+        return _connection;
     }
 
+    /// <summary>
+    /// Declares the exchange if it hasn't been declared already.
+    /// </summary>
+    private static async Task EnsureExchangeDeclaredAsync(IChannel channel, string exchangeName, CancellationToken cancellationToken)
+    {
+        if (DeclaredExchanges.ContainsKey(exchangeName))
+            return;
+
+        await channel.ExchangeDeclareAsync(
+            exchange: exchangeName,
+            type: ExchangeType.Direct,
+            durable: true,
+            autoDelete: false,
+            arguments: null,
+            cancellationToken: cancellationToken);
+
+        DeclaredExchanges.TryAdd(exchangeName, true);
+    }
+
+    /// <summary>
+    /// Converts a namespace-based event type to a domain-specific exchange name.
+    /// </summary>
     private static string ResolveExchangeName<TEvent>()
     {
-        // Convention: "Identity.Domain.Events.AccountRegisteredIntegrationEvent"
-        // -> "identity-events"
         var ns = typeof(TEvent).Namespace ?? "ecommerce";
         var domain = ns.Split('.')
             .FirstOrDefault(n => n.EndsWith("Domain", StringComparison.OrdinalIgnoreCase))
@@ -161,9 +196,12 @@ public class RabbitMQMessagePublisher : IMessagePublisher, IDisposable
         return $"{domain}-events";
     }
 
+    /// <summary>
+    /// Converts an event class name into a kebab-style routing key.
+    /// Example: AccountRegisteredIntegrationEvent → account.registered
+    /// </summary>
     private static string ResolveRoutingKey<TEvent>()
     {
-        // Convention: AccountRegisteredIntegrationEvent -> account.registered
         var name = typeof(TEvent).Name
             .Replace("IntegrationEvent", "", StringComparison.OrdinalIgnoreCase)
             .Replace("Event", "", StringComparison.OrdinalIgnoreCase);
@@ -173,15 +211,23 @@ public class RabbitMQMessagePublisher : IMessagePublisher, IDisposable
             .Trim('.');
     }
 
-    public void Dispose()
+    #endregion
+
+    #region 🧹 Cleanup
+
+    public async ValueTask DisposeAsync()
     {
         try
         {
-            _persistentConnection?.Dispose();
+            if (_connection is { IsOpen: true })
+                await _connection.CloseAsync();
+            _connection?.Dispose();
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error disposing RabbitMQ persistent connection.");
+            _logger.LogWarning(ex, "Error disposing RabbitMQ connection.");
         }
     }
+
+    #endregion
 }
