@@ -106,12 +106,40 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<IdentityDbContext>();
         var logger = services.GetRequiredService<ILogger<Program>>();
 
-        // Ensure database exists and apply migrations first
-        await context.Database.MigrateAsync();
+        // Check if database already has data (from Docker container)
+        var hasRoles = await context.Roles.AnyAsync();
+        var hasUsers = await context.Users.AnyAsync();
 
-        // Seed initial data after migrations are applied
-        var dataSeeder = services.GetRequiredService<DataSeeder>();
-        await dataSeeder.SeedAsync();
+        if (hasRoles && hasUsers)
+        {
+            logger.LogInformation("Database already contains data. Checking for pending migrations...");
+
+            // Still apply any pending migrations even if data exists
+            var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+            if (pendingMigrations.Any())
+            {
+                logger.LogInformation("Found {Count} pending migrations. Applying...", pendingMigrations.Count());
+                await context.Database.MigrateAsync();
+                logger.LogInformation("Pending migrations applied successfully.");
+            }
+            else
+            {
+                logger.LogInformation("No pending migrations found.");
+            }
+        }
+        else
+        {
+            logger.LogInformation("Database is empty. Applying migrations and seeding data...");
+
+            // Apply migrations first
+            await context.Database.MigrateAsync();
+
+            // Seed initial data after migrations are applied
+            var dataSeeder = services.GetRequiredService<DataSeeder>();
+            await dataSeeder.SeedAsync();
+
+            logger.LogInformation("Database initialization completed.");
+        }
     }
     catch (Exception ex)
     {
