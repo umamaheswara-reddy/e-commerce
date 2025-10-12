@@ -10,6 +10,7 @@ using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -17,6 +18,7 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure database context
 builder.Services.AddDbContext<IdentityDbContext>(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("IdentityDb");
@@ -25,6 +27,7 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
 
 builder.Services.AddScoped<DbContext>(provider => provider.GetRequiredService<IdentityDbContext>());
 
+// Configure Identity - this must be done before building the app
 builder.Services.AddIdentity<ApplicationUser, Role>()
     .AddEntityFrameworkStores<IdentityDbContext>()
     .AddDefaultTokenProviders();
@@ -89,21 +92,32 @@ builder.Services.AddMediatR(cfg =>
 // Register pipeline behaviors
 builder.Services.AddScoped(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
 
+// Add health checks
+builder.Services.AddHealthChecks();
+
 var app = builder.Build();
 
-// Seed data on startup
+// Initialize database and seed data on startup
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
     {
+        var context = services.GetRequiredService<IdentityDbContext>();
+        var logger = services.GetRequiredService<ILogger<Program>>();
+
+        // Ensure database exists and apply migrations first
+        await context.Database.MigrateAsync();
+
+        // Seed initial data after migrations are applied
         var dataSeeder = services.GetRequiredService<DataSeeder>();
         await dataSeeder.SeedAsync();
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while seeding the database.");
+        logger.LogError(ex, "An error occurred while initializing the database.");
+        throw; // Re-throw to prevent app startup if database initialization fails
     }
 }
 
@@ -113,7 +127,15 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// Only use HTTPS redirection if HTTPS port is available
+if (app.Environment.IsDevelopment() == false)
+{
+    app.UseHttpsRedirection();
+}
+
+// Map health checks endpoint
+app.MapHealthChecks("/health");
+
 app.UseCors("AllowAngularDev");
 app.UseAuthorization();
 app.MapControllers();

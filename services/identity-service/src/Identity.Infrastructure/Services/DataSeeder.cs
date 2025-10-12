@@ -67,6 +67,10 @@ public class DataSeeder
                         roleInfo.Name, string.Join(", ", result.Errors.Select(e => e.Description)));
                 }
             }
+            else
+            {
+                _logger.LogInformation("Role '{Role}' already exists", roleInfo.Name);
+            }
         }
     }
 
@@ -75,7 +79,7 @@ public class DataSeeder
         var superAdminRole = await _roleManager.FindByNameAsync("SuperAdmin");
         if (superAdminRole == null)
         {
-            _logger.LogError("SuperAdmin role not found. Cannot create default SuperAdmin.");
+                _logger.LogWarning("SuperAdmin role not found. This may be normal if database tables don't exist yet.");
             return;
         }
 

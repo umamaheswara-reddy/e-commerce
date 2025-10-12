@@ -1,0 +1,87 @@
+services:
+  # PostgreSQL Database - Database for identity service (created by app)
+  postgres:
+    image: postgres:16-alpine
+    container_name: identity_postgres
+    environment:
+      POSTGRES_DB: identitydb_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: m@#E$#@550
+    ports:
+      - "5432:5432"
+    networks:
+      - identity_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # RabbitMQ - Message broker for microservice communication
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: identity_rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - identity_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Identity Service - Main microservice
+  identity-service:
+    build:
+      context: ..
+      dockerfile: identity-service/src/Dockerfile
+    container_name: identity_service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__IdentityDb: "Host=postgres;Port=5432;Database=identitydb_dev;Username=postgres;Password=m@#E$#@550;"
+      Jwt__Key: "your-super-secret-key-here-make-it-long-and-secure-docker"
+      Jwt__Issuer: "IdentityService"
+      Jwt__Audience: "ECommerceApp"
+      RabbitMQ__HostName: "rabbitmq"
+      RabbitMQ__UserName: "guest"
+      RabbitMQ__Password: "guest"
+      RabbitMQ__Port: "5672"
+    ports:
+      - "8080:8080"   # HTTP
+      - "8081:8081"   # HTTPS
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - identity_network
+    restart: unless-stopped
+    # Volume mounts for hot reload (optional, for development)
+    # volumes:
+    #   - ./src:/src
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  rabbitmq_data:
+    driver: local
+
+networks:
+  identity_network:
+    driver: bridge
+    name: identity_network

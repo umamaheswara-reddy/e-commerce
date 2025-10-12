@@ -42,14 +42,10 @@ public sealed class RabbitMQMessagePublisher : IMessagePublisher, IAsyncDisposab
             UserName = _configuration["RabbitMQ:UserName"],
             Password = _configuration["RabbitMQ:Password"],
             Port = int.Parse(_configuration["RabbitMQ:Port"] ?? "5672"),
+            // Disable SSL for development environment
             Ssl = new SslOption
             {
-                Enabled = true,
-                ServerName = _configuration["RabbitMQ:HostName"],
-                Version = SslProtocols.Tls12,
-                AcceptablePolicyErrors =
-                    SslPolicyErrors.RemoteCertificateNameMismatch |
-                    SslPolicyErrors.RemoteCertificateChainErrors
+                Enabled = false
             }
         };
 

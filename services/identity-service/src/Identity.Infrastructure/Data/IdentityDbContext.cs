@@ -38,16 +38,7 @@ public class IdentityDbContext : IdentityDbContext<ApplicationUser, Role, Guid, 
             .WithMany()
             .HasForeignKey(rp => rp.PermissionId);
 
-        // Configure concurrency tokens
-        builder.Entity<ApplicationUser>()
-            .Property(u => u.RowVersion)
-            .IsRowVersion()
-            .HasColumnType("bytea");
-
-        builder.Entity<Role>()
-            .Property(r => r.RowVersion)
-            .IsRowVersion()
-            .HasColumnType("bytea");
+        // Concurrency tokens are handled by base Identity entities (ConcurrencyStamp)
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
