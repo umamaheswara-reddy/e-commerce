@@ -1,6 +1,7 @@
 using ECommerce.Common.Behaviors;
 using ECommerce.Common.Infrastructure.Abstractions;
 using ECommerce.Common.Infrastructure.Services;
+using ECommerce.Common.Swagger;
 using Identity.Application.Abstractions;
 using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.Factories;
@@ -49,7 +50,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 
-
 // Register supporting service abstractions
 builder.Services.AddScoped<IUserValidator, UserValidator>();
 builder.Services.AddScoped<IUserFactory, UserFactory>();
@@ -79,7 +79,7 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+builder.Services.AddSwagger(builder.Configuration, "Identity");
 
 // Register MediatR
 builder.Services.AddMediatR(cfg =>
@@ -152,7 +152,7 @@ using (var scope = app.Services.CreateScope())
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger(builder.Configuration, "Identity");
 }
 
 // Only use HTTPS redirection if HTTPS port is available

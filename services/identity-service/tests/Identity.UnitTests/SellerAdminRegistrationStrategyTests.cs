@@ -3,6 +3,7 @@ using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.DTOs;
 using Identity.Application.Registration.Strategies;
 using Identity.Domain.Entities;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -15,6 +16,7 @@ public class SellerAdminRegistrationStrategyTests
     private readonly Mock<IUserFactory> _userFactoryMock;
     private readonly Mock<IRoleAssigner> _roleAssignerMock;
     private readonly Mock<ITokenGenerator> _tokenGeneratorMock;
+    private readonly Mock<IMediator> _mediatorMock;
     private readonly Mock<ILogger<SellerAdminRegistrationStrategy>> _loggerMock;
     private readonly SellerAdminRegistrationStrategy _strategy;
 
@@ -24,6 +26,7 @@ public class SellerAdminRegistrationStrategyTests
         _userFactoryMock = new Mock<IUserFactory>();
         _roleAssignerMock = new Mock<IRoleAssigner>();
         _tokenGeneratorMock = new Mock<ITokenGenerator>();
+        _mediatorMock = new Mock<IMediator>();
         _loggerMock = new Mock<ILogger<SellerAdminRegistrationStrategy>>();
 
         _strategy = new SellerAdminRegistrationStrategy(
@@ -31,6 +34,7 @@ public class SellerAdminRegistrationStrategyTests
             _userFactoryMock.Object,
             _roleAssignerMock.Object,
             _tokenGeneratorMock.Object,
+            _mediatorMock.Object,
             _loggerMock.Object);
     }
 

@@ -5,6 +5,7 @@ using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.DTOs;
 using Identity.Domain.Constants;
 using Identity.Domain.Events;
+using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Identity.Application.Registration.Strategies;
@@ -14,6 +15,7 @@ public class SellerAdminRegistrationStrategy(
     IUserFactory userFactory,
     IRoleAssigner roleAssigner,
     ITokenGenerator tokenGenerator,
+    IMediator mediator,
     ILogger<SellerAdminRegistrationStrategy> logger) : IRegistrationStrategy
 {
     public async Task<Result<RegisterResponseDto>> RegisterAsync(RegisterRequestDto request, CancellationToken cancellationToken)
@@ -47,7 +49,7 @@ public class SellerAdminRegistrationStrategy(
                 return Result<RegisterResponseDto>.Failure(string.Join(", ", roleAssignment.Errors), ErrorCodes.RoleAssignmentFailed);
 
             // Raise domain event
-            user.AddDomainEvent(new UserRegisteredDomainEvent(user.Id, user.Email!, request.Role));
+            await mediator.Publish(new UserRegisteredDomainEvent(user.Id, user.Email!, request.Role), cancellationToken);
 
             // Generate token via ITokenGenerator
             var token = tokenGenerator.GenerateToken(user, request.Role);
