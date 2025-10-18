@@ -12,13 +12,18 @@
     "Container (Dockerfile)": {
       "commandName": "Docker",
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "launchUrl": "https://localhost:9000",
       "environmentVariables": {
-        "ASPNETCORE_HTTPS_PORTS": "8081",
-        "ASPNETCORE_HTTP_PORTS": "8080"
+        "ASPNETCORE_HTTPS_PORTS": "9000",
+        "ASPNETCORE_HTTP_PORTS": "9001",
+        "ASPNETCORE_URLS": "https://+:9000;http://+:9001",
+        "ConnectionStrings__IdentityDb": "Host=host.docker.internal;Port=5432;Database=identitydb_dev;Username=postgres;Password=m@#E$#@550;Pooling=true;Minimum Pool Size=1;Maximum Pool Size=20;Timeout=30;Command Timeout=30;Application Name=IdentityAPI-Docker;",
+        "ASPNETCORE_ENVIRONMENT": "Docker"
       },
       "publishAllPorts": true,
-      "useSSL": true
+      "useSSL": true,
+      "httpPort": 9001,
+      "sslPort": 9000
     }
   },
   "$schema": "https://json.schemastore.org/launchsettings.json"

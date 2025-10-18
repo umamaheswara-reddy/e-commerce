@@ -30,4 +30,13 @@ RUN dotnet publish "./Identity.API.csproj" -c $BUILD_CONFIGURATION -o /app/publi
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY ["appsettings.Docker.json", "appsettings.Docker.json"]
+
+# Copy HTTPS certificate for Docker
+COPY ["aspnetapp.pfx", "/https/aspnetapp.pfx"]
+
+ENV ConnectionStrings__IdentityDb="Host=host.docker.internal;Port=5432;Database=identitydb_dev;Username=postgres;Password=m@#E$#@550;Pooling=true;Minimum Pool Size=1;Maximum Pool Size=20;Timeout=30;Command Timeout=30;Application Name=IdentityAPI-Docker;"
+ENV ASPNETCORE_ENVIRONMENT="Docker"
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path="/https/aspnetapp.pfx"
+ENV ASPNETCORE_Kestrel__Certificates__Default__Password="password"
 ENTRYPOINT ["dotnet", "Identity.API.dll"]
