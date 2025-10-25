@@ -1,9 +1,6 @@
-using ECommerce.Common;
 using ECommerce.Common.Abstractions;
 using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.DTOs;
-using Identity.Domain.Constants;
-using Identity.Domain.Events;
 using MediatR;
 using Microsoft.Extensions.Logging;
 

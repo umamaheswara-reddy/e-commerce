@@ -47,7 +47,7 @@ public class UserValidatorTests
         };
 
         _userManagerMock.Setup(um => um.FindByEmailAsync(request.Email))
-            .ReturnsAsync((ApplicationUser)null);
+            .ReturnsAsync((ApplicationUser?)null);
 
         // Act
         var result = await _validator.ValidateAsync(request, CancellationToken.None);
@@ -116,7 +116,7 @@ public class UserValidatorTests
         };
 
         _userManagerMock.Setup(um => um.FindByEmailAsync(request.Email))
-            .ReturnsAsync((ApplicationUser)null);
+            .ReturnsAsync((ApplicationUser?)null);
 
         // Act
         var result = await _validator.ValidateAsync(request, CancellationToken.None);
@@ -140,7 +140,7 @@ public class UserValidatorTests
         };
 
         _userManagerMock.Setup(um => um.FindByEmailAsync(request.Email))
-            .ReturnsAsync((ApplicationUser)null);
+            .ReturnsAsync((ApplicationUser?)null);
 
         // Act
         var result = await _validator.ValidateAsync(request, CancellationToken.None);

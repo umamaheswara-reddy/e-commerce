@@ -145,11 +145,11 @@ public sealed class RabbitMQMessagePublisher : IMessagePublisher, IAsyncDisposab
             _connection = await _factory.CreateConnectionAsync(cancellationToken);
             _logger.LogInformation("RabbitMQ connection established to {Host}", _factory.HostName);
         }
-        catch (AuthenticationFailureException ex)
+        catch (AuthenticationFailureException)
         {
             throw new RabbitMqAuthenticationException();
         }
-        catch (BrokerUnreachableException ex)
+        catch (BrokerUnreachableException)
         {
             throw new RabbitMqUnreachableException();
         }
