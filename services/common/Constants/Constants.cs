@@ -8,6 +8,7 @@ public static class ErrorCodes
     public const string InternalError = "InternalError";
     public const string NotFound = "NotFound";
     public const string Unauthorized = "Unauthorized";
+    public const string Unavailable = "Unavailable";
 }
 
 public static class ErrorStatusCodes
@@ -21,6 +22,7 @@ public static class ErrorStatusCodes
         ErrorCodes.InternalError => 500,
         ErrorCodes.NotFound => 404,
         ErrorCodes.Unauthorized => 401,
+        ErrorCodes.Unavailable => 503,
         _ => 400
     };
 }

@@ -12,7 +12,6 @@ using Identity.Infrastructure.Data;
 using Identity.Infrastructure.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -161,6 +160,7 @@ if (app.Environment.IsDevelopment())
 if (app.Environment.IsDevelopment() == false)
 {
     app.UseHttpsRedirection();
+    app.UseHsts();
 }
 
 // Map health checks endpoint

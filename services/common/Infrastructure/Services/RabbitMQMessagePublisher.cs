@@ -147,13 +147,11 @@ public sealed class RabbitMQMessagePublisher : IMessagePublisher, IAsyncDisposab
         }
         catch (AuthenticationFailureException ex)
         {
-            _logger.LogCritical(ex, "RabbitMQ authentication failed.");
-            throw;
+            throw new RabbitMqAuthenticationException();
         }
         catch (BrokerUnreachableException ex)
         {
-            _logger.LogCritical(ex, "RabbitMQ unreachable.");
-            throw;
+            throw new RabbitMqUnreachableException();
         }
 
         return _connection;
