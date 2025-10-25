@@ -4,6 +4,7 @@ using ECommerce.Common.Infrastructure.Services;
 using ECommerce.Common.Swagger;
 using Identity.Application.Abstractions;
 using Identity.Application.Registration.Abstractions;
+using Identity.Application.Registration.Commands;
 using Identity.Application.Registration.Factories;
 using Identity.Application.Registration.Strategies;
 using Identity.Domain.Entities;
@@ -86,7 +87,8 @@ builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
     cfg.RegisterServicesFromAssembly(typeof(TransactionBehavior<,>).Assembly);
-    cfg.RegisterServicesFromAssembly(typeof(Identity.Application.Registration.Commands.RegisterUserCommand).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(RegisterUserCommand).Assembly);
+    cfg.AddOpenBehavior(typeof(ExceptionHandlingBehavior<,>));
 });
 
 // Register pipeline behaviors

@@ -15,28 +15,20 @@ public class RegisterUserCommandHandler(
 {
     public async Task<Result<RegisterResponseDto>> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        try
-        {
-            // Get the appropriate strategy based on the role
-            var strategy = strategyFactory.GetStrategy(request.Role);
+        // Get the appropriate strategy based on the role
+        var strategy = strategyFactory.GetStrategy(request.Role);
 
-            // Create registration request
-            var registerRequest = new RegisterRequestDto
-            {
-                Email = request.Email,
-                Password = request.Password,
-                Role = request.Role,
-                FirstName = request.FirstName,
-                LastName = request.LastName
-            };
-
-            // Delegate registration to the strategy
-            return await strategy.RegisterAsync(registerRequest, cancellationToken);
-        }
-        catch (Exception ex)
+        // Create registration request
+        var registerRequest = new RegisterRequestDto
         {
-            logger.LogError(ex, "Error during registration for {Email}", request.Email);
-            return Result<RegisterResponseDto>.Failure("An error occurred during registration.", ErrorCodes.InternalError);
-        }
+            Email = request.Email,
+            Password = request.Password,
+            Role = request.Role,
+            FirstName = request.FirstName,
+            LastName = request.LastName
+        };
+
+        // Delegate registration to the strategy
+        return await strategy.RegisterAsync(registerRequest, cancellationToken);
     }
 }

@@ -1,4 +1,3 @@
-using ECommerce.Common;
 using ECommerce.Common.Abstractions;
 using Identity.Application.Registration.DTOs;
 using MediatR;
