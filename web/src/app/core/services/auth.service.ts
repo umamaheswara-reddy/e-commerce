@@ -25,6 +25,7 @@ export interface AuthResponse {
   userId?: string;
   token?: string;
   message?: string;
+  errors?: string;
   tenantId?: string;
 }
 
@@ -70,12 +71,12 @@ export class AuthService {
               response.token
             );
           }
-          return { success: response.success, message: response.message };
+          return { success: response.success, message: response.message || response.errors };
         }),
         catchError((error) => {
           return of({
             success: false,
-            message: error.error?.message || 'Login failed',
+            message: error.error?.message || error.error?.errors || 'Login failed',
           });
         })
       );

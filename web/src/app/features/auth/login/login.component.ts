@@ -14,6 +14,7 @@ import { ILoginFormGroup } from '../../../shared/types/form.types';
 import { AuthFacade } from '../services/auth.facade';
 import { AuthErrorService } from '../services/auth-error.service';
 import { LoggerService } from '../../../shared/services/logger.service';
+import { IAuthResult } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -61,14 +62,13 @@ export class LoginComponent {
     return this.loginForm.controls.password;
   }
 
-  onSubmit(): void {
-    if (!this.loginForm.valid) {
+    onSubmit(): void {
+    if (this.loginForm.invalid) {
       this.formService.markFormGroupTouched(this.loginForm);
       return;
     }
 
     this.isLoading.set(true);
-
     const { email, password } = this.loginForm.getRawValue();
 
     this.authFacade
@@ -78,23 +78,23 @@ export class LoginComponent {
         finalize(() => this.isLoading.set(false))
       )
       .subscribe({
-        next: (result) => {
-          if (result.success) {
-            this.authFacade.navigateToHome();
-          } else {
-            this.snackBar.open(result.message || 'Login failed', 'Close', {
-              duration: 5000,
-            });
-          }
-        },
-        error: (error: any) => {
-          const userMessage = this.errorService.getUserFriendlyMessage(error);
-          this.snackBar.open(userMessage, 'Close', {
-            duration: 5000,
-          });
-          this.logger.error('Login failed', error);
-        },
+        next: (result) => this.handleLoginResponse(result),
+        error: (err) => this.handleLoginError(err),
       });
+  }
+
+  private handleLoginResponse(result: IAuthResult) {
+    if (result.success) {
+      this.authFacade.navigateToHome();
+    } else {
+      this.snackBar.open(result.message || 'Login failed', 'Close');
+    }
+  }
+
+  private handleLoginError(error: unknown) {
+    const userMessage = this.errorService.getUserFriendlyMessage(error);
+    this.snackBar.open(userMessage, 'Close');
+    this.logger.error('Login failed', error);
   }
 
   navigateToForgotPassword(): void {
