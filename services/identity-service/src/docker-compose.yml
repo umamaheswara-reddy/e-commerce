@@ -9,12 +9,27 @@ services:
       - "9001:9001"   # Map container port to host (adjust if your app runs on another port)
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__IdentityDb=Host=postgres;Port=5432;Database=identitydb;Username=postgres;Password=m@#E$#@550;
       - RabbitMQ__Host=rabbitmq
       - RabbitMQ__Port=5672
       - RabbitMQ__Username=guest
       - RabbitMQ__Password=guest
     depends_on:
+      - postgres
       - rabbitmq
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: identitydb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: m@#E$#@550
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -31,4 +46,5 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq  # persist message queue data
 
 volumes:
+  postgres_data:
   rabbitmq_data:

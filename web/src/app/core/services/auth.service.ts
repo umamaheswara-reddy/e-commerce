@@ -9,6 +9,8 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
+import { environment } from '../../../environments/environment';
+import { TokenUtils } from '../../utils/token.utils';
 
 export interface User {
   id: string;
@@ -19,7 +21,7 @@ export interface User {
 
 export interface AuthResponse {
   success: boolean;
-  user?: User;
+  user: User;
   userId?: string;
   token?: string;
   message?: string;
@@ -35,7 +37,7 @@ export interface IAuthResult {
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly API_BASE_URL = 'http://localhost:9003/api/auth';
+  private readonly API_BASE_URL = environment.apiUrl + '/auth';
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'user_data';
 
@@ -53,9 +55,30 @@ export class AuthService {
   ) {}
 
   login(email: string, password: string): Observable<IAuthResult> {
-    // For now, using mock authentication
-    // In a real app, this would make an HTTP call to your backend
-    return this.mockLogin(email, password);
+    return this.http
+      .post<AuthResponse>(`${this.API_BASE_URL}/login`, { email, password })
+      .pipe(
+        map((response) => {
+          if (response.success && response.token) {
+            this.setSession(
+              {
+                id: response.userId?.toString() || '',
+                email: email,
+                name: response.user.name,
+                role: response.user?.role || 'user',
+              },
+              response.token
+            );
+          }
+          return { success: response.success, message: response.message };
+        }),
+        catchError((error) => {
+          return of({
+            success: false,
+            message: error.error?.message || 'Login failed',
+          });
+        })
+      );
   }
 
   register(userData: {
@@ -83,14 +106,7 @@ export class AuthService {
             );
           }
           return response;
-        }),
-        catchError((error) => {
-          // Handle error
-          return of({
-            success: false,
-            message: error.error?.message || 'Registration failed',
-          });
-        })
+        })        
       );
   }
 
@@ -142,68 +158,6 @@ export class AuthService {
       );
   }
 
-  private mockLogin(email: string, password: string): Observable<IAuthResult> {
-    // Simple mock authentication
-    // In production, replace with actual authentication logic
-    const mockUsers = [
-      {
-        email: 'admin@example.com',
-        password: 'admin123',
-        name: 'Admin User',
-        role: 'admin',
-      },
-      {
-        email: 'user@example.com',
-        password: 'user123',
-        name: 'Regular User',
-        role: 'user',
-      },
-    ];
-
-    const user = mockUsers.find(
-      (u) => u.email === email && u.password === password
-    );
-
-    if (user) {
-      const userData: User = {
-        id: Math.random().toString(36).substr(2, 9),
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      };
-
-      const token = 'mock-jwt-token-' + Date.now();
-      this.setSession(userData, token);
-      return of({ success: true });
-    }
-
-    return of({ success: false, message: 'Invalid email or password' });
-  }
-
-  private mockRegister(userData: {
-    email: string;
-    password: string;
-    name: string;
-  }): Observable<AuthResponse> {
-    // Mock successful registration
-    const newUser: User = {
-      id: Math.random().toString(36).substr(2, 9),
-      email: userData.email,
-      name: userData.name,
-      role: 'user',
-    };
-
-    const token = 'mock-jwt-token-' + Date.now();
-    this.setSession(newUser, token);
-
-    return of({
-      success: true,
-      user: newUser,
-      token,
-      message: 'Registration successful',
-    });
-  }
-
   private setSession(user: User, token: string): void {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem(this.TOKEN_KEY, token);
@@ -224,8 +178,8 @@ export class AuthService {
   private hasValidToken(): boolean {
     if (isPlatformBrowser(this.platformId)) {
       const token = localStorage.getItem(this.TOKEN_KEY);
-      // In a real app, you'd validate the token's expiration
-      return !!token;
+      if (!token) return false;
+      return !TokenUtils.isTokenExpired(token);
     }
     return false;
   }

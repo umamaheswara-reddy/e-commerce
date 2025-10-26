@@ -44,13 +44,7 @@
                     </mat-error>
                 </mat-form-field>
 
-                <!-- Error Message -->
-                @if (loginError()) {
-                <div class="error-message">
-                    <mat-icon>error</mat-icon>
-                    <span>{{ loginError() }}</span>
-                </div>
-                }
+
 
                 <!-- Submit Button -->
                 <button mat-raised-button color="primary" type="submit" class="login-button" [disabled]="isLoading()">

@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -102,10 +103,13 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
     try
     {
         var context = services.GetRequiredService<IdentityDbContext>();
-        var logger = services.GetRequiredService<ILogger<Program>>();
+
+        // Try to apply migrations
+        await context.Database.MigrateAsync();
 
         // Check if database already has data (from Docker container)
         var hasRoles = await context.Roles.AnyAsync();
@@ -130,10 +134,7 @@ using (var scope = app.Services.CreateScope())
         }
         else
         {
-            logger.LogInformation("Database is empty. Applying migrations and seeding data...");
-
-            // Apply migrations first
-            await context.Database.MigrateAsync();
+            logger.LogInformation("Database is empty. Seeding data...");
 
             // Seed initial data after migrations are applied
             var dataSeeder = services.GetRequiredService<DataSeeder>();
@@ -142,9 +143,39 @@ using (var scope = app.Services.CreateScope())
             logger.LogInformation("Database initialization completed.");
         }
     }
+    catch (NpgsqlException ex) when (ex.SqlState == "3D000")
+    {
+        logger.LogWarning("Database does not exist. Creating database...");
+
+        // Create the database
+        var connectionString = builder.Configuration.GetConnectionString("IdentityDb");
+        var connBuilder = new NpgsqlConnectionStringBuilder(connectionString);
+        connBuilder.Database = null;
+        var serverConnString = connBuilder.ToString();
+
+        using (var conn = new NpgsqlConnection(serverConnString))
+        {
+            conn.Open();
+            using (var cmd = conn.CreateCommand())
+            {
+                cmd.CommandText = "CREATE DATABASE identitydb;";
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        logger.LogInformation("Database created. Applying migrations and seeding...");
+
+        // Now retry migrations and seeding
+        var context = services.GetRequiredService<IdentityDbContext>();
+        await context.Database.MigrateAsync();
+
+        var dataSeeder = services.GetRequiredService<DataSeeder>();
+        await dataSeeder.SeedAsync();
+
+        logger.LogInformation("Database initialization completed after creation.");
+    }
     catch (Exception ex)
     {
-        var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while initializing the database.");
         throw; // Re-throw to prevent app startup if database initialization fails
     }

@@ -6,6 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { finalize } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormService } from '../../../shared/services/form.service';
@@ -25,6 +26,7 @@ import { LoggerService } from '../../../shared/services/logger.service';
     MatButtonModule,
     MatCardModule,
     MatIconModule,
+    MatSnackBarModule,
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
@@ -34,13 +36,13 @@ export class LoginComponent {
   private authFacade = inject(AuthFacade);
   private errorService = inject(AuthErrorService);
   private logger = inject(LoggerService);
+  private snackBar = inject(MatSnackBar);
   private destroyRef = inject(DestroyRef);
 
   loginForm!: ILoginFormGroup;
 
   // Using Angular signals instead of BehaviorSubject
   isLoading = signal(false);
-  loginError = signal('');
   hidePassword = signal(true);
 
   constructor() {
@@ -66,7 +68,6 @@ export class LoginComponent {
     }
 
     this.isLoading.set(true);
-    this.loginError.set('');
 
     const { email, password } = this.loginForm.getRawValue();
 
@@ -81,12 +82,16 @@ export class LoginComponent {
           if (result.success) {
             this.authFacade.navigateToHome();
           } else {
-            this.loginError.set(result.message || 'Login failed');
+            this.snackBar.open(result.message || 'Login failed', 'Close', {
+              duration: 5000,
+            });
           }
         },
         error: (error: any) => {
           const userMessage = this.errorService.getUserFriendlyMessage(error);
-          this.loginError.set(userMessage);
+          this.snackBar.open(userMessage, 'Close', {
+            duration: 5000,
+          });
           this.logger.error('Login failed', error);
         },
       });

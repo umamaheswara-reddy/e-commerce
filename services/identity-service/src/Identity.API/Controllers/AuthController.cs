@@ -1,5 +1,7 @@
 using ECommerce.Common;
 using ECommerce.Common.Extensions;
+using Identity.Application.Login.Commands;
+using Identity.Application.Login.DTOs;
 using Identity.Application.Registration.Commands;
 using Identity.Application.Registration.DTOs;
 using MediatR;
@@ -22,6 +24,19 @@ public class AuthController(IMediator mediator) : ControllerBase
         }
 
         var result = await _mediator.Send(new RegisterUserCommand(request.Email, request.Password, request.Role, request.FirstName, request.LastName));
+
+        return result.ToActionResult();
+    }
+
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var result = await _mediator.Send(new LoginCommand(request.Email, request.Password));
 
         return result.ToActionResult();
     }
