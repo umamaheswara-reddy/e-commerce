@@ -55,31 +55,23 @@ export class AuthService {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
-  login(email: string, password: string): Observable<IAuthResult> {
-    return this.http
-      .post<AuthResponse>(`${this.API_BASE_URL}/login`, { email, password })
-      .pipe(
-        map((response) => {
-          if (response.success && response.token) {
-            this.setSession(
-              {
-                id: response.userId?.toString() || '',
-                email: email,
-                name: response.user.name,
-                role: response.user?.role || 'user',
-              },
-              response.token
-            );
-          }
-          return { success: response.success, message: response.message || response.errors };
-        }),
-        catchError((error) => {
-          return of({
-            success: false,
-            message: error.error?.message || error.error?.errors || 'Login failed',
-          });
-        })
-      );
+  login(email: string, password: string) {
+    return this.http.post<AuthResponse>(`${this.API_BASE_URL}/login`, { email, password }).pipe(
+      map((response) => {
+        if (response.success && response.token) {
+          this.setSession(
+            {
+              id: response.userId?.toString() ?? '',
+              email,
+              name: response.user.name,
+              role: response.user.role ?? 'user',
+            },
+            response.token
+          );
+        }
+        return { success: response.success, message: response.message } as IAuthResult;
+      })
+    );
   }
 
   register(userData: {
