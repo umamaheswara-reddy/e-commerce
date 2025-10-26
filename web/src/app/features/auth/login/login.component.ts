@@ -12,9 +12,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormService } from '../../../shared/services/form.service';
 import { ILoginFormGroup } from '../../../shared/types/form.types';
 import { AuthFacade } from '../services/auth.facade';
-import { AuthErrorService } from '../services/auth-error.service';
+import { ErrorService } from '../../../shared/services/error.service';
 import { LoggerService } from '../../../shared/services/logger.service';
 import { IAuthResult } from '../../../core/services/auth.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
@@ -35,7 +36,7 @@ import { IAuthResult } from '../../../core/services/auth.service';
 export class LoginComponent {
   private formService = inject(FormService);
   private authFacade = inject(AuthFacade);
-  private errorService = inject(AuthErrorService);
+  private errorService = inject(ErrorService);
   private logger = inject(LoggerService);
   private snackBar = inject(MatSnackBar);
   private destroyRef = inject(DestroyRef);
@@ -91,7 +92,7 @@ export class LoginComponent {
     }
   }
 
-  private handleLoginError(error: unknown) {
+  private handleLoginError(error: HttpErrorResponse) {
     const userMessage = this.errorService.getUserFriendlyMessage(error);
     this.snackBar.open(userMessage, 'Close');
     this.logger.error('Login failed', error);

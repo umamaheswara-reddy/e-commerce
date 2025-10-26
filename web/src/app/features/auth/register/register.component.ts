@@ -13,7 +13,7 @@ import { FormService } from '../../../shared/services/form.service';
 import { IRegisterFormControls } from '../../../shared/types/form.types';
 import { FormGroup } from '@angular/forms';
 import { AuthFacade } from '../services/auth.facade';
-import { AuthErrorService } from '../services/auth-error.service';
+import { ErrorService } from '../../../shared/services/error.service';
 import { LoggerService } from '../../../shared/services/logger.service';
 
 @Component({
@@ -35,7 +35,7 @@ import { LoggerService } from '../../../shared/services/logger.service';
 export class RegisterComponent {
   private formService = inject(FormService);
   private authFacade = inject(AuthFacade);
-  private errorService = inject(AuthErrorService);
+  private errorService = inject(ErrorService);
   private logger = inject(LoggerService);
   private destroyRef = inject(DestroyRef);
 

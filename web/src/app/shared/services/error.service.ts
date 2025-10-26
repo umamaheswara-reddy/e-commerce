@@ -1,21 +1,21 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-export interface IAuthError {
+export interface IError {
   code: string;
   message: string;
   userMessage: string;
 }
 
-export interface IAuthErrorService {
+export interface IErrorService {
   getUserFriendlyMessage(error: any): string;
-  mapBackendError(error: any): IAuthError;
 }
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthErrorService implements IAuthErrorService {
-  private readonly errorMappings: Record<string, IAuthError> = {
+export class ErrorService implements IErrorService {
+  private readonly errorMappings: Record<string, IError> = {
     INVALID_CREDENTIALS: {
       code: 'INVALID_CREDENTIALS',
       message: 'Invalid email or password',
@@ -51,44 +51,23 @@ export class AuthErrorService implements IAuthErrorService {
     },
   };
 
-  getUserFriendlyMessage(error: any): string {
-    const authError = this.mapBackendError(error);
-    return authError.userMessage;
-  }
-
-  mapBackendError(error: any): IAuthError {
-    // Handle HTTP errors
-    if (error?.status) {
-      switch (error.status) {
-        case 401:
-          return this.errorMappings['INVALID_CREDENTIALS'];
-        case 404:
-          return this.errorMappings['USER_NOT_FOUND'];
-        case 423: // Locked
-          return this.errorMappings['ACCOUNT_LOCKED'];
-        case 500:
-        case 502:
-        case 503:
-          return this.errorMappings['SERVER_ERROR'];
-        default:
-          return this.errorMappings['UNKNOWN_ERROR'];
-      }
+  getUserFriendlyMessage(error: HttpErrorResponse): string {
+    if (!navigator.onLine) return 'You are offline. Check your internet connection.';
+    switch (error.status) {
+      case 0:
+        return 'Cannot connect to the server.';
+      case 400:
+        return error.error?.message || 'Invalid request data.';
+      case 401:
+        return 'Unauthorized. Please log in again.';
+      case 403:
+        return 'Access denied.';
+      case 404:
+        return 'Requested resource not found.';
+      case 500:
+        return 'Internal server error. Please try again later.';
+      default:
+        return error.error?.message || 'An unexpected error occurred.';
     }
-
-    // Handle specific error codes from backend
-    if (error?.error?.code) {
-      const errorCode = error.error.code;
-      return (
-        this.errorMappings[errorCode] || this.errorMappings['UNKNOWN_ERROR']
-      );
-    }
-
-    // Handle network errors
-    if (error?.name === 'HttpErrorResponse' && !error.status) {
-      return this.errorMappings['NETWORK_ERROR'];
-    }
-
-    // Default fallback
-    return this.errorMappings['UNKNOWN_ERROR'];
   }
 }
