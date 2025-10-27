@@ -1,9 +1,6 @@
 import { Component, inject, signal, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
@@ -15,6 +12,8 @@ import { FormGroup } from '@angular/forms';
 import { AuthFacade } from '../services/auth.facade';
 import { ErrorService } from '../../../shared/services/error.service';
 import { LoggerService } from '../../../shared/services/logger.service';
+import { EButtonComponent } from '../../../ui/components/e-button/e-button.component';
+import { EInputComponent } from '../../../ui/components/e-input/e-input.component';
 
 @Component({
   selector: 'app-register',
@@ -22,12 +21,11 @@ import { LoggerService } from '../../../shared/services/logger.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
     MatCardModule,
     MatIconModule,
     MatSelectModule,
+    EButtonComponent,
+    EInputComponent,
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],

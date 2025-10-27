@@ -1,9 +1,6 @@
 import { Component, inject, signal, computed, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -16,6 +13,8 @@ import { ErrorService } from '../../../shared/services/error.service';
 import { LoggerService } from '../../../shared/services/logger.service';
 import { IAuthResult } from '../../../core/services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { EButtonComponent } from '../../../ui/components/e-button/e-button.component';
+import { EInputComponent } from '../../../ui/components/e-input/e-input.component';
 
 @Component({
   selector: 'app-login',
@@ -23,12 +22,11 @@ import { HttpErrorResponse } from '@angular/common/http';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
     MatCardModule,
     MatIconModule,
     MatSnackBarModule,
+    EButtonComponent,
+    EInputComponent,
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],

@@ -8,46 +8,15 @@
         <mat-card-content>
             <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
                 <!-- Email Field -->
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Email</mat-label>
-                    <input matInput type="email" formControlName="email" placeholder="Enter your email"
-                        autocomplete="email" />
-                    <mat-icon matSuffix class="form-icon">email</mat-icon>
-                    <mat-error>
-                        @if (email.invalid && email.touched) {
-                        @if (email.errors?.['required']) {
-                        Email is required
-                        } @else if (email.errors?.['email']) {
-                        Please enter a valid email
-                        }
-                        }
-                    </mat-error>
-                </mat-form-field>
+                <e-input label="Email" type="email" formControlName="email"></e-input>
 
                 <!-- Password Field -->
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Password</mat-label>
-                    <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password"
-                        placeholder="Enter your password" autocomplete="current-password" />
-                    <button mat-icon-button matSuffix (click)="hidePassword.set(!hidePassword())" type="button"
-                        [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hidePassword()">
-                        <mat-icon class="form-icon">{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
-                    </button>
-                    <mat-error>
-                        @if (password.invalid && password.touched) {
-                        @if (password.errors?.['required']) {
-                        Password is required
-                        } @else if (password.errors?.['minlength']) {
-                        Password must be at least 6 characters
-                        }
-                        }
-                    </mat-error>
-                </mat-form-field>
+                <e-input label="Password" [type]="hidePassword() ? 'password' : 'text'" formControlName="password"></e-input>
 
 
 
                 <!-- Submit Button -->
-                <button mat-raised-button color="primary" type="submit" class="login-button" [disabled]="isLoading()">
+                <e-button color="primary" type="submit" class="login-button" [disabled]="isLoading()">
                     @if (isLoading()) {
                     <ng-container>
                         <mat-icon>refresh</mat-icon>
@@ -56,7 +25,7 @@
                     } @else {
                     <span>Sign In</span>
                     }
-                </button>
+                </e-button>
             </form>
         </mat-card-content>
 
