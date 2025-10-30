@@ -15,27 +15,22 @@
 
 
 
-                <!-- Submit Button -->
-                <e-button color="primary" type="submit" class="login-button" [disabled]="isLoading()">
-                    @if (isLoading()) {
-                    <ng-container>
-                        <mat-icon>refresh</mat-icon>
-                        <span>Signing In...</span>
-                    </ng-container>
-                    } @else {
-                    <span>Sign In</span>
-                    }
-                </e-button>
+                                <!-- Submit Button -->
+                                <e-button color="primary" type="submit" class="login-button" [disabled]="isLoading()">
+                                    <ng-container *ngIf="isLoading(); else notLoading">
+                                        <mat-icon>refresh</mat-icon>
+                                        <span>Signing In...</span>
+                                    </ng-container>
+                                    <ng-template #notLoading>
+                                        <span>Sign In</span>
+                                    </ng-template>
+                                </e-button>
             </form>
         </mat-card-content>
 
         <mat-card-actions class="login-actions">
-            <button mat-button type="button" (click)="navigateToForgotPassword()">
-                Forgot Password?
-            </button>
-            <button mat-button type="button" (click)="navigateToRegister()">
-                Don't have an account? Sign Up
-            </button>
+            <e-button type="button" (click)="navigateToForgotPassword()">Forgot Password?</e-button>
+            <e-button type="button" (click)="navigateToRegister()">Don't have an account? Sign Up</e-button>
         </mat-card-actions>
     </mat-card>
 </div>

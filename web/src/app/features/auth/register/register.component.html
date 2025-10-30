@@ -31,42 +31,32 @@
                         <mat-option value="SellerAdmin">Seller Admin</mat-option>
                     </mat-select>
                     <mat-icon matSuffix class="form-icon">work</mat-icon>
-                    <mat-error>
-                        @if (registerForm.get('role')?.invalid && registerForm.get('role')?.touched) {
-                        @if (registerForm.get('role')?.errors?.['required']) {
-                        Role is required
-                        }
-                        }
+                    <mat-error *ngIf="registerForm.get('role')?.invalid && registerForm.get('role')?.touched">
+                        <ng-container *ngIf="registerForm.get('role')?.errors?.['required']">Role is required</ng-container>
                     </mat-error>
                 </mat-form-field>
 
                 <!-- Error Message -->
-                @if (registerError()) {
-                <div class="error-message">
+                <div class="error-message" *ngIf="registerError()">
                     <mat-icon>error</mat-icon>
                     <span>{{ registerError() }}</span>
                 </div>
-                }
 
-                <!-- Submit Button -->
-                <e-button color="primary" type="submit" class="register-button"
-                    [disabled]="isLoading()">
-                    @if (isLoading()) {
-                    <ng-container>
-                        <mat-icon>refresh</mat-icon>
-                        <span>Creating Account...</span>
-                    </ng-container>
-                    } @else {
-                    <span>Create Account</span>
-                    }
-                </e-button>
+                                <!-- Submit Button -->
+                                <e-button color="primary" type="submit" class="register-button" [disabled]="isLoading()">
+                                    <ng-container *ngIf="isLoading(); else notLoading">
+                                        <mat-icon>refresh</mat-icon>
+                                        <span>Creating Account...</span>
+                                    </ng-container>
+                                    <ng-template #notLoading>
+                                        <span>Create Account</span>
+                                    </ng-template>
+                                </e-button>
             </form>
         </mat-card-content>
 
         <mat-card-actions class="register-actions">
-            <button mat-button type="button" (click)="navigateToLogin()">
-                Already have an account? Sign In
-            </button>
+            <e-button type="button" (click)="navigateToLogin()">Already have an account? Sign In</e-button>
         </mat-card-actions>
     </mat-card>
 </div>

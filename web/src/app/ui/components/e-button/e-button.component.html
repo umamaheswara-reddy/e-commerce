@@ -1,0 +1,9 @@
+<button
+  mat-raised-button
+  [color]="computedColor()"
+  [disabled]="disabled()"
+  [attr.type]="type"
+  [ngClass]="hostClass"
+>
+  <ng-content></ng-content>
+</button>

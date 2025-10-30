@@ -21,8 +21,8 @@ export const E_BUTTON_DEFAULT_OPTIONS = new InjectionToken<EButtonOptions>(
 );
 
 export interface EInputOptions {
-  appearance: 'outline' | 'fill';
-  floatLabel: 'always' | 'auto';
+  appearance?: 'outline' | 'fill';
+  floatLabel?: 'always' | 'auto';
 }
 
 export const E_INPUT_DEFAULT_OPTIONS = new InjectionToken<EInputOptions>(

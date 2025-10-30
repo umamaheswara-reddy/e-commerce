@@ -3,8 +3,13 @@ import {
   Input,
   ChangeDetectionStrategy,
   signal,
-  Injector,
+  ChangeDetectorRef,
   inject,
+  forwardRef,
+  computed,
+  Injector,
+  AfterViewInit,
+  DestroyRef,
 } from '@angular/core';
 import {
   ControlValueAccessor,
@@ -12,6 +17,11 @@ import {
   NgControl,
   ReactiveFormsModule,
 } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { startWith } from 'rxjs';
+import { interval, map, distinctUntilChanged } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID } from '@angular/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import {
@@ -25,7 +35,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule],
   template: `
-    <mat-form-field [appearance]="options().appearance" class="w-full">
+  <mat-form-field [appearance]="options().appearance || 'outline'" class="w-full">
       <mat-label>{{ label }}</mat-label>
 
       <input
@@ -36,46 +46,75 @@ import { CommonModule } from '@angular/common';
         (blur)="markAsTouched()"
       />
 
-      @if(showError()){
-      <mat-error>
+      <mat-error *ngIf="showError()">
         {{ firstErrorMessage() }}
       </mat-error>
-      }
     </mat-form-field>
   `,
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: EInputComponent,
+      useExisting: forwardRef(() => EInputComponent),
       multi: true,
     },
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.Default,
 })
-export class EInputComponent implements ControlValueAccessor {
+export class EInputComponent implements ControlValueAccessor, AfterViewInit {
   @Input() label = '';
   @Input() type = 'text';
 
   value = signal('');
   options = signal<EInputOptions>({ appearance: 'outline', floatLabel:'always' });
 
+  // Resolve NgControl lazily to avoid circular DI when FormControlName and
+  // this component are constructed on the same element.
   private injector = inject(Injector);
+  private destroyRef = inject(DestroyRef);
+  private platformId = inject(PLATFORM_ID) as Object;
+  private ngControl?: NgControl | null = null;
   private defaults = inject(E_INPUT_DEFAULT_OPTIONS);
+  private cdr = inject(ChangeDetectorRef);
 
-  private ngControl: NgControl | null = null;
   private onChange = (v: any) => {};
   private onTouched = () => {};
 
   constructor() {
-    // 👇 delay NgControl resolution to break circular dependency
-    Promise.resolve().then(() => {
-      this.ngControl = this.injector.get(NgControl, null, { optional: true });
-      if (this.ngControl) {
-        this.ngControl.valueAccessor = this;
-      }
-    });
-
     this.options.set(this.defaults);
+    // Do not resolve NgControl here; resolve in ngAfterViewInit instead.
+  }
+
+  ngAfterViewInit(): void {
+    // Try to retrieve NgControl from the element injector now that child
+    // directives (e.g., FormControlName) are constructed.
+    try {
+      this.ngControl = this.injector.get(NgControl, null as any);
+    } catch {
+      this.ngControl = null;
+    }
+
+    if (this.ngControl) {
+      // Trigger change detection when control status changes
+      this.ngControl.control?.statusChanges
+        ?.pipe(startWith(this.ngControl.control.status), takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
+          this.cdr.markForCheck();
+        });
+
+      // Only start polling in the browser — polling uses setInterval which
+      // prevents Angular Universal (SSR) from becoming stable and will cause
+      // server-side render timeouts. For SSR we skip polling and rely on the
+      // parent to trigger change detection when marking the form touched.
+  if (isPlatformBrowser(this.platformId as Object)) {
+        interval(120)
+          .pipe(
+            map(() => !!this.ngControl?.control?.touched),
+            distinctUntilChanged(),
+            takeUntilDestroyed(this.destroyRef)
+          )
+          .subscribe(() => this.cdr.markForCheck());
+      }
+    }
   }
 
   writeValue(v: any): void {
