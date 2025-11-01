@@ -1,9 +1,10 @@
 import {
   Directive,
-  computed,
   DestroyRef,
-  inject,
   OnInit,
+  inject,
+  computed,
+  signal,
   effect,
 } from '@angular/core';
 import {
@@ -16,7 +17,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { startWith, distinctUntilChanged, tap } from 'rxjs';
+import { distinctUntilChanged, startWith } from 'rxjs';
 
 @Directive({
   selector: '[appControlValueAccessor]',
@@ -24,78 +25,86 @@ import { startWith, distinctUntilChanged, tap } from 'rxjs';
 export class ControlValueAccessorDirective<T>
   implements ControlValueAccessor, OnInit {
 
-  // ✅ Dependency injection
-  protected readonly ngControl = inject(NgControl, { optional: true });
   private readonly formGroupDir = inject(FormGroupDirective, { optional: true });
   private readonly destroyRef = inject(DestroyRef);
+  protected readonly ngControl = inject(NgControl, { optional: true });
 
-  // ✅ State
+  // reactive signals
+  protected readonly valueSig = signal<T | null>(null);
+  protected readonly disabledSig = signal(false);
+  protected readonly requiredSig = signal(false);
+
   protected control?: FormControl<T>;
-  protected value: T | null = null;
-  isRequired = false;
-  isDisabled = false;
 
-  // ✅ Callbacks (ControlValueAccessor)
+  // computed derived signals
+  readonly showError = computed(() => {
+    const control = this.control;
+    return !!(control && control.invalid && (control.dirty || control.touched));
+  });
+
   private onChange: (value: T | null) => void = () => {};
   private onTouched: () => void = () => {};
 
-  // ✅ Computed signal for reactivity
-  readonly controlSig = computed(() => this.control);
-  readonly showError = computed(() =>
-    !!(this.control && this.control.invalid && (this.control.dirty || this.control.touched))
-  );
-
   ngOnInit(): void {
-    this.bindFormControl();
-    this.isRequired = this.control?.hasValidator?.(Validators.required) ?? false;
+    this.initFormControl();
+    this.requiredSig.set(this.control?.hasValidator(Validators.required) ?? false);
+
+    // sync internal signal → form
+    effect(() => {
+      const value = this.valueSig();
+      if (this.control && this.control.value !== value) {
+        this.control.setValue(value as T, { emitEvent: false });
+      }
+    });
   }
 
-  private bindFormControl(): void {
-    // ✅ Avoid try/catch — simpler & more predictable control binding
-    if (!this.ngControl) return;
-
+  private initFormControl(): void {
     if (this.ngControl instanceof FormControlName && this.formGroupDir) {
       this.control = this.formGroupDir.getControl(this.ngControl);
     } else if (this.ngControl instanceof FormControlDirective) {
       this.control = this.ngControl.form as FormControl<T>;
+    } else {
+      throw new Error('appControlValueAccessor: No valid NgControl found');
     }
   }
 
-  // ✅ CVA methods
-  writeValue(value: T): void {
-    this.value = value;
+  // CVA methods
+  writeValue(value: T | null): void {
+    this.valueSig.set(value);
   }
 
   registerOnChange(fn: (val: T | null) => void): void {
     this.onChange = fn;
-
-    // ⚙️ Subscribe once and manage cleanup automatically
     this.control?.valueChanges
-      ?.pipe(
-        takeUntilDestroyed(this.destroyRef),
+      .pipe(
         startWith(this.control.value),
-        distinctUntilChanged()
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef)
       )
-      .subscribe((val) => fn(val));
+      .subscribe(value => {
+        this.valueSig.set(value);
+        fn(value);
+      });
   }
 
   registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
 
+  setDisabledState(isDisabled: boolean): void {
+    this.disabledSig.set(isDisabled);
+  }
+
+  // UI event handlers
   onBlur(): void {
     this.onTouched();
   }
 
   onInput(event: Event): void {
-    if (this.isDisabled) return;
-    const inputValue = (event.target as HTMLInputElement).value as unknown as T;
-    this.value = inputValue;
-    this.onChange(inputValue);
+    if (this.disabledSig()) return;
+    const value = (event.target as HTMLInputElement).value as unknown as T;
+    this.valueSig.set(value);
+    this.onChange(value);
     this.onTouched();
-  }
-
-  setDisabledState(isDisabled: boolean): void {
-    this.isDisabled = isDisabled;
   }
 }
