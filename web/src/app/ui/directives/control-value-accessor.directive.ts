@@ -4,6 +4,7 @@ import {
   DestroyRef,
   inject,
   OnInit,
+  effect,
 } from '@angular/core';
 import {
   ControlValueAccessor,
@@ -18,77 +19,83 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { startWith, distinctUntilChanged, tap } from 'rxjs';
 
 @Directive({
-  selector: '[appControlValueAccessor]'
+  selector: '[appControlValueAccessor]',
 })
 export class ControlValueAccessorDirective<T>
   implements ControlValueAccessor, OnInit {
 
+  // ✅ Dependency injection
+  protected readonly ngControl = inject(NgControl, { optional: true });
   private readonly formGroupDir = inject(FormGroupDirective, { optional: true });
   private readonly destroyRef = inject(DestroyRef);
-    
-  protected readonly ngControl = inject(NgControl, { optional: true });
-  protected control?: FormControl;
+
+  // ✅ State
+  protected control?: FormControl<T>;
   protected value: T | null = null;
   isRequired = false;
   isDisabled = false;
 
-  private onChange: (value: any) => void = () => {};
+  // ✅ Callbacks (ControlValueAccessor)
+  private onChange: (value: T | null) => void = () => {};
   private onTouched: () => void = () => {};
 
-  controlSig = computed(() => this.control);
+  // ✅ Computed signal for reactivity
+  readonly controlSig = computed(() => this.control);
+  readonly showError = computed(() =>
+    !!(this.control && this.control.invalid && (this.control.dirty || this.control.touched))
+  );
 
   ngOnInit(): void {
-    this.setFormControl();
-    this.isRequired = this.controlSig()?.hasValidator(Validators.required) ?? false;
+    this.bindFormControl();
+    this.isRequired = this.control?.hasValidator?.(Validators.required) ?? false;
   }
 
-  private setFormControl() {
-    try {
-      if (this.ngControl instanceof FormControlName && this.formGroupDir) {
-        this.control = this.formGroupDir.getControl(this.ngControl);
-      } else if (this.ngControl instanceof FormControlDirective) {
-        this.control = this.ngControl.form as FormControl;
-      }
-    } catch {}
+  private bindFormControl(): void {
+    // ✅ Avoid try/catch — simpler & more predictable control binding
+    if (!this.ngControl) return;
+
+    if (this.ngControl instanceof FormControlName && this.formGroupDir) {
+      this.control = this.formGroupDir.getControl(this.ngControl);
+    } else if (this.ngControl instanceof FormControlDirective) {
+      this.control = this.ngControl.form as FormControl<T>;
+    }
   }
 
+  // ✅ CVA methods
   writeValue(value: T): void {
     this.value = value;
   }
 
   registerOnChange(fn: (val: T | null) => void): void {
-    this.controlSig()?.valueChanges
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        startWith(this.control?.value),
-        distinctUntilChanged(),
-        tap((val: T) => fn(val))
-      )
-      .subscribe(() => this.controlSig()?.markAsUntouched());
     this.onChange = fn;
+
+    // ⚙️ Subscribe once and manage cleanup automatically
+    this.control?.valueChanges
+      ?.pipe(
+        takeUntilDestroyed(this.destroyRef),
+        startWith(this.control.value),
+        distinctUntilChanged()
+      )
+      .subscribe((val) => fn(val));
   }
 
   registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
 
-  onBlur() {
+  onBlur(): void {
     this.onTouched();
   }
 
-  onInput(event: Event) {
+  onInput(event: Event): void {
     if (this.isDisabled) return;
-    this.value = (event.target as HTMLInputElement).value as unknown as T;
-    this.onChange(this.value);
+    const inputValue = (event.target as HTMLInputElement).value as unknown as T;
+    this.value = inputValue;
+    this.onChange(inputValue);
     this.onTouched();
   }
 
   setDisabledState(isDisabled: boolean): void {
     this.isDisabled = isDisabled;
   }
-
-  showError = computed(() => {
-    const control = this.control;
-    return !!(control && control.invalid && (control.dirty || control.touched));
-  });
 }
