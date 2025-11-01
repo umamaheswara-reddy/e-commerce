@@ -6,6 +6,7 @@ import {
   computed,
   signal,
   effect,
+  Injector,
 } from '@angular/core';
 import {
   ControlValueAccessor,
@@ -27,14 +28,15 @@ export class ControlValueAccessorDirective<T>
 
   private readonly formGroupDir = inject(FormGroupDirective, { optional: true });
   private readonly destroyRef = inject(DestroyRef);
-  protected readonly ngControl = inject(NgControl, { optional: true });
+  private readonly injector = inject(Injector);
+
+  protected control?: FormControl<T>;
+  protected ngControl: NgControl | undefined;
 
   // reactive signals
   protected readonly valueSig = signal<T | null>(null);
   protected readonly disabledSig = signal(false);
   protected readonly requiredSig = signal(false);
-
-  protected control?: FormControl<T>;
 
   // computed derived signals
   readonly showError = computed(() => {
@@ -45,17 +47,17 @@ export class ControlValueAccessorDirective<T>
   private onChange: (value: T | null) => void = () => {};
   private onTouched: () => void = () => {};
 
+  // sync internal signal → form
+  effect = effect(() => {
+    const value = this.valueSig();
+    if (this.control && this.control.value !== value) {
+      this.control.setValue(value as T, { emitEvent: false });
+    }
+  });
+
   ngOnInit(): void {
     this.initFormControl();
     this.requiredSig.set(this.control?.hasValidator(Validators.required) ?? false);
-
-    // sync internal signal → form
-    effect(() => {
-      const value = this.valueSig();
-      if (this.control && this.control.value !== value) {
-        this.control.setValue(value as T, { emitEvent: false });
-      }
-    });
   }
 
   //#region CVA methods
@@ -87,7 +89,6 @@ export class ControlValueAccessorDirective<T>
 
   //#endregion
 
-  //#region UI event handlers
   onBlur(): void {
     this.onTouched();
   }
@@ -99,27 +100,20 @@ export class ControlValueAccessorDirective<T>
     this.onChange(value);
     this.onTouched();
   }
-  //#endregion
 
-  //#region Protected getters
-
-  /** Expose control name (works for FormControlName only) */
   protected get controlName(): string | number | null {
-    console.log(this.ngControl);
     return this.ngControl instanceof FormControlName ? this.ngControl.name : null;
   }
 
-  //#endregion
-
-  //#region private methods
   private initFormControl(): void {
+    // 👇 inject NgControl lazily to avoid circular dependency
+    this.ngControl = this.injector.get(NgControl, undefined, { optional: true })?? undefined;
     if (this.ngControl instanceof FormControlName && this.formGroupDir) {
       this.control = this.formGroupDir.getControl(this.ngControl);
     } else if (this.ngControl instanceof FormControlDirective) {
-      this.control = this.ngControl.form as FormControl<T>;
+      this.control = this.ngControl.form as FormControl;
     } else {
-      throw new Error('appControlValueAccessor: No valid NgControl found');
+      throw new Error('appControlValueAccessor: Unsupported control type');
     }
   }
-  //#endregion
 }
