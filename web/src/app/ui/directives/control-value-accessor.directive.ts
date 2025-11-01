@@ -23,8 +23,7 @@ import { distinctUntilChanged, startWith } from 'rxjs';
 @Directive({
   selector: '[appControlValueAccessor]',
 })
-export class ControlValueAccessorDirective<T>
-  implements ControlValueAccessor, OnInit {
+export class ControlValueAccessorDirective<T> implements ControlValueAccessor, OnInit {
 
   private readonly formGroupDir = inject(FormGroupDirective, { optional: true });
   private readonly destroyRef = inject(DestroyRef);
