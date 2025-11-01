@@ -13,7 +13,7 @@ import { AuthFacade } from '../services/auth.facade';
 import { ErrorService } from '../../../shared/services/error.service';
 import { LoggerService } from '../../../shared/services/logger.service';
 import { EButtonComponent } from '../../../ui/components/e-button/e-button.component';
-import { EInputComponent } from '../../../ui/components/e-input/e-input.component';
+import { InputComponent } from '../../../ui/components/e-input/e-input.component';
 
 @Component({
   selector: 'app-register',
@@ -25,7 +25,7 @@ import { EInputComponent } from '../../../ui/components/e-input/e-input.componen
     MatIconModule,
     MatSelectModule,
     EButtonComponent,
-    EInputComponent,
+    InputComponent,
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],

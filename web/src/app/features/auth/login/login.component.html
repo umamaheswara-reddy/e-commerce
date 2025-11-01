@@ -12,19 +12,17 @@
 
                 <!-- Password Field -->
                 <e-input label="Password" [type]="hidePassword() ? 'password' : 'text'" formControlName="password"></e-input>
-
-
-
-                                <!-- Submit Button -->
-                                <e-button color="primary" type="submit" class="login-button" [disabled]="isLoading()">
-                                    <ng-container *ngIf="isLoading(); else notLoading">
-                                        <mat-icon>refresh</mat-icon>
-                                        <span>Signing In...</span>
-                                    </ng-container>
-                                    <ng-template #notLoading>
-                                        <span>Sign In</span>
-                                    </ng-template>
-                                </e-button>
+                <button [disabled]="!loginForm.touched" type="submit">Sign In</button>
+                <!-- Submit Button -->
+                <e-button [disabled]="!loginForm.touched" color="primary" type="submit" class="login-button" [disabled]="isLoading()">
+                    <ng-container *ngIf="isLoading(); else notLoading">
+                        <mat-icon>refresh</mat-icon>
+                        <span>Signing In...</span>
+                    </ng-container>
+                    <ng-template #notLoading>
+                        <span>Sign In</span>
+                    </ng-template>
+                </e-button>
             </form>
         </mat-card-content>
 

@@ -46,13 +46,10 @@ type InputType = 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
 })
 export class InputComponent<T> extends ControlValueAccessorDirective<T> {
   type: InputSignal<InputType> = input<InputType>('text');
-  label: InputSignal<string | null> = input<string | null>(null);
+  label: InputSignal<string> = input<string>('');
   placeholder?: InputSignal<string | undefined> = input<string | undefined>(undefined);
 
   // ✅ Generate a clean string id (controlName or fallback)
-  idSig = computed(() => this.ngControl?.name?.toString() ?? '');
+  idSig = computed(() => this.controlName?.toString() ?? '');
 
-  constructor() {
-    super();
-  }
 }

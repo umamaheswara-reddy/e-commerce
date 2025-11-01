@@ -58,17 +58,7 @@ export class ControlValueAccessorDirective<T>
     });
   }
 
-  private initFormControl(): void {
-    if (this.ngControl instanceof FormControlName && this.formGroupDir) {
-      this.control = this.formGroupDir.getControl(this.ngControl);
-    } else if (this.ngControl instanceof FormControlDirective) {
-      this.control = this.ngControl.form as FormControl<T>;
-    } else {
-      throw new Error('appControlValueAccessor: No valid NgControl found');
-    }
-  }
-
-  // CVA methods
+  //#region CVA methods
   writeValue(value: T | null): void {
     this.valueSig.set(value);
   }
@@ -95,7 +85,9 @@ export class ControlValueAccessorDirective<T>
     this.disabledSig.set(isDisabled);
   }
 
-  // UI event handlers
+  //#endregion
+
+  //#region UI event handlers
   onBlur(): void {
     this.onTouched();
   }
@@ -107,4 +99,27 @@ export class ControlValueAccessorDirective<T>
     this.onChange(value);
     this.onTouched();
   }
+  //#endregion
+
+  //#region Protected getters
+
+  /** Expose control name (works for FormControlName only) */
+  protected get controlName(): string | number | null {
+    console.log(this.ngControl);
+    return this.ngControl instanceof FormControlName ? this.ngControl.name : null;
+  }
+
+  //#endregion
+
+  //#region private methods
+  private initFormControl(): void {
+    if (this.ngControl instanceof FormControlName && this.formGroupDir) {
+      this.control = this.formGroupDir.getControl(this.ngControl);
+    } else if (this.ngControl instanceof FormControlDirective) {
+      this.control = this.ngControl.form as FormControl<T>;
+    } else {
+      throw new Error('appControlValueAccessor: No valid NgControl found');
+    }
+  }
+  //#endregion
 }

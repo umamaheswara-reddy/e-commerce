@@ -1,6 +1,6 @@
-import { Component, inject, signal, computed, DestroyRef } from '@angular/core';
+import { Component, inject, signal, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { NgControl, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -14,7 +14,7 @@ import { LoggerService } from '../../../shared/services/logger.service';
 import { IAuthResult } from '../../../core/services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { EButtonComponent } from '../../../ui/components/e-button/e-button.component';
-import { EInputComponent } from '../../../ui/components/e-input/e-input.component';
+import { InputComponent } from '../../../ui/components/e-input/e-input.component';
 
 @Component({
   selector: 'app-login',
@@ -26,7 +26,7 @@ import { EInputComponent } from '../../../ui/components/e-input/e-input.componen
     MatIconModule,
     MatSnackBarModule,
     EButtonComponent,
-    EInputComponent,
+    InputComponent,
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
@@ -102,5 +102,19 @@ export class LoginComponent {
 
   navigateToRegister(): void {
     this.authFacade.navigateToRegister();
+  }
+
+  value = signal('');
+  private onChange = (v: any) => {};
+  private onTouched = () => {};
+  private ngControl?: NgControl | null = null;
+  onInput(event: Event) {
+    const val = (event.target as HTMLInputElement).value;
+    this.value.set(val);
+    this.onChange(val);
+  }
+
+  markAsTouched() {
+    this.onTouched();
   }
 }
