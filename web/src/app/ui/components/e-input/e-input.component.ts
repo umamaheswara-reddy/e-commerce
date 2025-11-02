@@ -5,6 +5,7 @@ import {
   input,
   InputSignal,
   computed,
+  effect,
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -20,23 +21,23 @@ type InputType = 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, ValidationErrorsComponent],
   template: `
-    <mat-form-field>
+    <mat-form-field appearance="outline">
       @if (label()) {
         <mat-label>{{ label() }}</mat-label>
       }
+
       <input
         matInput
         [type]="type()"
         [id]="idSig()"
         [value]="valueSig()"
-        [disabled]="disabledSig()"
         [attr.placeholder]="placeholder()"
         [attr.autocomplete]="autoCompleteSig()"
         (input)="onInput($event)"
         (blur)="onBlur()"
         [formControl]="control!"
       />
-      <!-- 👇 Auto error display -->
+
       @if (control) {
         <e-validation-errors [control]="control"></e-validation-errors>
       }
@@ -49,45 +50,43 @@ type InputType = 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
       multi: true,
     },
   ],
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InputComponent<T> extends ControlValueAccessorDirective<T> {
-  type: InputSignal<InputType> = input<InputType>('text');
-  label: InputSignal<string> = input<string>('');
-  placeholder: InputSignal<string> = input<string>('');
-
-  /**
-   * Optional override for autocomplete behavior
-   * Example: <e-input autocomplete="new-password" />
-   */
+  type = input<InputType>('text');
+  label = input<string>('');
+  placeholder = input<string>('');
   autocomplete = input<InputType | undefined>(undefined);
 
-  // ✅ Generate a clean string id (controlName or fallback)
   idSig = computed(() => this.controlName?.toString() ?? '');
 
-  // ✅ Computed: auto-detect autocomplete (override if provided)
   autoCompleteSig = computed(() => {
     const explicit = this.autocomplete();
-    if (explicit) return explicit; // provided value takes priority
+    if (explicit) return explicit;
 
-    const rawName = this.controlName;
-    const name =
-      typeof rawName === 'string'
-        ? rawName.toLowerCase()
-        : rawName?.toString().toLowerCase() ?? '';
-
+    const name = (this.controlName?.toString().toLowerCase() ?? '');
     const type = this.type();
 
-    // 👇 smart defaults based on type or control name
-    if (name.includes('email') || type === 'email') return 'email';
-    if (name.includes('password') && name.includes('new')) return 'new-password';
+    if (type === 'email' || name.includes('email')) return 'email';
+    if (name.includes('newpassword')) return 'new-password';
     if (name.includes('password')) return 'current-password';
-    if (name.includes('phone') || name.includes('mobile') || type === 'tel') return 'tel';
-    if (name.includes('url') || type === 'url') return 'url';
+    if (type === 'tel' || name.includes('phone') || name.includes('mobile')) return 'tel';
+    if (type === 'url' || name.includes('url')) return 'url';
     if (name.includes('name')) return 'name';
     if (type === 'number') return 'off';
 
     return 'on';
   });
 
+  constructor() {
+    super();
+
+    // ✅ Sync disabled state safely
+    effect(() => {
+      if (!this.control) return;
+      const isDisabled = this.disabledSig();
+      if (isDisabled && this.control.enabled) this.control.disable({ emitEvent: false });
+      else if (!isDisabled && this.control.disabled) this.control.enable({ emitEvent: false });
+    });
+  }
 }
