@@ -1,0 +1,7 @@
+@use "../../../../styles/abstracts/flex" as *;
+
+:host {
+  @extend %flex-full;
+  @extend %flex-center;
+  background: #ffffff;
+}

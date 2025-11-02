@@ -1,0 +1,89 @@
+// ================================================
+// FLEX UTILITIES
+// Centralized flexbox helpers for consistency
+// ================================================
+
+// ----------
+// 🔸 Placeholders (for @extend)
+// Use these for commonly repeated flex patterns.
+// These do not generate CSS unless extended.
+// ----------
+
+%flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+%flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+%flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+%flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+%flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+%flex-full {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+// ----------
+// 🔸 Mixins (for @include)
+// Use when you need dynamic control.
+// ----------
+
+/// Flexible layout mixin
+/// @param {string} $direction - row | column (default: row)
+/// @param {string} $justify - justify-content value (default: flex-start)
+/// @param {string} $align - align-items value (default: stretch)
+/// @param {boolean} $wrap - whether to wrap items (default: false)
+@mixin flex(
+  $direction: row,
+  $justify: flex-start,
+  $align: stretch,
+  $wrap: false
+) {
+  display: flex;
+  flex-direction: $direction;
+  justify-content: $justify;
+  align-items: $align;
+
+  @if $wrap {
+    flex-wrap: wrap;
+  }
+}
+
+/// Shortcut for flex centering
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/// Full-size flex column layout
+@mixin flex-full {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}

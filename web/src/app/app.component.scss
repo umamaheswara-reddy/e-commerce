@@ -1,3 +1,7 @@
+@use "../styles/layout/ecommerce" as *;
+@use "../styles/abstracts/flex" as *;
+
 :host{
-    width: 100%;
+    // Global app container layout
+    @extend %flex-full;
 }
