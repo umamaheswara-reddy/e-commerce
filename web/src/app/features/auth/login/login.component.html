@@ -1,16 +1,15 @@
 <e-card title="Welcome Back" subtitle="Please sign in to your account" variant="outlined">
-  <e-card-content>
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <e-input type="email" formControlName="email"></e-input>
-      <e-input type="password" formControlName="password"></e-input>
-
-      <e-card-actions>
-        <e-button type="submit" color="primary" [loading]="isLoading()" loadingText="Signing in...">
-          Sign In
-        </e-button>
-        <e-button (click)="navigateToForgotPassword()">Forgot Password?</e-button>
-        <e-button (click)="navigateToRegister()">Don't have an account? Sign Up</e-button>
-      </e-card-actions>
+        <e-card-content>
+            <e-input type="email" formControlName="email"></e-input>
+            <e-input type="password" formControlName="password"></e-input>
+        </e-card-content>
+        <e-card-actions>
+            <e-button type="submit" color="primary" [loading]="isLoading()" loadingText="Signing in...">
+            Sign In
+            </e-button>
+            <e-button (click)="navigateToForgotPassword()">Forgot Password?</e-button>
+            <e-button (click)="navigateToRegister()">Don't have an account? Sign Up</e-button>
+        </e-card-actions>
     </form>
-  </e-card-content>
 </e-card>
