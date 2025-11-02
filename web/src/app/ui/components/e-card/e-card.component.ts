@@ -17,11 +17,15 @@ type CardVariant = 'elevated' | 'outlined' | 'flat';
   template: `
     <mat-card [ngClass]="[variantClass(), hostClass()]" class="e-card">
       <!-- Header -->
-      <mat-card-header *ngIf="hasHeader()">
-        <mat-card-title *ngIf="title()">{{ title() }}</mat-card-title>
-        <mat-card-subtitle *ngIf="subtitle()">{{ subtitle() }}</mat-card-subtitle>
-        <ng-content select="[card-header]"></ng-content>
-      </mat-card-header>
+      <mat-card-header>
+          @if (title()) {
+            <mat-card-title>{{ title() }}</mat-card-title>
+          }
+          @if (subtitle()) {
+            <mat-card-subtitle>{{ subtitle() }}</mat-card-subtitle>
+          }
+          <ng-content select="[card-header]"></ng-content>
+        </mat-card-header>
 
       <!-- content -->
       <mat-card-content>
