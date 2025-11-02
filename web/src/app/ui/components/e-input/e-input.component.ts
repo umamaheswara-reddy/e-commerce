@@ -19,7 +19,7 @@ type InputType = 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
 @Component({
   selector: 'e-input',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, ValidationErrorsComponent],
+  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule],
   template: `
     <mat-form-field appearance="outline">
       @if (label()) {
@@ -58,9 +58,7 @@ type InputType = 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
         <mat-error>Invalid format</mat-error>
       }
 
-      @if (control) {
-        <e-validation-errors [control]="control"></e-validation-errors>
-      }
+      <!-- ToDo: <e-validation-errors [control]="control"></e-validation-errors> -->
     </mat-form-field>
   `,
   providers: [
