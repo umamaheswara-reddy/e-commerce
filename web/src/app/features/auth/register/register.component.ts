@@ -12,7 +12,7 @@ import { FormGroup } from '@angular/forms';
 import { AuthFacade } from '../services/auth.facade';
 import { ErrorService } from '../../../shared/services/error.service';
 import { LoggerService } from '../../../shared/services/logger.service';
-import { EButtonComponent } from '../../../ui/components/e-button/e-button.component';
+import { ButtonComponent } from '../../../ui/components/e-button/e-button.component';
 import { InputComponent } from '../../../ui/components/e-input/e-input.component';
 
 @Component({
@@ -24,7 +24,7 @@ import { InputComponent } from '../../../ui/components/e-input/e-input.component
     MatCardModule,
     MatIconModule,
     MatSelectModule,
-    EButtonComponent,
+    ButtonComponent,
     InputComponent,
   ],
   templateUrl: './register.component.html',
@@ -42,7 +42,6 @@ export class RegisterComponent {
   // Using Angular signals instead of BehaviorSubject
   isLoading = signal(false);
   registerError = signal('');
-  hidePassword = signal(true);
   hideConfirmPassword = signal(true);
 
   constructor() {

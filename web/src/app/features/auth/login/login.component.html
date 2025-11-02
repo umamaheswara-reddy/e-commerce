@@ -14,14 +14,8 @@
                 <e-input type="password" formControlName="password"></e-input>
 
                 <!-- Submit Button -->
-                <e-button [disabled]="!loginForm.touched" color="primary" type="submit" class="login-button" [disabled]="isLoading()">
-                    <ng-container *ngIf="isLoading(); else notLoading">
-                        <mat-icon>refresh</mat-icon>
-                        <span>Signing In...</span>
-                    </ng-container>
-                    <ng-template #notLoading>
-                        <span>Sign In</span>
-                    </ng-template>
+                <e-button type="submit" color="primary" [loading]="isLoading()" loadingText="Signing in...">
+                    Sign In
                 </e-button>
             </form>
         </mat-card-content>

@@ -13,7 +13,7 @@ import { ErrorService } from '../../../shared/services/error.service';
 import { LoggerService } from '../../../shared/services/logger.service';
 import { IAuthResult } from '../../../core/services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { EButtonComponent } from '../../../ui/components/e-button/e-button.component';
+import { ButtonComponent } from '../../../ui/components/e-button/e-button.component';
 import { InputComponent } from '../../../ui/components/e-input/e-input.component';
 
 @Component({
@@ -25,7 +25,7 @@ import { InputComponent } from '../../../ui/components/e-input/e-input.component
     MatCardModule,
     MatIconModule,
     MatSnackBarModule,
-    EButtonComponent,
+    ButtonComponent,
     InputComponent,
   ],
   templateUrl: './login.component.html',
