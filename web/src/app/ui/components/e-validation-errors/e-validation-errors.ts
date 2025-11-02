@@ -1,8 +1,8 @@
 import {
   Component,
-  Input,
   ChangeDetectionStrategy,
   computed,
+  input,
   Signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -14,40 +14,42 @@ import { MatFormFieldModule } from '@angular/material/form-field';
   standalone: true,
   imports: [CommonModule, MatFormFieldModule],
   template: `
-    @if (visible()) {
-      @for (msg of messages(); track msg) {
-        <mat-error>{{ msg }}</mat-error>
-      }
+    @for (msg of messages(); track msg) {
+      <mat-error>{{ msg }}</mat-error>
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ValidationErrorsComponent {
-  @Input({ required: true }) control!: AbstractControl | null;
+  control = input.required<AbstractControl>();
 
-  // Show only after interaction and when invalid
-  visible = computed(() => {
-    const c = this.control;
-    if (!c) return false;
-
-    const interacted = c.touched || c.dirty;
-    const hasError = !!c.errors && c.invalid;
-
-    return interacted && hasError;
-  });
-
-  // Automatically show the values in the Angular error object
+  /**
+   * Returns validation messages only when control is invalid
+   * and has validation errors. Shows them automatically when
+   * Angular marks the control as touched/dirty.
+   */
   messages: Signal<string[]> = computed(() => {
-    const c = this.control;
-    if (!c?.errors) return [];
+    const c = this.control();
+    if (!c || !c.errors || !c.invalid) return [];
 
-    // Each error object might contain string messages or structured objects.
-    // We’ll extract readable strings from them.
-    return Object.values(c.errors).map((err) => {
-      if (typeof err === 'string') return err;              // e.g. { customError: 'Message here' }
-      if (typeof err === 'boolean') return '';              // e.g. { required: true }
-      if (err?.message) return err.message;                 // e.g. { backendError: { message: 'Invalid token' } }
-      return JSON.stringify(err);                           // fallback for unknown formats
-    }).filter(m => !!m); // remove empty strings
+    const errs = c.errors;
+    const msgs: string[] = [];
+
+    if (errs['required']) msgs.push('This field is required');
+    if (errs['email']) msgs.push('Please enter a valid email address');
+    if (errs['minlength'])
+      msgs.push(`Minimum length is ${errs['minlength'].requiredLength} characters`);
+    if (errs['maxlength'])
+      msgs.push(`Maximum length is ${errs['maxlength'].requiredLength} characters`);
+    if (errs['pattern']) msgs.push('Invalid format');
+
+    // Handle any custom error messages
+    for (const key in errs) {
+      const err = errs[key];
+      if (typeof err === 'string') msgs.push(err);
+      else if (err?.message) msgs.push(err.message);
+    }
+
+    return msgs;
   });
 }
