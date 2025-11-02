@@ -1,5 +1,5 @@
-<e-card title="Welcome Back" subtitle="Please sign in to your account" variant="outlined">
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <e-card title="Welcome Back" subtitle="Please sign in to your account" variant="outlined">
         <e-card-content>
             <e-input type="email" formControlName="email"></e-input>
             <e-input type="password" formControlName="password"></e-input>
@@ -11,5 +11,5 @@
             <e-button (click)="navigateToForgotPassword()">Forgot Password?</e-button>
             <e-button (click)="navigateToRegister()">Don't have an account? Sign Up</e-button>
         </e-card-actions>
-    </form>
-</e-card>
+    </e-card>
+</form>
