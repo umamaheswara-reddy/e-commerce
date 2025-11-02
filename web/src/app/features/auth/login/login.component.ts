@@ -43,7 +43,6 @@ export class LoginComponent {
 
   // Using Angular signals instead of BehaviorSubject
   isLoading = signal(false);
-  hidePassword = signal(true);
 
   constructor() {
     this.initializeForm();

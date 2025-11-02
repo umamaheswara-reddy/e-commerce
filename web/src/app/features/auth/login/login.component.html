@@ -8,11 +8,11 @@
         <mat-card-content>
             <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
                 <!-- Email Field -->
-                <e-input label="Email" type="email" formControlName="email"></e-input>
+                <e-input type="email" formControlName="email"></e-input>
 
                 <!-- Password Field -->
-                <e-input label="Password" [type]="hidePassword() ? 'password' : 'text'" formControlName="password"></e-input>
-                <button [disabled]="!loginForm.touched" type="submit">Sign In</button>
+                <e-input type="password" formControlName="password"></e-input>
+
                 <!-- Submit Button -->
                 <e-button [disabled]="!loginForm.touched" color="primary" type="submit" class="login-button" [disabled]="isLoading()">
                     <ng-container *ngIf="isLoading(); else notLoading">
