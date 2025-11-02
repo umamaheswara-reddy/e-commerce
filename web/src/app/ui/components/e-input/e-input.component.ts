@@ -3,7 +3,6 @@ import {
   ChangeDetectionStrategy,
   forwardRef,
   input,
-  InputSignal,
   computed,
   effect,
 } from '@angular/core';
@@ -12,26 +11,28 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessorDirective } from '../../directives/control-value-accessor.directive';
-import { ValidationErrorsComponent } from '../e-validation-errors/e-validation-errors';
 
 type InputType = 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
 
 @Component({
   selector: 'e-input',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule
+  ],
   template: `
     <mat-form-field appearance="outline">
-      @if (label()) {
-        <mat-label>{{ label() }}</mat-label>
-      }
+      <mat-label>{{ labelSig() }}</mat-label>
 
       <input
         matInput
         [type]="type()"
         [id]="idSig()"
         [value]="valueSig()"
-        [attr.placeholder]="placeholder()"
+        [attr.placeholder]="placeholderSig()"
         [attr.autocomplete]="autoCompleteSig()"
         (input)="onInput($event)"
         (blur)="onBlur()"
@@ -68,20 +69,27 @@ type InputType = 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
       multi: true,
     },
   ],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class InputComponent<T> extends ControlValueAccessorDirective<T> {
   type = input<InputType>('text');
-  label = input<string>('');
   placeholder = input<string>('');
-  autocomplete = input<InputType | undefined>(undefined);
+
+  // 🧠 Auto derive label from controlName
+  labelSig = computed(() => {
+    const name = this.controlName?.toString() ?? '';
+    if (!name) return '';
+    return name
+      .replace(/([A-Z])/g, ' $1')   // convert camelCase or PascalCase → spaced words
+      .replace(/^./, (s) => s.toUpperCase()) // capitalize first letter
+      .trim();
+  });
 
   idSig = computed(() => this.controlName?.toString() ?? '');
 
-  autoCompleteSig = computed(() => {
-    const explicit = this.autocomplete();
-    if (explicit) return explicit;
+  placeholderSig = computed(() => this.placeholder() || this.labelSig());
 
+  autoCompleteSig = computed(() => {
     const name = (this.controlName?.toString().toLowerCase() ?? '');
     const type = this.type();
 
@@ -92,14 +100,13 @@ export class InputComponent<T> extends ControlValueAccessorDirective<T> {
     if (type === 'url' || name.includes('url')) return 'url';
     if (name.includes('name')) return 'name';
     if (type === 'number') return 'off';
-
     return 'on';
   });
 
   constructor() {
     super();
 
-    // ✅ Sync disabled state safely
+    // ✅ Keep control enabled/disabled in sync reactively
     effect(() => {
       if (!this.control) return;
       const isDisabled = this.disabledSig();
