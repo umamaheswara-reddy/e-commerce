@@ -3,8 +3,6 @@ import {
   ChangeDetectionStrategy,
   Input,
   computed,
-  signal,
-  effect,
   inject,
   input,
 } from '@angular/core';
@@ -27,12 +25,12 @@ type ButtonVariant = 'flat' | 'raised' | 'stroked' | 'icon' | 'fab' | 'mini-fab'
       [attr.type]="type()"
       [color]="computedColor()"
       [disabled]="disabled() || loading()"
-      [ngClass]="[variantClass(), hostClass]"
+      [ngClass]="[variantClass(), hostClass()]"
       class="e-btn"
     >
       <ng-container *ngIf="loading(); else content">
         <mat-icon class="spin">refresh</mat-icon>
-        <span class="ml-2">{{ loadingTextSig() }}</span>
+        <span class="ml-2">{{ loadingText() }}</span>
       </ng-container>
 
       <ng-template #content>
@@ -46,39 +44,18 @@ export class ButtonComponent {
   private defaults = inject(E_BUTTON_DEFAULT_OPTIONS);
 
   // ---- Inputs ----
-  @Input('class') hostClass = '';
-
   type = input<ButtonType>('button');
-
-  private colorSig = signal<ButtonColor>(undefined);
-  @Input() set color(v: ButtonColor) {
-    this.colorSig.set(v);
-  }
-
-  disabled = signal(false);
-  @Input() set disabledInput(v: boolean | string | null | undefined) {
-    this.disabled.set(!!v);
-  }
-
-  loading = signal(false);
-  @Input('loading') set loadingInput(v: boolean | string | null | undefined) {
-    this.loading.set(!!v);
-  }
-
-  private variantSig = signal<ButtonVariant>('flat');
-  @Input() set variant(v: ButtonVariant) {
-    this.variantSig.set(v);
-  }
-
-  loadingTextSig = signal('Loading...');
-  @Input() set loadingText(v: string) {
-    this.loadingTextSig.set(v || 'Loading...');
-  }
+  color = input<ButtonColor>('primary');
+  disabled = input<boolean>(false);
+  loading = input<boolean>(false);
+  variant = input<ButtonVariant>('raised');
+  loadingText = input<string>('Loading...');
+  hostClass = input<string>('');
 
   // ---- Computed ----
-  computedColor = computed(() => this.colorSig() ?? this.defaults.color);
+  computedColor = computed(() => this.color() ?? this.defaults.color);
   variantClass = computed(() => {
-    const v = this.variantSig();
+    const v = this.variant();
     switch (v) {
       case 'raised': return 'mat-raised-button';
       case 'stroked': return 'mat-stroked-button';
