@@ -38,6 +38,26 @@ type InputType = 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
         [formControl]="control!"
       />
 
+      @if (control?.hasError('required')) {
+        <mat-error>This field is required</mat-error>
+      }
+      @if (control?.hasError('email')) {
+        <mat-error>Please enter a valid email address</mat-error>
+      }
+      @if (control?.hasError('minlength')) {
+        <mat-error>
+          Minimum length is {{ control?.getError('minlength').requiredLength }} characters
+        </mat-error>
+      }
+      @if (control?.hasError('maxlength')) {
+        <mat-error>
+          Maximum length is {{ control?.getError('maxlength').requiredLength }} characters
+        </mat-error>
+      }
+      @if (control?.hasError('pattern')) {
+        <mat-error>Invalid format</mat-error>
+      }
+
       @if (control) {
         <e-validation-errors [control]="control"></e-validation-errors>
       }
