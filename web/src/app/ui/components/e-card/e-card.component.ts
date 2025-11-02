@@ -24,14 +24,10 @@ type CardVariant = 'elevated' | 'outlined' | 'flat';
       </mat-card-header>
 
       <!-- Content -->
-      <mat-card-content>
-        <ng-content></ng-content>
-      </mat-card-content>
+        <ng-content select="e-card-content"></ng-content>
 
       <!-- Actions -->
-      <mat-card-actions>
-        <ng-content select="[card-actions]"></ng-content>
-      </mat-card-actions>
+        <ng-content select="e-card-actions"></ng-content>
     </mat-card>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -15,7 +15,7 @@ import { IAuthResult } from '../../../core/services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ButtonComponent } from '../../../ui/components/e-button/e-button.component';
 import { InputComponent } from '../../../ui/components/e-input/e-input.component';
-import { CardComponent } from '../../../ui/components/e-card/e-card.component';
+import { CardComponent, CardContentComponent, CardActionsComponent } from '../../../ui/components/e-card/index';
 
 @Component({
   selector: 'app-login',
@@ -28,7 +28,9 @@ import { CardComponent } from '../../../ui/components/e-card/e-card.component';
     MatSnackBarModule,
     ButtonComponent,
     InputComponent,
-    CardComponent
+    CardComponent,
+    CardContentComponent,
+    CardActionsComponent
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
