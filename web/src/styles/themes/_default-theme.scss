@@ -1,8 +1,10 @@
-@use "sass:map"; // Add map module for map.get()
+@use "sass:map";
 @use "@angular/material" as mat;
 @use "../abstracts/colors" as app-colors;
 
-// 1️⃣ Define base M3 theme configuration
+// ================================================
+// Define base M3 theme configuration
+// ================================================
 $b-typography: (
   plain-family: "Roboto, sans-serif",
   brand-family: "Roboto, sans-serif",
@@ -11,12 +13,21 @@ $b-typography: (
   regular-weight: 400,
 );
 
-$b-theme:(theme-type: light, primary:mat.$azure-palette, tertiary: mat.$orange-palette);
-$b-density: (scale:-5);
+$b-color: (
+  theme-type: light,
+  primary: mat.$azure-palette,
+  tertiary: mat.$orange-palette,
+);
 
-$theme: mat.define-theme((color: $b-theme, typography: $b-typography, density: $b-density));
+$b-density: (scale: -5);
 
-html{
+$theme: mat.define-theme((
+  color: $b-color,
+  typography: $b-typography,
+  density: $b-density,
+));
+
+html {
   @include mat.core-theme($theme);
   @include mat.all-component-themes($theme);
 }

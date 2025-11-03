@@ -21,12 +21,11 @@ type ButtonVariant = 'flat' | 'raised' | 'stroked' | 'icon' | 'fab' | 'mini-fab'
   imports: [CommonModule, MatButtonModule, MatIconModule],
   template: `
     <button
-      matButton
+      matButton="filled"
       [attr.type]="type()"
       [color]="computedColor()"
       [disabled]="disabled() || loading()"
       [ngClass]="[variantClass(), hostClass()]"
-      class="e-btn"
     >
       <ng-container *ngIf="loading(); else content">
         <mat-icon class="spin">refresh</mat-icon>

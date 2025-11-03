@@ -1,6 +1,54 @@
 @use "abstracts/variables" as gv;
-@use "abstracts/placeholders" as *;
+@use "abstracts/flex" as *;
 
 .brand-color {
   color: var(--brand-color);
 }
+
+// 🔸 Public classes (for HTML templates)
+.d-flex { @extend %flex; }
+.f-col { @extend %flex-col; }
+.f-wrap { @extend %flex-wrap; }
+.f-center { @extend %flex-center; }
+.f-between { @extend %flex-between; }
+.f-around { @extend %flex-around; }
+.f-evenly { @extend %flex-evenly; }
+.f-full { @extend %flex-full; }
+
+// 🔸 Alignment modifiers (optional but common)
+.align-start { align-items: flex-start }
+.align-center { align-items: center }
+.align-end { align-items: flex-end }
+
+.justify-start { justify-content: flex-start }
+.justify-center { justify-content: center }
+.justify-end { justify-content: flex-end }
+.justify-between { justify-content: space-between }
+.justify-around { justify-content: space-around }
+
+// ==============================================
+// 📦 Spacing Utilities (p-, m-, pt-, mx-, etc.)
+// ==============================================
+$spacer: 0.25rem;
+.gap-1 { gap: $spacer }
+.gap-2 { gap: $spacer * 2 }
+.gap-3 { gap: $spacer * 3 }
+
+// ================================================
+// WIDTH UTILITIES
+// ================================================
+
+// Static width utilities
+.w-auto { width: auto }
+.w-25 { width: 25% }
+.w-50 { width: 50% }
+.w-75 { width: 75% }
+.w-100 { width: 100% }
+
+// Max-width utilities
+.mw-100 { max-width: 100% }
+.mw-auto { max-width: none }
+
+// Min-width utilities
+.min-w-100 { min-width: 100% }
+.min-w-50 { min-width: 50% }

@@ -1,8 +1,9 @@
-@use "@angular/material" as mat;
+@use '@angular/material' as mat;
 
+// Customize the entire app. Change :root to your selector if you want to scope the styles.
 :root {
-  // Use M3 CSS variables for button theming
-  --mat-button-filled-container-color: var(--md-sys-color-primary);
-  --mat-button-filled-label-text-color: var(--md-sys-color-on-primary);
-  --mat-button-protected-container-shape: 4px;
+  @include mat.fab-overrides((
+    container-color: orange,
+    container-elevation-shadow: -4px -4px 5px 0px rgba(0, 0, 0, 0.5),
+  ));
 }
