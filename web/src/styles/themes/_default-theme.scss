@@ -3,111 +3,25 @@
 @use "../abstracts/colors" as app-colors;
 
 // 1️⃣ Define base M3 theme configuration
-$base-theme-config: (
-  typography: (
-    plain-family: "Roboto, sans-serif",
-    brand-family: "Roboto, sans-serif",
-    bold-weight: 700,
-    medium-weight: 500,
-    regular-weight: 400,
-  ),
+$b-typography: (
+  plain-family: "Roboto, sans-serif",
+  brand-family: "Roboto, sans-serif",
+  bold-weight: 700,
+  medium-weight: 500,
+  regular-weight: 400,
 );
 
-// 2️⃣ Define light theme
-$light-theme: mat.define-theme(
-  (
-    color: (
-      theme-type: light,
-      primary: mat.$azure-palette,
-      tertiary: mat.$orange-palette,
-    ),
-    typography: map.get($base-theme-config, typography),
-  )
-);
+$b-theme:(theme-type: light, primary:mat.$azure-palette, tertiary: mat.$orange-palette);
+$b-density: (scale:-5);
 
-// 3️⃣ Define dark theme
-$dark-theme: mat.define-theme(
-  (
-    color: (
-      theme-type: dark,
-      primary: mat.$azure-palette,
-      tertiary: mat.$orange-palette,
-    ),
-    typography: map.get($base-theme-config, typography),
-  )
-);
+$theme: mat.define-theme((color: $b-theme, typography: $b-typography, density: $b-density));
 
-// 4️⃣ Apply Angular Material core
-@include mat.core();
-
-// 5️⃣ Theme application mixin
-@mixin apply-theme($theme) {
+html{
+  @include mat.core-theme($theme);
   @include mat.all-component-themes($theme);
-  @include mat.all-component-densities(-4);
-
-  // Typography settings
-  --mdc-typography-body-large-font-size: 1rem;
-  --mdc-typography-body-large-font-weight: 500;
-  --mdc-typography-label-large-font-size: 0.875rem;
-
-  // Button styles
-  --mdc-text-button-container-shape: 8px;
-  --mdc-filled-button-container-shape: 8px;
-  --mdc-outlined-button-container-shape: 8px;
-  --mdc-elevated-button-container-shape: 8px;
-  --mdc-text-button-label-text-size: 16px;
-  --mdc-text-button-label-text-weight: 500;
-  --mdc-filled-button-label-text-size: 16px;
-  --mdc-filled-button-label-text-weight: 500;
-  --mdc-text-button-with-icon-icon-size: 20px;
-  --mdc-filled-button-with-icon-icon-size: 20px;
-  --mdc-filled-button-horizontal-padding: 20px;
-  --mdc-filled-button-vertical-padding: 10px;
-
-  // Custom token overrides
-  @include mat.button-color($theme);
-  @include mat.button-typography($theme);
-  @include mat.button-density($theme);
 }
 
-// 6️⃣ Apply light theme by default
-:root {
-  @include apply-theme($light-theme);
-
-  // Light theme specific overrides
-  --app-surface: #{app-colors.$light-surface};
-  --app-on-surface: #{app-colors.$light-on-surface};
-
-  // Header colors
-  --header-background: #ffffff;
-  --header-text: #333333;
-  --header-border: #e0e0e0;
+body {
+  background-color: var(--mat-sys-background);
+  color: var(--mat-sys-on-background);
 }
-
-// 7️⃣ Apply dark theme when preferred
-@media (prefers-color-scheme: dark) {
-  :root {
-    @include apply-theme($dark-theme);
-
-    // Dark theme specific overrides
-    --app-surface: #{app-colors.$dark-surface};
-    --app-on-surface: #{app-colors.$dark-on-surface};
-
-    // Header colors
-    --header-background: #1a1a1a;
-    --header-text: #f0f0f0;
-    --header-border: #444444;
-  }
-}
-
-// 8️⃣ Autocomplete theme
-// .mat-mdc-autocomplete-panel {
-//   border-radius: 12px;
-//   padding: 8px 0;
-//   box-shadow: 0px 2px 6px 2px rgba(0, 0, 0, 0.15),
-//     0px 1px 2px rgba(0, 0, 0, 0.3);
-
-//   // Use theme surface color
-//   background-color: var(--app-surface);
-//   color: var(--app-on-surface);
-// }
