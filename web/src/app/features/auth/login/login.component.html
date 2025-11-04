@@ -1,6 +1,6 @@
 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
     <e-card title="Welcome Back" subtitle="Please sign in to your account" variant="outlined">
-        <e-card-content>
+        <e-card-content class="f-col">
             <e-input type="email" formControlName="email"></e-input>
             <e-input type="password" formControlName="password"></e-input>
         </e-card-content>
@@ -9,8 +9,8 @@
             Sign In
             </e-button>
             <div>
-                <e-button (click)="navigateToForgotPassword()">Forgot Password?</e-button>
-                <e-button (click)="navigateToRegister()">Don't have an account? Sign Up</e-button>
+                <e-button (click)="navigateToForgotPassword()" appearance="outlined">Forgot Password?</e-button>
+                <e-button (click)="navigateToRegister()" appearance="outlined">Don't have an account? Sign Up</e-button>
             </div>
         </e-card-actions>
     </e-card>

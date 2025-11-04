@@ -15,7 +15,7 @@ type CardVariant = 'elevated' | 'outlined' | 'flat';
   standalone: true,
   imports: [CommonModule, MatCardModule],
   template: `
-    <mat-card [ngClass]="[variantClass(), hostClass()]" class="e-card">
+    <mat-card [ngClass]="[variantClass(), hostClass()]">
       <!-- Header -->
       <mat-card-header>
           @if (title()) {

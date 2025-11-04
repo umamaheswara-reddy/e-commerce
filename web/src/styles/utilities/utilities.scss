@@ -1,0 +1,39 @@
+// _spacing.scss
+@use "sass:map";
+@use "sass:math";
+@use "../abstracts/variables" as *;
+
+$spacer-scale: (
+  0: 0,
+  1: $b-spacer,
+  2: $b-spacer * 2,
+  3: $b-spacer * 3,
+  4: $b-spacer * 4,
+  5: $b-spacer * 5,
+);
+
+// Generate margin & padding utility classes
+@each $key, $space in $spacer-scale {
+  // Padding utilities
+  .p-#{$key}  { padding: $space !important; }
+  .pt-#{$key} { padding-top: $space !important; }
+  .pb-#{$key} { padding-bottom: $space !important; }
+  .ps-#{$key} { padding-inline-start: $space !important; }
+  .pe-#{$key} { padding-inline-end: $space !important; }
+  .px-#{$key} { padding-inline: $space !important; }
+  .py-#{$key} { padding-block: $space !important; }
+
+  // Margin utilities
+  .m-#{$key}  { margin: $space !important; }
+  .mt-#{$key} { margin-top: $space !important; }
+  .mb-#{$key} { margin-bottom: $space !important; }
+  .ms-#{$key} { margin-inline-start: $space !important; }
+  .me-#{$key} { margin-inline-end: $space !important; }
+  .mi-#{$key} { margin-inline: $space !important; }
+  .mb-#{$key} { margin-block: $space !important; }
+}
+
+// Gap utilities for flex/grid
+@each $key, $space in $spacer-scale {
+  .gap-#{$key} { gap: $space !important; }
+}

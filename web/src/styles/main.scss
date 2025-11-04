@@ -9,6 +9,7 @@
 @use "components" as *;
 @use "vendors-extensions" as *;
 @use "themes/default-theme";
+@use "./utilities/utilities.scss" as *;
 
 html,
 body {

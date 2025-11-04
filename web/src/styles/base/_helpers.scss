@@ -1,5 +1,5 @@
-@use "abstracts/variables" as gv;
-@use "abstracts/flex" as *;
+@use "../abstracts/variables" as *;
+@use "../abstracts/flex" as *;
 
 .brand-color {
   color: var(--brand-color);
@@ -29,10 +29,9 @@
 // ==============================================
 // 📦 Spacing Utilities (p-, m-, pt-, mx-, etc.)
 // ==============================================
-$spacer: 0.25rem;
-.gap-1 { gap: $spacer }
-.gap-2 { gap: $spacer * 2 }
-.gap-3 { gap: $spacer * 3 }
+.gap-1 { gap: $b-spacer }
+.gap-2 { gap: $b-spacer * 2 }
+.gap-3 { gap: $b-spacer * 3 }
 
 // ================================================
 // WIDTH UTILITIES

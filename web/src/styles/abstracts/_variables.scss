@@ -14,3 +14,8 @@ $gray-light: color.adjust($gray, $lightness: 50%);
 // Breakpoints
 $default-min-bp: 320px;
 $default-max-bp: 1440px;
+
+// ==============================================
+// 📦 Spacing Utilities variables
+// ==============================================
+$b-spacer: 0.25rem; // Bootstrap base = 0.25rem (4px)

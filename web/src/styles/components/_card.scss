@@ -1,0 +1,16 @@
+@use "@angular/material" as mat;
+
+// Customize the entire app. Change :root to your selector if you want to scope the styles.
+:root {
+  @include mat.card-overrides((
+    elevated-container-color: #ffffff,
+    elevated-container-elevation: red,
+  ));
+}
+
+.mat-mdc-card-content{
+  margin-block: 1rem !important;
+}
+.mat-mdc-card-actions{
+  padding: 0 16px 16px !important;
+}
