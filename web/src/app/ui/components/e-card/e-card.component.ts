@@ -6,16 +6,14 @@ import {
   input,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatCardModule } from '@angular/material/card';
-
-type CardVariant = 'elevated' | 'outlined' | 'flat';
+import { MatCardAppearance, MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'e-card',
   standalone: true,
   imports: [CommonModule, MatCardModule],
   template: `
-    <mat-card [ngClass]="[variantClass(), hostClass()]">
+    <mat-card [appearance]="appearance()">
       <!-- Header -->
       <mat-card-header>
           @if (title()) {
@@ -45,17 +43,7 @@ export class CardComponent {
   hostClass = input<string>('');
   title = input<string>('');
   subtitle = input<string>('');
-  variant = input<CardVariant>('elevated');
-
-  // Derived
-  variantClass = computed(() => {
-    switch (this.variant()) {
-      case 'outlined': return 'mat-card-outlined';
-      case 'flat': return 'mat-card-flat';
-      default: return 'mat-card-elevated';
-    }
-  });
+  appearance = input<MatCardAppearance>('outlined');
 
   hasHeader = computed(() => !!(this.title() || this.subtitle()));
-
 }
