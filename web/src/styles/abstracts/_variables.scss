@@ -19,3 +19,15 @@ $default-max-bp: 1440px;
 // 📦 Spacing Utilities variables
 // ==============================================
 $b-spacer: 0.25rem; // Bootstrap base = 0.25rem (4px)
+$spacer-scale: (
+  0: 0,
+  1: $b-spacer,          // 0.25rem = 4px
+  2: $b-spacer * 2,      // 0.5rem = 8px
+  3: $b-spacer * 3,      // 0.75rem = 12px
+  4: $b-spacer * 4,      // 1rem = 16px
+  5: $b-spacer * 5,      // 1.25rem = 20px
+  6: $b-spacer * 6,      // 1.5rem = 24px
+  7: $b-spacer * 8,      // 2rem = 32px
+  8: $b-spacer * 10,     // 2.5rem = 40px
+  9: $b-spacer * 12,     // 3rem = 48px
+);

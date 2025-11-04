@@ -3,15 +3,6 @@
 @use "sass:math";
 @use "../abstracts/variables" as *;
 
-$spacer-scale: (
-  0: 0,
-  1: $b-spacer,
-  2: $b-spacer * 2,
-  3: $b-spacer * 3,
-  4: $b-spacer * 4,
-  5: $b-spacer * 5,
-);
-
 // Generate margin & padding utility classes
 @each $key, $space in $spacer-scale {
   // Padding utilities

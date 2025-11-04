@@ -1,4 +1,6 @@
 @use "@angular/material" as mat;
+@use "sass:map";
+@use "../abstracts/variables" as *;
 
 // Customize the entire app. Change :root to your selector if you want to scope the styles.
 :root {
@@ -8,17 +10,24 @@
   ));
 }
 
-$pixel:25px;
-$b-h-padding: $pixel $pixel 0 !important;
-$b-c-padding: 0 $pixel !important;
-$b-a-padding: 0 $pixel $pixel !important;
-.mat-mdc-card-header{
-  padding: $b-h-padding;
+// -------------------------------------------------
+// Material Card Spacing (using spacing utilities)
+// -------------------------------------------------
+
+@mixin card-spacing($scale) {
+  .mat-mdc-card-header {
+    padding: $space $space 0 !important;
+  }
+
+  .mat-mdc-card-content {
+    padding: 0 $space !important;
+  }
+
+  .mat-mdc-card-actions {
+    padding: 0 $space $space !important;
+  }
 }
-.mat-mdc-card-content{
-  padding: $b-c-padding;
-  margin-block: 1rem !important;
-}
-.mat-mdc-card-actions{
-  padding: $b-a-padding;
-}
+
+// Get values from your $spacer-scale
+$space: map.get($spacer-scale, 7);
+@include card-spacing($space);
