@@ -7,7 +7,7 @@ import {
   effect,
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatFormFieldAppearance, MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessorDirective } from '../../directives/control-value-accessor.directive';
@@ -24,7 +24,7 @@ type InputType = 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
     MatInputModule
   ],
   template: `
-    <mat-form-field appearance="outline">
+    <mat-form-field [appearance]="appearance()">
       <mat-label>{{ labelSig() }}</mat-label>
 
       <input
@@ -74,6 +74,7 @@ type InputType = 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
 export class InputComponent<T> extends ControlValueAccessorDirective<T> {
   type = input<InputType>('text');
   placeholder = input<string>('');
+  appearance = input<MatFormFieldAppearance>('outline');
 
   // 🧠 Auto derive label from controlName
   labelSig = computed(() => {

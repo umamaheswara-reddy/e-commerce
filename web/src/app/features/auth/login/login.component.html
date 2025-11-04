@@ -1,11 +1,11 @@
 <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <e-card title="Welcome Back" subtitle="Please sign in to your account" appearance="outlined">
+    <e-card title="Sign in or create an account" subtitle="Please sign in to your account" appearance="outlined">
         <e-card-content class="f-col">
             <e-input type="email" formControlName="email"></e-input>
             <e-input type="password" formControlName="password"></e-input>
         </e-card-content>
         <e-card-actions class="f-col gap-2">
-            <e-button type="submit" color="primary" [loading]="isLoading()" loadingText="Signing in..." class="f-center">
+            <e-button type="submit" color="primary" [loading]="isLoading()" loadingText="Signing in..." hostClass="w-75" class="f-center">
             Sign In
             </e-button>
             <div>

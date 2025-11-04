@@ -8,9 +8,17 @@
   ));
 }
 
+$pixel:25px;
+$b-h-padding: $pixel $pixel 0 !important;
+$b-c-padding: 0 $pixel !important;
+$b-a-padding: 0 $pixel $pixel !important;
+.mat-mdc-card-header{
+  padding: $b-h-padding;
+}
 .mat-mdc-card-content{
+  padding: $b-c-padding;
   margin-block: 1rem !important;
 }
 .mat-mdc-card-actions{
-  padding: 0 16px 16px !important;
+  padding: $b-a-padding;
 }
