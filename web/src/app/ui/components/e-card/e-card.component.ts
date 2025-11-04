@@ -22,7 +22,7 @@ import { MatCardAppearance, MatCardModule } from '@angular/material/card';
           @if (subtitle()) {
             <mat-card-subtitle>{{ subtitle() }}</mat-card-subtitle>
           }
-          <ng-content select="[card-header]"></ng-content>
+          <ng-content select="e-card-header"></ng-content>
         </mat-card-header>
 
       <!-- content -->

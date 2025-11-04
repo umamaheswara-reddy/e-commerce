@@ -1,10 +1,9 @@
 import {
   Component,
   ChangeDetectionStrategy,
-  Input,
-  computed,
   inject,
   input,
+  computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonAppearance, MatButtonModule } from '@angular/material/button';
@@ -25,14 +24,15 @@ type ButtonVariant = 'flat' | 'raised' | 'stroked' | 'icon' | 'fab' | 'mini-fab'
       [attr.type]="type()"
       [color]="computedColor()"
       [disabled]="disabled() || loading()"
-      [ngClass]="[variantClass(), hostClass()]"
+      [class]="hostClass()"
+      [ngClass]="variantDirective()"
     >
-      <ng-container *ngIf="loading(); else content">
+      <ng-container *ngIf="loading(); else normalContent">
         <mat-icon class="spin">refresh</mat-icon>
         <span class="ml-2">{{ loadingText() }}</span>
       </ng-container>
 
-      <ng-template #content>
+      <ng-template #normalContent>
         <ng-content></ng-content>
       </ng-template>
     </button>
@@ -42,23 +42,24 @@ type ButtonVariant = 'flat' | 'raised' | 'stroked' | 'icon' | 'fab' | 'mini-fab'
 export class ButtonComponent {
   private defaults = inject(E_BUTTON_DEFAULT_OPTIONS);
 
-  // ---- Inputs ----
+  // Inputs
   type = input<ButtonType>('button');
   color = input<ButtonColor>('primary');
   variant = input<ButtonVariant>('raised');
   appearance = input<MatButtonAppearance>('filled');
-  disabled = input<boolean>(false);
-  loading = input<boolean>(false);
-  loadingText = input<string>('Loading...');
-  hostClass = input<string>('');
+  disabled = input(false);
+  loading = input(false);
+  loadingText = input('Loading...');
+  hostClass = input('');
 
-  // ---- Computed ----
+  // Computed
   computedColor = computed(() => this.color() ?? this.defaults.color);
-  variantClass = computed(() => {
-    const v = this.variant();
-    switch (v) {
+
+  variantDirective = computed(() => {
+    switch (this.variant()) {
       case 'raised': return 'mat-raised-button';
       case 'stroked': return 'mat-stroked-button';
+      case 'flat': return 'mat-flat-button';
       case 'icon': return 'mat-icon-button';
       case 'fab': return 'mat-fab';
       case 'mini-fab': return 'mat-mini-fab';
