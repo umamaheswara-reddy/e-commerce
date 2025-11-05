@@ -27,14 +27,16 @@ type ButtonVariant = 'flat' | 'raised' | 'stroked' | 'icon' | 'fab' | 'mini-fab'
       [class]="hostClass()"
       [ngClass]="variantDirective()"
     >
-      <ng-container *ngIf="loading(); else normalContent">
-        <mat-icon class="spin">refresh</mat-icon>
-        <span class="ml-2">{{ loadingText() }}</span>
-      </ng-container>
-
-      <ng-template #normalContent>
+      @if (loading()) {
+        <ng-container>
+          <span class="d-flex align-center">
+            <mat-icon class="spin">refresh</mat-icon>
+            <span class="ml-2">{{ loadingText() }}</span>
+          </span>
+        </ng-container>
+      } @else {
         <ng-content></ng-content>
-      </ng-template>
+      }
     </button>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
