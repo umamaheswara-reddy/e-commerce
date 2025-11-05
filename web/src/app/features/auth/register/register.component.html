@@ -20,23 +20,17 @@
                         formControlName="confirmPassword"></e-input>
 
                 <!-- Role Field -->
-                <mat-form-field appearance="outline">
-                    <mat-label>Role</mat-label>
-                    <mat-select formControlName="role">
-                        <mat-option value="Customer">Customer</mat-option>
-                        <mat-option value="SellerAdmin">Seller Admin</mat-option>
-                    </mat-select>
-                    <mat-icon matSuffix class="form-icon">work</mat-icon>
-                    <mat-error *ngIf="registerForm.get('role')?.invalid && registerForm.get('role')?.touched">
-                        <ng-container *ngIf="registerForm.get('role')?.errors?.['required']">Role is required</ng-container>
-                    </mat-error>
-                </mat-form-field>
+                 <e-select
+                    formControlName="role"
+                    [options]="[ { value: 'Customer', label: 'Customer' }, { value: 'SellerAdmin', label: 'Seller Admin' } ]"
+                    appearance="outline"
+                ></e-select>
 
                 <!-- Error Message -->
-                <div class="error-message" *ngIf="registerError()">
+                <!-- <div class="error-message" *ngIf="registerError()">
                     <mat-icon>error</mat-icon>
                     <span>{{ registerError() }}</span>
-                </div>
+                </div> -->
             </form>
         </e-card-content>
 
