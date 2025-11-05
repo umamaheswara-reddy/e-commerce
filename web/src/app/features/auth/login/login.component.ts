@@ -1,21 +1,31 @@
-import { Component, inject, signal, DestroyRef } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  inject,
+  signal,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgControl, ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { finalize } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
+
+// 🧱 UI Components
+import { ButtonComponent } from '../../../ui/components/e-button/e-button.component';
+import { InputComponent } from '../../../ui/components/e-input/e-input.component';
+import {
+  CardComponent,
+  CardContentComponent,
+  CardActionsComponent,
+} from '../../../ui/components/e-card';
+
+// 🧠 Services & Types
 import { FormService } from '../../../shared/services/form.service';
-import { ILoginFormGroup } from '../../../shared/types/form.types';
 import { AuthFacade } from '../services/auth.facade';
 import { ErrorService } from '../../../shared/services/error.service';
 import { LoggerService } from '../../../shared/services/logger.service';
 import { IAuthResult } from '../../../core/services/auth.service';
-import { HttpErrorResponse } from '@angular/common/http';
-import { ButtonComponent } from '../../../ui/components/e-button/e-button.component';
-import { InputComponent } from '../../../ui/components/e-input/e-input.component';
-import { CardComponent, CardContentComponent, CardActionsComponent } from '../../../ui/components/e-card/index';
 
 @Component({
   selector: 'app-login',
@@ -23,39 +33,36 @@ import { CardComponent, CardContentComponent, CardActionsComponent } from '../..
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatCardModule,
-    MatIconModule,
     MatSnackBarModule,
     ButtonComponent,
     InputComponent,
     CardComponent,
     CardContentComponent,
-    CardActionsComponent
+    CardActionsComponent,
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
-  private formService = inject(FormService);
-  private authFacade = inject(AuthFacade);
-  private errorService = inject(ErrorService);
-  private logger = inject(LoggerService);
-  private snackBar = inject(MatSnackBar);
-  private destroyRef = inject(DestroyRef);
+  // ==============================
+  // 🧩 Dependency Injection
+  // ==============================
+  private readonly formService = inject(FormService);
+  private readonly authFacade = inject(AuthFacade);
+  private readonly errorService = inject(ErrorService);
+  private readonly logger = inject(LoggerService);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly destroyRef = inject(DestroyRef);
 
-  loginForm!: ILoginFormGroup;
+  // ==============================
+  // 💡 State
+  // ==============================
+  readonly isLoading = signal(false);
+  readonly loginForm = this.formService.createLoginForm();
 
-  // Using Angular signals instead of BehaviorSubject
-  isLoading = signal(false);
-
-  constructor() {
-    this.initializeForm();
-  }
-
-  private initializeForm(): void {
-    this.loginForm = this.formService.createLoginForm();
-  }
-
+  // ==============================
+  // 📬 Form Getters (for template binding)
+  // ==============================
   get email() {
     return this.loginForm.controls.email;
   }
@@ -64,14 +71,17 @@ export class LoginComponent {
     return this.loginForm.controls.password;
   }
 
-    onSubmit(): void {
+  // ==============================
+  // 🚀 Submit Handler
+  // ==============================
+  onSubmit(): void {
     if (this.loginForm.invalid) {
       this.formService.markFormGroupTouched(this.loginForm);
       return;
     }
 
-    this.isLoading.set(true);
     const { email, password } = this.loginForm.getRawValue();
+    this.isLoading.set(true);
 
     this.authFacade
       .login(email, password)
@@ -85,20 +95,27 @@ export class LoginComponent {
       });
   }
 
-  private handleLoginResponse(result: IAuthResult) {
+  // ==============================
+  // ✅ Response Handling
+  // ==============================
+  private handleLoginResponse(result: IAuthResult): void {
     if (result.success) {
       this.authFacade.navigateToHome();
-    } else {
-      this.snackBar.open(result.message || 'Login failed', 'Close');
+      return;
     }
+
+    this.showSnack(result.message || 'Login failed');
   }
 
-  private handleLoginError(error: HttpErrorResponse) {
-    const userMessage = this.errorService.getUserFriendlyMessage(error);
-    this.snackBar.open(userMessage, 'Close');
+  private handleLoginError(error: HttpErrorResponse): void {
+    const message = this.errorService.getUserFriendlyMessage(error);
+    this.showSnack(message);
     this.logger.error('Login failed', error);
   }
 
+  // ==============================
+  // 🧭 Navigation
+  // ==============================
   navigateToForgotPassword(): void {
     this.authFacade.navigateToForgotPassword();
   }
@@ -107,17 +124,10 @@ export class LoginComponent {
     this.authFacade.navigateToRegister();
   }
 
-  value = signal('');
-  private onChange = (v: any) => {};
-  private onTouched = () => {};
-  private ngControl?: NgControl | null = null;
-  onInput(event: Event) {
-    const val = (event.target as HTMLInputElement).value;
-    this.value.set(val);
-    this.onChange(val);
-  }
-
-  markAsTouched() {
-    this.onTouched();
+  // ==============================
+  // 🍬 Utility
+  // ==============================
+  private showSnack(message: string): void {
+    this.snackBar.open(message, 'Close', { duration: 3000 });
   }
 }
