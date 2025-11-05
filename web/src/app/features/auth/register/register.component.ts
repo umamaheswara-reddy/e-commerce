@@ -1,7 +1,6 @@
 import { Component, inject, signal, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { finalize } from 'rxjs/operators';
@@ -14,6 +13,7 @@ import { ErrorService } from '../../../shared/services/error.service';
 import { LoggerService } from '../../../shared/services/logger.service';
 import { ButtonComponent } from '../../../ui/components/e-button/e-button.component';
 import { InputComponent } from '../../../ui/components/e-input/e-input.component';
+import { CardComponent, CardContentComponent, CardActionsComponent } from '../../../ui/components/e-card';
 
 @Component({
   selector: 'app-register',
@@ -21,11 +21,13 @@ import { InputComponent } from '../../../ui/components/e-input/e-input.component
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    MatCardModule,
     MatIconModule,
     MatSelectModule,
     ButtonComponent,
     InputComponent,
+    CardComponent,
+    CardContentComponent,
+    CardActionsComponent
   ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],

@@ -1,21 +1,17 @@
-<div class="register-container">
-    <mat-card class="register-card">
-        <mat-card-header>
-            <mat-card-title>Create Account</mat-card-title>
-            <mat-card-subtitle>Join us today</mat-card-subtitle>
-        </mat-card-header>
+    <e-card title="Create Account" subtitle="Join us today" appearance="outlined" hostClass="w-50">
+        <e-card-content>
+            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
 
-        <mat-card-content>
-            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
-                <!-- First Name Field -->
-                <e-input type="text" formControlName="firstName"></e-input>
+                <div class="d-flex">
+                    <!-- First Name Field -->
+                    <e-input type="text" formControlName="firstName"></e-input>
 
-                <!-- Last Name Field -->
-                <e-input type="text" formControlName="lastName"></e-input>
+                    <!-- Last Name Field -->
+                    <e-input type="text" formControlName="lastName"></e-input>
+                </div>
 
-                <!-- Email Field -->
-                <e-input type="email" formControlName="email"></e-input>
-
+                    <!-- Email Field -->
+                    <e-input type="email" formControlName="email"></e-input>
                 <!-- Password Field -->
                 <e-input type="password" formControlName="password"></e-input>
 
@@ -24,7 +20,7 @@
                         formControlName="confirmPassword"></e-input>
 
                 <!-- Role Field -->
-                <mat-form-field appearance="outline" class="full-width">
+                <mat-form-field appearance="outline">
                     <mat-label>Role</mat-label>
                     <mat-select formControlName="role">
                         <mat-option value="Customer">Customer</mat-option>
@@ -41,16 +37,11 @@
                     <mat-icon>error</mat-icon>
                     <span>{{ registerError() }}</span>
                 </div>
-
-                <!-- Submit Button -->
-                <e-button color="primary" [loading]="isLoading()" loadingText="Create Account...">
-                    Create Account
-                </e-button>
             </form>
-        </mat-card-content>
+        </e-card-content>
 
-        <mat-card-actions class="register-actions">
-            <e-button type="button" (click)="navigateToLogin()">Already have an account? Sign In</e-button>
-        </mat-card-actions>
-    </mat-card>
-</div>
+        <e-card-actions class="d-flex justify-start gap-2">
+            <e-button color="primary" [loading]="isLoading()" loadingText="Create Account...">Create Account</e-button>
+            <e-button appearance="outlined" (click)="navigateToLogin()">Already have an account? Sign In</e-button>
+        </e-card-actions>
+    </e-card>
