@@ -12,8 +12,9 @@ import { MatCardAppearance, MatCardModule } from '@angular/material/card';
   selector: 'e-card',
   standalone: true,
   imports: [CommonModule, MatCardModule],
+  styles: [`:host { display: flex; justify-content: center; align-items: center; }`],
   template: `
-    <mat-card [appearance]="appearance()">
+    <mat-card [appearance]="appearance()" [class]="hostClass()">
       <!-- Header -->
       <mat-card-header>
           @if (title()) {

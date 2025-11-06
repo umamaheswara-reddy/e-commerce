@@ -1,41 +1,39 @@
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
     <e-card title="Create Account" subtitle="Join us today" appearance="outlined" hostClass="w-50">
         <e-card-content>
-            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+            <!-- First Name Field -->
+            <e-input type="text" formControlName="firstName"></e-input>
 
-                <div class="d-flex">
-                    <!-- First Name Field -->
-                    <e-input type="text" formControlName="firstName"></e-input>
+            <!-- Last Name Field -->
+            <e-input type="text" formControlName="lastName"></e-input>
 
-                    <!-- Last Name Field -->
-                    <e-input type="text" formControlName="lastName"></e-input>
-                </div>
+            <!-- Email Field -->
+            <e-input type="email" formControlName="email"></e-input>
+            <!-- Password Field -->
+            <e-input type="password" formControlName="password"></e-input>
 
-                    <!-- Email Field -->
-                    <e-input type="email" formControlName="email"></e-input>
-                <!-- Password Field -->
-                <e-input type="password" formControlName="password"></e-input>
+            <!-- Confirm Password Field -->
+            <e-input [type]="hideConfirmPassword() ? 'password' : 'text'"
+                    formControlName="confirmPassword"></e-input>
 
-                <!-- Confirm Password Field -->
-                <e-input [type]="hideConfirmPassword() ? 'password' : 'text'"
-                        formControlName="confirmPassword"></e-input>
+            <!-- Role Field -->
+                <e-select
+                formControlName="role"
+                [options]="[ { value: 'Customer', label: 'Customer' }, { value: 'SellerAdmin', label: 'Seller Admin' } ]"
+                appearance="outline"
+            ></e-select>
 
-                <!-- Role Field -->
-                 <e-select
-                    formControlName="role"
-                    [options]="[ { value: 'Customer', label: 'Customer' }, { value: 'SellerAdmin', label: 'Seller Admin' } ]"
-                    appearance="outline"
-                ></e-select>
-
-                <!-- Error Message -->
-                <!-- <div class="error-message" *ngIf="registerError()">
-                    <mat-icon>error</mat-icon>
-                    <span>{{ registerError() }}</span>
-                </div> -->
-            </form>
+            <!-- Error Message -->
+            <!-- <div class="error-message" *ngIf="registerError()">
+                <mat-icon>error</mat-icon>
+                <span>{{ registerError() }}</span>
+            </div> -->
         </e-card-content>
 
         <e-card-actions class="d-flex justify-start gap-2">
-            <e-button color="primary" [loading]="isLoading()" loadingText="Create Account...">Create Account</e-button>
+            <e-button type="submit" color="primary" [loading]="isLoading()" loadingText="Create Account...">Create Account</e-button>
             <e-button appearance="outlined" (click)="navigateToLogin()">Already have an account? Sign In</e-button>
         </e-card-actions>
     </e-card>
+</form>
+
