@@ -7,10 +7,9 @@ import {
   effect,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MatFormFieldAppearance, MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ControlValueAccessorDirective } from '../../directives/control-value-accessor.directive';
 
 export interface SelectOption<T = any> {
@@ -38,21 +37,16 @@ export interface SelectOption<T = any> {
         (blur)="onBlur()"
       >
         @for (opt of options(); track opt.value) {
-          <mat-option
-            [value]="opt.value"
-            [disabled]="opt.disabled"
-          >
+          <mat-option [value]="opt.value" [disabled]="opt.disabled">
             {{ opt.label }}
           </mat-option>
         }
       </mat-select>
 
-      @if (control?.hasError('required')) {
-        <mat-error>This field is required</mat-error>
+      <!-- ✅ Validation messages -->
+      @if (validationMessageSig()) {
+        <mat-error>{{ validationMessageSig() }}</mat-error>
       }
-
-      <!-- Future enhancement -->
-      <!-- <e-validation-errors [control]="control"></e-validation-errors> -->
     </mat-form-field>
   `,
   providers: [
@@ -83,7 +77,7 @@ export class SelectComponent<T> extends ControlValueAccessorDirective<T> {
   constructor() {
     super();
 
-    // Sync control disabled state with signal
+    // ✅ Sync control disabled state reactively
     effect(() => {
       if (!this.control) return;
       const isDisabled = this.disabledSig();
