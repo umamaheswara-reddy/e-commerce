@@ -60,16 +60,23 @@ export class ControlValueAccessorDirective<T>
     const errors = this.errorsSig();
     if (!errors) return null;
 
+    const controlName = this.controlName?.toString() ?? '';
+  const label =
+    controlName
+      ?.replace(/([A-Z])/g, ' $1')
+      .replace(/^./, s => s.toUpperCase())
+      .trim() || 'This field';
+
     // Default messages — replace or extend as needed or make injectable
     const messages: Record<string, string> = {
-      required: 'This field is required.',
-      minlength: `Minimum length is ${errors['minlength']?.requiredLength}.`,
-      maxlength: `Maximum length is ${errors['maxlength']?.requiredLength}.`,
-      email: 'Please enter a valid email address.',
-      pattern: 'Invalid format.',
-      min: `Value must be at least ${errors['min']?.min}.`,
-      max: `Value must be less than or equal to ${errors['max']?.max}.`,
-    };
+    required: `${label} is required.`,
+    minlength: `${label} must be at least ${errors['minlength']?.requiredLength} characters.`,
+    maxlength: `${label} must be at most ${errors['maxlength']?.requiredLength} characters.`,
+    email: `${label} must be a valid email address.`,
+    pattern: `${label} format is invalid.`,
+    min: `${label} must be at least ${errors['min']?.min}.`,
+    max: `${label} must be less than or equal to ${errors['max']?.max}.`,
+  };
 
     const firstKey = Object.keys(errors)[0];
     return messages[firstKey] ?? 'Invalid value.';
