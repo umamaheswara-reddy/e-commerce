@@ -11,6 +11,10 @@ $secondary-color: #f9c50b;
 $gray: #6c757d; // Mid-neutral gray as the base value
 $gray-light: color.adjust($gray, $lightness: 50%);
 
+// heights
+$h-2: 2px;
+$h-40: 40px;
+
 // Breakpoints
 $default-min-bp: 320px;
 $default-max-bp: 1440px;
