@@ -44,7 +44,7 @@ export interface SelectOption<T = any> {
       </mat-select>
 
       <!-- ✅ Validation messages -->
-      @if (validationMessageSig()) {
+      @if (hasError()) {
         <mat-error>{{ validationMessageSig() }}</mat-error>
       }
     </mat-form-field>

@@ -40,7 +40,7 @@ type InputType = 'text' | 'number' | 'email' | 'password' | 'tel' | 'url';
       />
 
       <!-- ✅ Validation messages -->
-      @if (validationMessageSig() && control?.touched) {
+      @if (hasError()) {
         <mat-error>{{ validationMessageSig() }}</mat-error>
       }
 

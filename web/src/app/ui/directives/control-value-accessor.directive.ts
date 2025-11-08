@@ -37,18 +37,22 @@ export class ControlValueAccessorDirective<T>
   protected readonly valueSig = signal<T | null>(null);
   protected readonly disabledSig = signal(false);
 
-  // internal signal to track validation state reactively
+  // internal reactive errors signal — single source of truth for validation state
   private readonly errorsSig = signal<ValidationErrors | null>(null);
 
   // derived signals
   readonly showError = computed(() => {
     const control = this.control;
+    // show only when invalid and user interacted
     return !!(control && control.invalid && (control.dirty || control.touched));
   });
 
+  // convenience boolean for templates
+  readonly hasError = computed(() => !!this.validationMessageSig());
+
   /**
-   * ⚡ Reactive validation message signal
-   * Updates automatically whenever control errors or state changes
+   * Reactive validation message signal — returns the first message (or null)
+   * Depends on errorsSig and showError() only.
    */
   readonly validationMessageSig = computed<string | null>(() => {
     if (!this.showError()) return null;
@@ -56,7 +60,7 @@ export class ControlValueAccessorDirective<T>
     const errors = this.errorsSig();
     if (!errors) return null;
 
-    // 💬 custom validation messages
+    // Default messages — replace or extend as needed or make injectable
     const messages: Record<string, string> = {
       required: 'This field is required.',
       minlength: `Minimum length is ${errors['minlength']?.requiredLength}.`,
@@ -86,8 +90,11 @@ export class ControlValueAccessorDirective<T>
   ngOnInit(): void {
     this.initFormControl();
 
-    // 🔄 track both valueChanges and statusChanges to refresh errorsSig
     if (this.control) {
+      // initialize errors immediately
+      this.errorsSig.set(this.control.errors ?? null);
+
+      // merge value + status changes to refresh errorsSig
       merge(this.control.valueChanges, this.control.statusChanges)
         .pipe(startWith(null), takeUntilDestroyed(this.destroyRef))
         .subscribe(() => {
@@ -99,18 +106,24 @@ export class ControlValueAccessorDirective<T>
   //#region CVA
   writeValue(value: T | null): void {
     this.valueSig.set(value);
+    // keep errors in sync when programmatically writing value
+    this.errorsSig.set(this.control?.errors ?? null);
   }
 
   registerOnChange(fn: (val: T | null) => void): void {
     this.onChange = fn;
+
+    // keep value + errors in sync through the control's valueChanges stream
     this.control?.valueChanges
       .pipe(
-        startWith(this.control.value),
+        startWith(this.control?.value),
         distinctUntilChanged(),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((value) => {
         this.valueSig.set(value);
+        // update errors right away when value changes
+        this.errorsSig.set(this.control?.errors ?? null);
         fn(value);
       });
   }
@@ -126,14 +139,23 @@ export class ControlValueAccessorDirective<T>
 
   onBlur(): void {
     this.onTouched();
+    // update errors on blur too
+    this.errorsSig.set(this.control?.errors ?? null);
   }
 
   onInput(event: Event): void {
     if (this.disabledSig()) return;
     const value = (event.target as HTMLInputElement).value as unknown as T;
+
+    // update internal signal and notify form
     this.valueSig.set(value);
     this.onChange(value);
-    this.onTouched();
+
+    // mark touched if you want immediate touched behavior on input (optional)
+    // this.onTouched(); // uncomment if desired to mark touched on first input
+
+    // immediately refresh errors so validationMessageSig updates synchronously
+    this.errorsSig.set(this.control?.errors ?? null);
   }
 
   protected get controlName(): string | number | null {
