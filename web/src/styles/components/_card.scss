@@ -15,16 +15,19 @@
 // -------------------------------------------------
 
 @mixin card-spacing($scale) {
-  .mat-mdc-card-header {
-    padding: $space $space 0 !important;
-  }
+  mat-card{
+    gap:0.5rem;
+    .mat-mdc-card-header {
+      padding: $space $space 0 !important;
+    }
 
-  .mat-mdc-card-content {
-    padding: 0 $space !important;
-  }
+    .mat-mdc-card-content {
+      padding: 0 $space !important;
+    }
 
-  .mat-mdc-card-actions {
-    padding: 0 $space $space !important;
+    .mat-mdc-card-actions {
+      padding: 0 $space $space !important;
+    }
   }
 }
 

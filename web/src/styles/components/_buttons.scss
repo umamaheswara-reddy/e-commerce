@@ -7,3 +7,9 @@
     container-elevation-shadow: -4px -4px 5px 0px rgba(0, 0, 0, 0.5),
   ));
 }
+
+button.mdc-button{
+  .mdc-button__label{
+    text-wrap-mode: nowrap;
+  }
+}
