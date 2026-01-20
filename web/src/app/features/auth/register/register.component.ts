@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatIconModule } from '@angular/material/icon';
 import { FormService } from '../../../shared/services/form.service';
 import { IRegisterFormControls } from '../../../shared/types/form.types';
 import { FormGroup } from '@angular/forms';
@@ -20,6 +21,7 @@ import { SelectComponent } from '../../../ui/components/e-select/e-select.compon
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    MatIconModule,
     ButtonComponent,
     InputComponent,
     CardComponent,
@@ -95,7 +97,7 @@ export class RegisterComponent {
           if (result.success) {
             this.authFacade.navigateToHome();
           } else {
-            this.registerError.set(result.message || 'Registration failed');
+            this.registerError.set(result.errors || result.data?.message || 'Registration failed');
           }
         },
         error: (error: any) => {

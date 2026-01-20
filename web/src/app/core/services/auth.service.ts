@@ -21,12 +21,15 @@ export interface User {
 
 export interface AuthResponse {
   success: boolean;
-  user: User;
-  userId?: string;
-  token?: string;
-  message?: string;
+  data?: {
+    message: string;
+    userId: string;
+    token: string;
+    user: User;
+    tenantId: string | null;
+  };
   errors?: string;
-  tenantId?: string;
+  statusCode: number;
 }
 
 export interface IAuthResult {
@@ -58,18 +61,18 @@ export class AuthService {
   login(email: string, password: string) {
     return this.http.post<AuthResponse>(`${this.API_BASE_URL}/login`, { email, password }).pipe(
       map((response) => {
-        if (response.success && response.token) {
+        if (response.success && response.data?.token) {
           this.setSession(
             {
-              id: response.userId?.toString() ?? '',
+              id: response.data.userId?.toString() ?? '',
               email,
-              name: response.user.name,
-              role: response.user.role ?? 'user',
+              name: response.data.user.name,
+              role: response.data.user.role ?? 'user',
             },
-            response.token
+            response.data.token
           );
         }
-        return { success: response.success, message: response.message } as IAuthResult;
+        return { success: response.success, message: response.data?.message } as IAuthResult;
       })
     );
   }
@@ -87,19 +90,19 @@ export class AuthService {
       .post<AuthResponse>(`${this.API_BASE_URL}/register`, userData)
       .pipe(
         map((response) => {
-          if (response.success && response.token) {
+          if (response.success && response.data?.token) {
             this.setSession(
               {
-                id: response.userId?.toString() || '',
+                id: response.data.userId?.toString() || '',
                 email: userData.email,
                 name: `${userData.firstName} ${userData.lastName}`,
                 role: 'user',
               },
-              response.token
+              response.data.token
             );
           }
           return response;
-        })        
+        })
       );
   }
 

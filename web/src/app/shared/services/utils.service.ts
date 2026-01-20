@@ -19,11 +19,10 @@ export class UtilsService {
 
   /**
    * Validates password strength requirements:
-   * - At least 8 characters
+   * - At least 6 characters
    * - Contains uppercase letter
-   * - Contains lowercase letter
    * - Contains numeric digit
-   * - Contains special character
+   * - Contains non-alphanumeric character
    * @param password - The password string to validate
    * @returns boolean indicating if the password meets strength requirements
    */
@@ -31,14 +30,11 @@ export class UtilsService {
     if (!password) return false;
 
     const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
     const hasNumeric = /[0-9]/.test(password);
-    const hasSpecial = /[#?!@$%^&*-]/.test(password);
-    const isValidLength = password.length >= 8;
+    const hasNonAlphanumeric = /[^a-zA-Z0-9]/.test(password);
+    const isValidLength = password.length >= 6;
 
-    return (
-      hasUpperCase && hasLowerCase && hasNumeric && hasSpecial && isValidLength
-    );
+    return hasUpperCase && hasNumeric && hasNonAlphanumeric && isValidLength;
   }
 
   /**

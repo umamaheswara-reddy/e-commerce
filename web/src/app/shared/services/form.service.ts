@@ -111,7 +111,7 @@ export class FormService {
     }
 
     if (control.errors?.['passwordStrength']) {
-      return 'Password must contain uppercase, lowercase, number, and special character';
+      return 'Password must have at least one uppercase letter, one digit, and one non-alphanumeric character';
     }
 
     return 'Invalid value';
@@ -264,7 +264,7 @@ export class FormService {
           nonNullable: true,
         }),
         password: new FormControl('', {
-          validators: [Validators.required, Validators.minLength(6)],
+          validators: [Validators.required, this.passwordStrengthValidator()],
           nonNullable: true,
         }),
         confirmPassword: new FormControl('', {

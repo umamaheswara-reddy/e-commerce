@@ -76,6 +76,7 @@ export class ControlValueAccessorDirective<T>
     pattern: `${label} format is invalid.`,
     min: `${label} must be at least ${errors['min']?.min}.`,
     max: `${label} must be less than or equal to ${errors['max']?.max}.`,
+    passwordStrength: 'Password must have at least one uppercase letter, one digit, and one non-alphanumeric character.',
   };
 
     const firstKey = Object.keys(errors)[0];
