@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Identity.Application.EventHandlers;
 
-public sealed class UserRegisteredIntegrationEventHandler(IEventPublisher eventPublisher) : INotificationHandler<UserRegisteredDomainEvent>
+public sealed class UserRegisteredIntegrationEventHandler(IIntegrationEventPublisher eventPublisher) : INotificationHandler<UserRegisteredDomainEvent>
 {
     public async Task Handle(UserRegisteredDomainEvent notification, CancellationToken cancellationToken)
     {

@@ -3,6 +3,7 @@ using ECommerce.Common.Constants;
 using Identity.Application.Abstractions;
 using Identity.Application.Login.DTOs;
 using Identity.Domain.Entities;
+using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -34,15 +35,12 @@ public class LoginCommandHandler(
 
         var token = tokenGenerator.GenerateToken(user, role);
 
-        var response = new LoginResponseDto
-        {
-            Success = true,
-            Message = "Login successful.",
-            UserId = user.Id,
-            Token = token,
-            User = user,
-            TenantId = user.TenantId
-        };
+        var response = user.Adapt<LoginResponseDto>();
+        response.Message = "Login successful.";
+        response.Token = token;
+        response.User = user.Adapt<UserDto>();
+        response.User.Name = user.UserName ?? user.Email ?? string.Empty;
+        response.User.Role = role;
 
         return Result<LoginResponseDto>.Success(response);
     }

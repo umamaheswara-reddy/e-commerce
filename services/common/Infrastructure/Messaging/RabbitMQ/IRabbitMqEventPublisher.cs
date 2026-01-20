@@ -1,53 +1,30 @@
 ﻿using ECommerce.Common.Infrastructure.Abstractions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Polly;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Exceptions;
-using System.Collections.Concurrent;
-using System.Net.Security;
-using System.Security.Authentication;
 using System.Text;
 using System.Text.Json;
 
-namespace ECommerce.Common.Infrastructure.Services;
+namespace ECommerce.Common.Infrastructure.Messaging.RabbitMQ;
 
 /// <summary>
 /// A resilient, convention-based RabbitMQ message publisher for integration events.
 /// Supports retry, TLS, and connection reuse.
 /// </summary>
-public sealed class RabbitMQMessagePublisher : IMessagePublisher, IAsyncDisposable
+public sealed class IRabbitMqEventPublisher : IMessagePublisher
 {
-    private readonly IConfiguration _configuration;
-    private readonly ILogger<RabbitMQMessagePublisher> _logger;
-    private readonly ConnectionFactory _factory;
-    private IConnection? _connection;
+    private readonly ILogger<IRabbitMqEventPublisher> _logger;
+    private readonly RabbitMQConnectionService _connectionService;
     private readonly AsyncPolicy _retryPolicy;
     private readonly JsonSerializerOptions _jsonOptions;
 
-    // Cache exchange declarations to avoid duplicate broker calls
-    private static readonly ConcurrentDictionary<string, bool> DeclaredExchanges = new();
-
-    public RabbitMQMessagePublisher(
-        IConfiguration configuration,
-        ILogger<RabbitMQMessagePublisher> logger)
+    public IRabbitMqEventPublisher(
+        RabbitMQConnectionService connectionService,
+        ILogger<IRabbitMqEventPublisher> logger)
     {
-        _configuration = configuration;
+        _connectionService = connectionService;
         _logger = logger;
-
-        // Configure connection factory
-        _factory = new ConnectionFactory
-        {
-            HostName = _configuration["RabbitMQ:HostName"],
-            UserName = _configuration["RabbitMQ:UserName"],
-            Password = _configuration["RabbitMQ:Password"],
-            Port = int.Parse(_configuration["RabbitMQ:Port"] ?? "5672"),
-            // Disable SSL for development environment
-            Ssl = new SslOption
-            {
-                Enabled = false
-            }
-        };
 
         // Configure JSON serialization options
         _jsonOptions = new JsonSerializerOptions
@@ -92,10 +69,7 @@ public sealed class RabbitMQMessagePublisher : IMessagePublisher, IAsyncDisposab
 
         await _retryPolicy.ExecuteAsync(async () =>
         {
-            var connection = await GetOrCreateConnectionAsync(cancellationToken);
-            await using var channel = await connection.CreateChannelAsync(cancellationToken:cancellationToken);
-
-            await EnsureExchangeDeclaredAsync(channel, exchangeName, cancellationToken);
+            await using var channel = await _connectionService.CreateChannelAsync(cancellationToken);
 
             var message = JsonSerializer.Serialize(eventData, _jsonOptions);
             var body = Encoding.UTF8.GetBytes(message);
@@ -133,61 +107,16 @@ public sealed class RabbitMQMessagePublisher : IMessagePublisher, IAsyncDisposab
     #region 🔧 Helpers
 
     /// <summary>
-    /// Creates or reuses a persistent RabbitMQ connection.
-    /// </summary>
-    private async Task<IConnection> GetOrCreateConnectionAsync(CancellationToken cancellationToken)
-    {
-        if (_connection?.IsOpen == true)
-            return _connection;
-
-        try
-        {
-            _connection = await _factory.CreateConnectionAsync(cancellationToken);
-            _logger.LogInformation("RabbitMQ connection established to {Host}", _factory.HostName);
-        }
-        catch (AuthenticationFailureException)
-        {
-            throw new RabbitMqAuthenticationException();
-        }
-        catch (BrokerUnreachableException)
-        {
-            throw new RabbitMqUnreachableException();
-        }
-
-        return _connection;
-    }
-
-    /// <summary>
-    /// Declares the exchange if it hasn't been declared already.
-    /// </summary>
-    private static async Task EnsureExchangeDeclaredAsync(IChannel channel, string exchangeName, CancellationToken cancellationToken)
-    {
-        if (DeclaredExchanges.ContainsKey(exchangeName))
-            return;
-
-        await channel.ExchangeDeclareAsync(
-            exchange: exchangeName,
-            type: ExchangeType.Direct,
-            durable: true,
-            autoDelete: false,
-            arguments: null,
-            cancellationToken: cancellationToken);
-
-        DeclaredExchanges.TryAdd(exchangeName, true);
-    }
-
-    /// <summary>
     /// Converts a namespace-based event type to a domain-specific exchange name.
     /// </summary>
     private static string ResolveExchangeName<TEvent>()
     {
         var ns = typeof(TEvent).Namespace ?? "ecommerce";
-        var domain = ns.Split('.')
-            .FirstOrDefault(n => n.EndsWith("Domain", StringComparison.OrdinalIgnoreCase))
-            ?.Replace("Domain", "", StringComparison.OrdinalIgnoreCase)
-            .ToLowerInvariant() ?? "ecommerce";
+        var domainName = ns.Contains(".IntegrationEvents")
+                        ? ns.Split('.').Reverse().Skip(1).First()
+                        : "ecommerce";
 
-        return $"{domain}-events";
+        return $"{domainName}-events";
     }
 
     /// <summary>
@@ -203,24 +132,6 @@ public sealed class RabbitMQMessagePublisher : IMessagePublisher, IAsyncDisposab
         return string.Concat(name.Select((ch, i) =>
             i > 0 && char.IsUpper(ch) ? "." + char.ToLower(ch) : char.ToLower(ch).ToString()))
             .Trim('.');
-    }
-
-    #endregion
-
-    #region 🧹 Cleanup
-
-    public async ValueTask DisposeAsync()
-    {
-        try
-        {
-            if (_connection is { IsOpen: true })
-                await _connection.CloseAsync();
-            _connection?.Dispose();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex, "Error disposing RabbitMQ connection.");
-        }
     }
 
     #endregion

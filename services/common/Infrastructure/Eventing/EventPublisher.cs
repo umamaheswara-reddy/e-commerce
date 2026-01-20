@@ -1,13 +1,13 @@
 using ECommerce.Common.Infrastructure.Abstractions;
 
-namespace ECommerce.Common.Infrastructure.Services;
+namespace ECommerce.Common.Infrastructure.Eventing;
 
-public class EventPublisher(IMessagePublisher messagePublisher) : IEventPublisher
+public class EventPublisher(IMessagePublisher messagePublisher) : IIntegrationEventPublisher
 {
     private readonly IMessagePublisher _messagePublisher = messagePublisher;
 
     public async Task PublishAsync<TEvent>(TEvent @integrationEvent
-        , IDictionary<string, string>? metadata = null
+        , IntegrationEventMetadata? metadata = null
         , CancellationToken cancellationToken = default) where TEvent : IIntegrationEvent
     {
         ArgumentNullException.ThrowIfNull(@integrationEvent);

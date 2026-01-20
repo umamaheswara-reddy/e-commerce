@@ -2,7 +2,7 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ECommerce.Common.Infrastructure.Services;
+namespace ECommerce.Common.Infrastructure.Eventing;
 public sealed class DomainEventDispatcher(IMediator mediator)
 {
     private readonly IMediator _mediator = mediator;

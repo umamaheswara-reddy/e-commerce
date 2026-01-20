@@ -1,6 +1,7 @@
 using ECommerce.Common.Behaviors;
 using ECommerce.Common.Infrastructure.Abstractions;
-using ECommerce.Common.Infrastructure.Services;
+using ECommerce.Common.Infrastructure.Eventing;
+using ECommerce.Common.Infrastructure.Messaging.RabbitMQ;
 using ECommerce.Common.Swagger;
 using Identity.Application.Abstractions;
 using Identity.Application.Registration.Abstractions;
@@ -56,15 +57,17 @@ builder.Services.AddScoped<IUserValidator, UserValidator>();
 builder.Services.AddScoped<IUserFactory, UserFactory>();
 builder.Services.AddScoped<IRoleAssigner, RoleAssigner>();
 builder.Services.AddScoped<ITokenGenerator, TokenGenerator>();
-builder.Services.AddScoped<IEventPublisher, EventPublisher>();
+builder.Services.AddScoped<IIntegrationEventPublisher, EventPublisher>();
 
 // Register strategy factory and strategies (needed for RegisterUserCommandHandler)
 builder.Services.AddScoped<IRegistrationStrategyFactory, RegistrationStrategyFactory>();
 builder.Services.AddScoped<SellerAdminRegistrationStrategy>();
 builder.Services.AddScoped<CustomerRegistrationStrategy>();
 
-builder.Services.AddSingleton<IMessagePublisher, RabbitMQMessagePublisher>();
+builder.Services.AddSingleton<RabbitMQConnectionService>();
+builder.Services.AddSingleton<IMessagePublisher, IRabbitMqEventPublisher>();
 builder.Services.AddScoped<DataSeeder>();
+builder.Services.AddScoped<IRabbitMQInfrastructureSetup, IRabbitMQTopologyManager>();
 
 // Add CORS policy
 builder.Services.AddCors(options =>
@@ -181,6 +184,42 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Initialize RabbitMQ infrastructure on startup
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var rabbitMQSetup = services.GetRequiredService<IRabbitMQInfrastructureSetup>();
+
+        // Define queues for identity service
+        var queueDefinitions = new[]
+        {
+            new QueueDefinition
+            {
+                QueueName = "account-registered-queue",
+                Exchange = "Identity-events",
+                RoutingKeys = new[] { "account.registered" },
+                DeadLetterExchange = "identity-events.dlx",
+                DeadLetterQueue = "identity-events.dlq",
+                DeadLetterRoutingKey = "account.registered",
+                MessageTtl = 86400000, // 24 hours
+                QueueType = "classic"
+            }
+        };
+
+        await rabbitMQSetup.SetupInfrastructureAsync(queueDefinitions);
+        logger.LogInformation("RabbitMQ infrastructure initialized successfully");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred while initializing RabbitMQ infrastructure.");
+        // Note: Not throwing here as RabbitMQ setup failure shouldn't prevent app startup
+        // The app can still function, just without proper queue infrastructure
+    }
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -194,11 +233,12 @@ if (app.Environment.IsDevelopment() == false)
     app.UseHsts();
 }
 
-// Map health checks endpoint
-app.MapHealthChecks("/health");
-
 app.UseCors("AllowAngularDev");
 app.UseAuthorization();
+
 app.MapControllers();
+
+// Map health checks endpoint
+app.MapHealthChecks("/health");
 
 app.Run();

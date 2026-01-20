@@ -1,5 +1,4 @@
-﻿using ECommerce.Common.Domain;
-using ECommerce.Common.Infrastructure.Services;
+﻿using ECommerce.Common.Infrastructure.Eventing;
 using Identity.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;

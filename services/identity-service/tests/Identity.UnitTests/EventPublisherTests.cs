@@ -1,6 +1,6 @@
 using ECommerce.Common.Contracts.Identity.IntegrationEvents;
 using ECommerce.Common.Infrastructure.Abstractions;
-using ECommerce.Common.Infrastructure.Services;
+using ECommerce.Common.Infrastructure.Eventing;
 using Identity.Domain.Entities;
 using Microsoft.Extensions.Logging;
 using Moq;

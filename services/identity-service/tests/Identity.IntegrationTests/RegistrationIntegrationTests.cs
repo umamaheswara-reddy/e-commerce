@@ -1,6 +1,7 @@
 ﻿using ECommerce.Common.Behaviors;
 using ECommerce.Common.Infrastructure.Abstractions;
-using ECommerce.Common.Infrastructure.Services;
+using ECommerce.Common.Infrastructure.Eventing;
+using ECommerce.Common.Infrastructure.Messaging.RabbitMQ;
 using Identity.Application.Abstractions;
 using Identity.Application.Registration.Abstractions;
 using Identity.Application.Registration.Commands;
@@ -61,8 +62,8 @@ public class RegistrationIntegrationTests : IDisposable
         services.AddScoped<IUserFactory, UserFactory>();
         services.AddScoped<IRoleAssigner, RoleAssigner>();
         services.AddScoped<ITokenGenerator, TokenGenerator>();
-        services.AddScoped<IEventPublisher, EventPublisher>();
-        services.AddScoped<IMessagePublisher, RabbitMQMessagePublisher>();
+        services.AddScoped<IIntegrationEventPublisher, EventPublisher>();
+        services.AddScoped<IMessagePublisher, IRabbitMqEventPublisher>();
         services.AddScoped<DataSeeder>();
 
         // Register registration strategies
